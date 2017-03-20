@@ -1,0 +1,24 @@
+{
+  "name": "ts-ody",
+  "version": "0.0.1",
+  "description": "",
+  "main": "bin/odyssey.js",
+  "bin": {
+    "ts-ody": "odyssey.js"
+  },
+  "scripts": {
+    "start": "tsc && node bin/odyssey.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^7.0.8",
+    "gulp": "^3.9.1",
+    "tslint": "^4.5.1",
+    "typescript": "^2.2.1"
+  },
+  "dependencies": {
+    "commander": "^2.9.0"
+  }
+}

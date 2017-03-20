@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "module": "none",
+    "target": "es6",
+    "noImplicitAny": false,
+    "sourceMap": true,
+    "alwaysStrict": true,
+    "outDir": "bin"
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "bin"
+  ]
+}
