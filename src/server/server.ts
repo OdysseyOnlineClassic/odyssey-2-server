@@ -1,15 +1,19 @@
 import * as net from 'net';
-import {ClientManager} from './clients/ClientManager';
+import {ClientManager} from './clients/client-manager';
 import {Client} from './clients/client';
+import {Data} from './data/data';
+import {GameState} from './game-state';
 
 export class OdysseyServer {
-  readonly port;
+  private data: Data;
+  private gameState: GameState;
   private server: net.Server;
-  private clients: clients.ClientManager;
+  private clients: ClientManager;
 
-  constructor(port: number = 5150) {
-    this.clients = new clients.ClientManager();
-    this.port = port;
+  constructor(readonly port: number = 5150) {
+    this.data = new Data('server.dat', {});
+    this.gameState = new GameState(this.data);
+    this.clients = new ClientManager(this.gameState);
     this.server = net.createServer((socket: net.Socket) => {this.onConnection(socket)});
   }
 
@@ -20,7 +24,5 @@ export class OdysseyServer {
 
   protected onConnection(socket: net.Socket){
     let client = this.clients.createClient(socket);
-
-
   }
 }

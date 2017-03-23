@@ -7,7 +7,7 @@
     "ts-ody": "odyssey.js"
   },
   "scripts": {
-    "start": "tsc && node bin/odyssey.js",
+    "start": "tsc --target ES6 && node bin/odyssey.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -19,6 +19,7 @@
     "typescript": "^2.2.1"
   },
   "dependencies": {
-    "commander": "^2.9.0"
+    "commander": "^2.9.0",
+    "lokijs": "^1.4.3"
   }
 }

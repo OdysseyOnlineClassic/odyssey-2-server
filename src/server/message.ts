@@ -1,14 +1,11 @@
-import {Client} from './client';
+import {Client} from './clients/client';
 
 export class Message {
-  id: number = null;
-  client: Client;
-  length: number = null;
   data: Buffer;
 
   private bytesRead = 0;
 
-  constructor(id: number, length: number, client: Client) {
+  constructor(public id: number, public length: number, public client: Client) {
     this.id = id;
     this.length = length;
     this.client = client;
