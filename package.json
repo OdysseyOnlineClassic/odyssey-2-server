@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "",
   "main": "bin/odyssey.js",
+  "repository": "https://github.com/OdysseyClassicHistoryBook/odyssey-2-server.git",
   "bin": {
     "ts-ody": "odyssey.js"
   },
@@ -13,13 +14,17 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/bcrypt": "^1.0.0",
+    "@types/nedb": "^1.8.0",
     "@types/node": "^7.0.8",
     "gulp": "^3.9.1",
     "tslint": "^4.5.1",
     "typescript": "^2.2.1"
   },
   "dependencies": {
+    "bcrypt": "^1.0.2",
     "commander": "^2.9.0",
-    "lokijs": "^1.4.3"
+    "nedb": "^1.8.0",
+    "q": "^1.5.0"
   }
 }

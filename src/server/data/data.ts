@@ -1,15 +1,12 @@
-import * as Loki from 'lokijs';
-import { DataManager } from './data-manager';
+import * as NeDB from 'nedb';
 import { AccountDataManager } from './accounts';
 
-export class Data extends Loki {
+export class Data {
   private managers: any;
 
-  constructor(filename: string, options) {
-    super(filename, options);
-
+  constructor(dataFolder: string) {
     this.managers = {
-      'accounts': new AccountDataManager(this, 'accounts')
+      'accounts': new AccountDataManager(dataFolder)
     }
   }
 

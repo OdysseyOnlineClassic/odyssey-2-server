@@ -11,7 +11,7 @@ export class OdysseyServer {
   private clients: ClientManager;
 
   constructor(readonly port: number = 5150) {
-    this.data = new Data('server.dat', {});
+    this.data = new Data('data/');
     this.gameState = new GameState(this.data);
     this.clients = new ClientManager(this.gameState);
     this.server = net.createServer((socket: net.Socket) => {this.onConnection(socket)});

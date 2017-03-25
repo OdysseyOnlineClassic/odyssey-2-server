@@ -1,29 +1,34 @@
-import { DataManager } from './data-manager';
+import * as NeDB from 'nedb';
+import * as Q from 'q';
 
 export interface AccountDocument {
-  $loki?: number;
+  _id?: number;
   username: string;
   password: string;
   email?: string;
 }
 
-export class Account {
-  constructor(private account: AccountDocument) {
+export class AccountDataManager {
+  private data: NeDB;
+  constructor(dataFolder: string){
+    let options: NeDB.DataStoreOptions = {
+      filename: dataFolder + 'accounts.data',
+      autoload: true
+    }
+    this.data = new NeDB(options);
+
+    this.data.ensureIndex({
+      fieldName: 'username',
+      unique: true,
+      sparse: false
+    });
   }
-}
 
-export class AccountDataManager<AccountDocument> extends DataManager<AccountDocument> {
-
-  protected createCollection(collectionName: string) {
-    return this.data.addCollection<AccountDocument>(collectionName, {});
+  createAccount(username: string, cryptPassword: string) {
+    return Q.ninvoke(this.data, 'insert', {username: username, password: cryptPassword});
   }
 
-  createAccount(username: string, password: string) {
-    console.log(`Create Account in DB ${username}:${password}`);
-    this.collection.insert({username: username, password: password});
-  }
-
-  getAccount() {
-
+  getAccount(username: string) {
+    return Q.ninvoke(this.data, 'findOne', {username: username});
   }
 }

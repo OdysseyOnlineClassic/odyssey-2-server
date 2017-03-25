@@ -15,7 +15,6 @@ export class Client extends events.EventEmitter {
   }
 
   onData(chunk: Buffer) {
-    console.log(`Chunk: ${chunk.toString()}\n`);
     this.readMessage(chunk);
   }
 
@@ -48,14 +47,14 @@ export class Client extends events.EventEmitter {
     }
   }
 
-  sendMessage(msg: Message) {
-    let length: number = msg.data.length + 1;
+  sendMessage(id: number, data: Buffer) {
+    let length: number = data.length + 1;
     let buffer: Buffer = Buffer.allocUnsafe(length + 4);
-    let checksum: number = msg.id;
-    let len = msg.data.length;
+    let checksum: number = id;
+    let len = data.length;
 
     for(let i = 0; i < len; i++) {
-      checksum += msg.data.readInt8(i);
+      checksum += data.readInt8(i);
     }
 
     checksum = checksum * 20 % 194;
@@ -66,8 +65,8 @@ export class Client extends events.EventEmitter {
     buffer.writeUInt8(length % 256, 1);
     buffer.writeInt8(checksum, 2);
     buffer.writeInt8(this.packetOrder, 3);
-    buffer.writeInt8(msg.id, 4);
-    msg.data.copy(buffer, 5, 0);
+    buffer.writeInt8(id, 4);
+    data.copy(buffer, 5, 0);
 
     this.packetOrder++;
     if(this.packetOrder > 200) {

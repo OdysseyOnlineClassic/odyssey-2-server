@@ -32,4 +32,12 @@ export class Message {
   isComplete():boolean {
     return this.bytesRead === this.length;
   }
+
+  send() {
+    if(!this.client) {
+      throw new TypeError('Client is null. Cannot send to null client');
+    }
+
+    this.client.sendMessage(this.id, this.data);
+  }
 }
