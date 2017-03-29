@@ -8,6 +8,7 @@ import { AccountDataManager } from '../data/accounts';
 import { AccountDocument } from '../data/accounts';
 import { CharacterDataManager } from '../data/characters';
 import { CharacterDocument } from '../data/characters';
+import { Client } from '../clients/client';
 
 export class AccountsProcessor extends MessageProcessor {
   protected processors: { [id: number]: ProcessFunction } = {};
@@ -18,7 +19,7 @@ export class AccountsProcessor extends MessageProcessor {
     super(game);
     this.processors[0] = this.createAccount.bind(this);
     this.processors[1] = this.login.bind(this);
-    this.processors[2] = this.createAccount.bind(this);
+    this.processors[2] = this.createCharacter.bind(this);
 
     this.accountData = game.data.getManager('accounts');
     this.characterData = game.data.getManager('characters');
@@ -38,17 +39,15 @@ export class AccountsProcessor extends MessageProcessor {
     let salt = bcrypt.genSaltSync();
     password = bcrypt.hashSync(password, salt);
 
-    this.accountData.createAccount(username, password)
-      .then((account) => {
-        //Successfully created
-        msg.client.sendMessage(2, Buffer.allocUnsafe(0));
-      })
-      .catch((err) => {
-        if (err.errorType == 'uniqueViolated') {
-          //Account already exists
-          msg.client.sendMessage(1, Buffer.from([1]));
-        }
-      });
+    this.accountData.createAccount(username, password, (account, err) => {
+      if (err.errorType == 'uniqueViolated') {
+        //Account already exists
+        msg.client.sendMessage(1, Buffer.from([1]));
+        return;
+      }
+
+      msg.client.sendMessage(2, Buffer.allocUnsafe(0));
+    });
   }
 
   login(msg: Message) {
@@ -58,24 +57,36 @@ export class AccountsProcessor extends MessageProcessor {
     let username = strings[0];
     let password = strings[1];
 
-    let self = this;
-    this.accountData.getAccount(username)
-      .then((account: AccountDocument) => {
-        if (!(account && bcrypt.compareSync(password, account.password))) {
-          msg.client.sendMessage(0, Buffer.from([1]));
+    this.accountData.getAccount(username, (err, account) => {
+      if (err) {
+        msg.client.sendMessage(0, Buffer.from('\0Unknown Error'));
+        return;
+      }
+
+      if (!(account && bcrypt.compareSync(password, account.password))) {
+        msg.client.sendMessage(0, Buffer.from([1]));
+        return;
+      }
+
+      //TODO Check for Ban
+
+      msg.client.account = account;
+
+      this.characterData.getCharacter(account._id, (err, character) => {
+        if (err) {
+          //TODO handle errors
+        }
+
+        if (!character) {
+          msg.client.sendMessage(3, Buffer.allocUnsafe(0));
           return;
         }
 
-        /*self.characterData.getCharacter(account._id)
-          .then((character) => {
-            if(!character) {
-              msg.client.sendMessage(3, Buffer.allocUnsafe(0));
-            }
-          })*/
-      })
-      .catch((err) => {
-        console.log(err);
+        this.sendCharacter(msg.client, character);
       });
+
+
+    });
   }
 
   createCharacter(msg: Message) {
@@ -91,25 +102,50 @@ export class AccountsProcessor extends MessageProcessor {
     }
 
     let character: CharacterDocument = {
+      accountId: msg.client.account._id,
       name: name,
       class: classIndex,
       female: female,
       sprite: 1, //TODO calculate or load sprite
       description: description,
+      status: 1,
       position: {}, //TODO
       stats: {}, //TODO
       inventory: new Array(20), //TODO
       bank: new Array(20), //TODO
-      guild: null,
+      guild: {
+        id: null,
+        rank: 0,
+        slot: 0,
+        invite: 0
+      },
       extended: null,
       timers: {}, //TODO
       alive: true
     };
 
-    this.characterData.createCharacter(character)
-      .then((character) => {
-        //Character successfully created
-        //Update account to point to character
-      })
+    this.characterData.createCharacter(character, (err, character) => {
+      this.sendCharacter(msg.client, character);
+    });
+  }
+
+  protected sendCharacter(client: Client, character: CharacterDocument): void {
+    let length = 15 + character.name.length + character.description.length;
+    let data = Buffer.allocUnsafe(length);
+    data.writeUInt8(character.class, 0);
+    data.writeUInt8(character.female ? 0 : 1, 1);
+    data.writeUInt16BE(character.sprite, 2);
+    data.writeUInt8(character.stats.level, 4);
+    data.writeUInt8(character.status, 5);
+    data.writeUInt8(character.guild.id, 6);
+    data.writeUInt8(character.guild.rank, 7);
+    data.writeUInt8(client.account.access, 8);
+    data.writeUInt8(0, 9); //TODO player index
+    data.writeUInt32BE(character.stats.experience, 10);
+    data.write(character.name, 11);
+    data.writeUInt8(0, character.name.length + 11);
+    data.write(character.description, character.name.length + 12);
+
+    client.sendMessage(3, data);
   }
 }

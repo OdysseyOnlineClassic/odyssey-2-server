@@ -1,17 +1,31 @@
 import * as net from 'net';
 import * as events from 'events';
 import { Message } from '../message';
+import { AccountDocument } from '../data/accounts';
 
 export class Client extends events.EventEmitter {
   readonly socket: net.Socket;
   private msg: Message = null;
   private packetOrder: number = 0;
+  private _account: AccountDocument;
 
   constructor(socket: net.Socket) {
     super();
     this.socket = socket;
     socket.on('data', (chunk: Buffer) => { this.onData(chunk); });
     socket.on('end', () => { this.onEnd(); });
+  }
+
+  get account() {
+    return this._account;
+  }
+
+  set account(account: AccountDocument) {
+    if(this._account) {
+      throw new Error('Client has already been assigned an account.');
+    }
+
+    this._account = account
   }
 
   onData(chunk: Buffer) {

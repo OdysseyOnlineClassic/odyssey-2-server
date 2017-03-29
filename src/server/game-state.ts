@@ -17,10 +17,12 @@ export class GameState implements GameStateInterface {
   constructor(public readonly data: Data.Data) {
     this.processors[0] = new AccountsProcessor(this);
     this.processors[1] = this.processors[0];
+    this.processors[2] = this.processors[0];
     //this.processors[61] =
   }
 
   processMessage(msg: Message) {
+    console.log(`Message ${msg.id}`);
     if (this.processors[msg.id]) {
       this.processors[msg.id].process(msg);
     }

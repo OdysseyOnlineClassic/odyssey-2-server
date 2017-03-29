@@ -3,17 +3,26 @@ import * as Q from 'q';
 import * as path from 'path';
 import { DataDocument } from './data';
 
+/**
+ * Represents a Player's Character
+ *
+ * @export
+ * @interface CharacterDocument
+ * @extends {DataDocument}
+ */
 export interface CharacterDocument extends DataDocument {
+  accountId: string;
   name: string;
   class: any; //Class interface?
   female: boolean;
   sprite: number;
   description?: string;
+  status: number;
   position: any; //Position interface
   stats: any; //Stats interface
   inventory: any; //Inventory interface
   bank: any; //Bank interface (extends inventory?)
-  guild: any; //Guild Interface
+  guild: CharacterGuild; //Guild Interface
   extended: any; //Extended data to hold whatever scripts want
   timers: any; //Flood, walk, etc.
   alive: boolean;
@@ -95,8 +104,16 @@ export interface CharacterDocument extends DataDocument {
   Bookmark As Variant*/
 }
 
+/**
+ *
+ * Represents the available Character Classes
+ *
+ * @export
+ * @interface CharacterClassDocument
+ * @extends {DataDocument}
+ */
 export interface CharacterClassDocument extends DataDocument {
-  index: number; //Old system references by index
+  index: number; //Old code referenced them by index
   maxHP: number;
   maxEnergy: number;
   maxMana: number;
@@ -116,7 +133,7 @@ export class CharacterDataManager {
     });
 
     this.characterData.ensureIndex({
-      fieldName: 'name',
+      fieldName: '_name',
       unique: true,
       sparse: false
     });
@@ -133,7 +150,21 @@ export class CharacterDataManager {
     });
   }
 
-  createCharacter(character: CharacterDocument) {
-    return Q.ninvoke(this.characterData, 'insert', character);
+  createCharacter(character: CharacterDocument, cb: Callback): void {
+    this.characterData.insert(character, cb);
   }
+
+  getCharacter(accountId: string, cb: Callback) {
+    this.characterData.findOne({accountId: accountId}, cb);
+  }
+
+}
+
+interface Callback { (Error, CharacterDocument): void }
+
+interface CharacterGuild {
+  id: number, //Guild numeric id, old system used byte (255)
+  rank: number,
+  slot: number, //TODO what is this for in old code?
+  invite: number //Current invite to join Guild by number id
 }

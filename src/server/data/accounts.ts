@@ -1,7 +1,7 @@
 import * as NeDB from 'nedb';
 import * as Q from 'q';
 import * as path from 'path';
-import {DataDocument} from './data';
+import { DataDocument } from './data';
 
 export interface AccountDocument extends DataDocument {
   username: string;
@@ -13,7 +13,7 @@ export interface AccountDocument extends DataDocument {
 export class AccountDataManager {
   private data: NeDB;
 
-  constructor(dataFolder: string){
+  constructor(dataFolder: string) {
     let options: NeDB.DataStoreOptions = {
       filename: dataFolder + path.sep + 'accounts.data',
       autoload: true
@@ -27,11 +27,13 @@ export class AccountDataManager {
     });
   }
 
-  createAccount(username: string, cryptPassword: string) {
-    return Q.ninvoke(this.data, 'insert', {username: username, password: cryptPassword, access: 0});
+  createAccount(username: string, cryptPassword: string, cb: Callback): void {
+    this.data.insert({ username: username, password: cryptPassword, access: 0 }, cb);
   }
 
-  getAccount(username: string) {
-    return Q.ninvoke(this.data, 'findOne', {username: username});
+  getAccount(username: string, cb: Callback): void {
+    this.data.findOne({ username: username }, cb);
   }
 }
+
+interface Callback { (Error, AccountDocument): void }
