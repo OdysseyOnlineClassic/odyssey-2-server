@@ -10,7 +10,12 @@ export interface AccountDocument extends DataDocument {
   email?: string;
 }
 
-export class AccountDataManager {
+export interface AccountDataManagerInterface {
+  createAccount(username: string, cryptPassword: string, cb: Callback): void,
+  getAccount(username: string, cb: Callback): void
+}
+
+export class AccountDataManager implements AccountDataManagerInterface {
   private data: NeDB;
 
   constructor(dataFolder: string) {

@@ -122,6 +122,11 @@ export interface CharacterClassDocument extends DataDocument {
   startMana: number;
 }
 
+export interface CharacterDataManagerInterface {
+  createCharacter(character: CharacterDocument, cb: Callback): void,
+  getCharacter(accountId: string, cb: Callback)
+}
+
 export class CharacterDataManager {
   private characterData: NeDB;
   private classData: NeDB;

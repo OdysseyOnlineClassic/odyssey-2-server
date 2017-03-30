@@ -3,7 +3,12 @@ import * as events from 'events';
 import { Message } from '../message';
 import { AccountDocument } from '../data/accounts';
 
-export class Client extends events.EventEmitter {
+export interface ClientInterface {
+  account: AccountDocument,
+  sendMessage(id: number, data: Buffer);
+}
+
+export class Client extends events.EventEmitter implements ClientInterface {
   readonly socket: net.Socket;
   private msg: Message = null;
   private packetOrder: number = 0;
@@ -28,11 +33,11 @@ export class Client extends events.EventEmitter {
     this._account = account
   }
 
-  onData(chunk: Buffer) {
+  protected onData(chunk: Buffer) {
     this.readMessage(chunk);
   }
 
-  readMessage(data: Buffer) {
+  protected readMessage(data: Buffer) {
     let remainingData: Buffer;
 
     if (!this.msg) {
@@ -90,7 +95,7 @@ export class Client extends events.EventEmitter {
     this.socket.write(buffer);
   }
 
-  onEnd() {
+  protected onEnd() {
     console.log('end');
   }
 }

@@ -1,6 +1,6 @@
 import * as bcrypt from 'bcrypt';
 import * as Q from 'q';
-import { GameStateInterface } from '../game-state-interface';
+import { GameStateInterface } from '../game-state';
 import { MessageProcessor } from './process';
 import { ProcessFunction } from './process';
 import { Message } from '../message';
@@ -8,7 +8,7 @@ import { AccountDataManager } from '../data/accounts';
 import { AccountDocument } from '../data/accounts';
 import { CharacterDataManager } from '../data/characters';
 import { CharacterDocument } from '../data/characters';
-import { Client } from '../clients/client';
+import { ClientInterface } from '../clients/client';
 
 export class AccountsProcessor extends MessageProcessor {
   protected processors: { [id: number]: ProcessFunction } = {};
@@ -40,9 +40,14 @@ export class AccountsProcessor extends MessageProcessor {
     password = bcrypt.hashSync(password, salt);
 
     this.accountData.createAccount(username, password, (account, err) => {
-      if (err.errorType == 'uniqueViolated') {
-        //Account already exists
-        msg.client.sendMessage(1, Buffer.from([1]));
+      if (err) {
+        if (err.errorType == 'uniqueViolated') {
+          //Account already exists
+          msg.client.sendMessage(1, Buffer.from([1]));
+        } else {
+          //Database Error
+          msg.client.sendMessage(1, Buffer.from([0, Array.from('Unknown Error')]));
+        }
         return;
       }
 
@@ -64,9 +69,12 @@ export class AccountsProcessor extends MessageProcessor {
       }
 
       if (!(account && bcrypt.compareSync(password, account.password))) {
+        //Invalid user/pass
         msg.client.sendMessage(0, Buffer.from([1]));
         return;
       }
+
+      //TODO Check if already logged in
 
       //TODO Check for Ban
 
@@ -129,7 +137,7 @@ export class AccountsProcessor extends MessageProcessor {
     });
   }
 
-  protected sendCharacter(client: Client, character: CharacterDocument): void {
+  protected sendCharacter(client: ClientInterface, character: CharacterDocument): void {
     let length = 15 + character.name.length + character.description.length;
     let data = Buffer.allocUnsafe(length);
     data.writeUInt8(character.class, 0);
