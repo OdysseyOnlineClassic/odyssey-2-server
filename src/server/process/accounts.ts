@@ -36,6 +36,16 @@ export class AccountsProcessor extends MessageProcessor {
     let username = strings[0];
     let password = strings[1];
 
+    if(username.length < 3 || username.length > 15) {
+      msg.client.sendMessage(1, Buffer.from([0, Array.from('Username must be between 3 and 15 characters')]));
+      return;
+    }
+
+    if(password.length < 8) {
+      msg.client.sendMessage(1, Buffer.from([0, Array.from('Password must be at least 8 characters')]));
+      return;
+    }
+
     let salt = bcrypt.genSaltSync();
     password = bcrypt.hashSync(password, salt);
 

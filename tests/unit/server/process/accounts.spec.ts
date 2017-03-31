@@ -47,10 +47,33 @@ describe('Accounts Processor', () => {
   })
 
   describe('Create Account', () => {
-    let msg = new Message(0, 3, client);
-    msg.data = Buffer.from([80, 0, 80]); // 'P\0P'
+    let data = 'username\0password';
+    let msg = new Message(0, data.length, client);
+    msg.data = Buffer.from(data);
 
-    describe('Handles Errors', () => {
+    describe('Username and Password Checks', () => {
+      it('should send error when username is < 3 characters long', () => {
+        let badData = 'u\0password';
+        let badMsg = new Message(0, badData.length, client);
+        badMsg.data = Buffer.from(badData);
+        accountsProcessor.process(badMsg);
+
+        assert.isTrue(sendMessage.calledOnce, `client.sendMessage was called ${sendMessage.callCount} times`);
+        assert.isTrue(sendMessage.calledWith(1, Buffer.from([0, Array.from('Username must be between 3 and 15 characters')])), `client.sendMessage was called with ${sendMessage.lastCall.args}`);
+      })
+
+      it('should send error when username is > 15 characters long', () => {
+        let badData = 'reallylongusername\0password';
+        let badMsg = new Message(0, badData.length, client);
+        badMsg.data = Buffer.from(badData);
+        accountsProcessor.process(badMsg);
+
+        assert.isTrue(sendMessage.calledOnce, `client.sendMessage was called ${sendMessage.callCount} times`);
+        assert.isTrue(sendMessage.calledWith(1, Buffer.from([0, Array.from('Username must be between 3 and 15 characters')])), `client.sendMessage was called with ${sendMessage.lastCall.args}`);
+      })
+    })
+
+    describe('Error Handling', () => {
       it('should send error when account already exists', () => {
         accountData.createAccount = sinon.stub().callsArgOnWith(2, accountsProcessor, null, { errorType: 'uniqueViolated' });
         accountsProcessor.process(msg);
@@ -77,5 +100,9 @@ describe('Accounts Processor', () => {
         assert.isTrue(sendMessage.calledWith(2, Buffer.allocUnsafe(0)), `client.sendMessage was called with ${sendMessage.lastCall.args}`);
       });
     })
+  })
+
+  describe('Login', () => {
+
   })
 })

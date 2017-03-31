@@ -9,8 +9,7 @@
   },
   "scripts": {
     "start": "tsc --target ES6 && node bin/odyssey.js",
-    "test": "mocha --recursive -r ts-node/register tests/**/*.spec.ts",
-    "test-debug": "mocha --debug-brk --recursive -r ts-node/register tests/**/*.spec.ts"
+    "test": "mocha --recursive -r ts-node/register tests/**/*.spec.ts"
   },
   "author": "",
   "license": "ISC",
