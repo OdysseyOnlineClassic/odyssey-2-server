@@ -1,11 +1,18 @@
 import * as net from 'net';
 import * as events from 'events';
 import { Message } from '../message';
+import { AccountDocument } from '../data/accounts';
 
-export class Client extends events.EventEmitter {
+export interface ClientInterface {
+  account: AccountDocument,
+  sendMessage(id: number, data: Buffer);
+}
+
+export class Client extends events.EventEmitter implements ClientInterface {
   readonly socket: net.Socket;
   private msg: Message = null;
   private packetOrder: number = 0;
+  private _account: AccountDocument;
 
   constructor(socket: net.Socket) {
     super();
@@ -14,11 +21,23 @@ export class Client extends events.EventEmitter {
     socket.on('end', () => { this.onEnd(); });
   }
 
-  onData(chunk: Buffer) {
+  get account() {
+    return this._account;
+  }
+
+  set account(account: AccountDocument) {
+    if(this._account) {
+      throw new Error('Client has already been assigned an account.');
+    }
+
+    this._account = account
+  }
+
+  protected onData(chunk: Buffer) {
     this.readMessage(chunk);
   }
 
-  readMessage(data: Buffer) {
+  protected readMessage(data: Buffer) {
     let remainingData: Buffer;
 
     if (!this.msg) {
@@ -76,7 +95,7 @@ export class Client extends events.EventEmitter {
     this.socket.write(buffer);
   }
 
-  onEnd() {
+  protected onEnd() {
     console.log('end');
   }
 }

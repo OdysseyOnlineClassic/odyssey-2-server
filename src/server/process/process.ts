@@ -1,4 +1,4 @@
-import { GameStateInterface } from '../game-state-interface';
+import { GameStateInterface } from '../game-state';
 import { Message } from '../message';
 
 export interface ProcessFunction {
