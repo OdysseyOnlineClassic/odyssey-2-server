@@ -21,7 +21,12 @@ export interface CharacterDocument extends DataDocument {
   stats: any; //Stats interface
   inventory: any; //Inventory interface
   bank: any; //Bank interface (extends inventory?)
-  guild: CharacterGuild; //Guild Interface
+  guild: {
+    id: number, //Guild numeric id, old system used byte (255)
+    rank: number,
+    slot: number, //TODO what is this for in old code?
+    invite: number //Current invite to join Guild by number id
+  },
   extended: any; //Extended data to hold whatever scripts want
   timers: any; //Flood, walk, etc.
   alive: boolean;
@@ -159,16 +164,9 @@ export class CharacterDataManager {
   }
 
   getCharacter(accountId: string, cb: Callback) {
-    this.characterData.findOne({accountId: accountId}, cb);
+    this.characterData.findOne({ accountId: accountId }, cb);
   }
 
 }
 
 interface Callback { (Error, CharacterDocument): void }
-
-interface CharacterGuild {
-  id: number, //Guild numeric id, old system used byte (255)
-  rank: number,
-  slot: number, //TODO what is this for in old code?
-  invite: number //Current invite to join Guild by number id
-}
