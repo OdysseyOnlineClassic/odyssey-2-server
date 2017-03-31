@@ -1,5 +1,4 @@
 import * as bcrypt from 'bcrypt';
-import * as Q from 'q';
 import { GameStateInterface } from '../game-state';
 import { MessageProcessor } from './process';
 import { ProcessFunction } from './process';
@@ -49,14 +48,14 @@ export class AccountsProcessor extends MessageProcessor {
     let salt = bcrypt.genSaltSync();
     password = bcrypt.hashSync(password, salt);
 
-    this.accountData.createAccount(username, password, (account, err) => {
+    this.accountData.createAccount(username, password, (err, account) => {
       if (err) {
         if (err.errorType == 'uniqueViolated') {
           //Account already exists
           msg.client.sendMessage(1, Buffer.from([1]));
         } else {
           //Database Error
-          msg.client.sendMessage(1, Buffer.from([0, Array.from('Unknown Error')]));
+          msg.client.sendMessage(1, Buffer.from([0, Array.from('\0Unknown Error')]));
         }
         return;
       }
@@ -74,7 +73,7 @@ export class AccountsProcessor extends MessageProcessor {
 
     this.accountData.getAccount(username, (err, account) => {
       if (err) {
-        msg.client.sendMessage(0, Buffer.from('\0Unknown Error'));
+        msg.client.sendMessage(0, Buffer.from('\0Unknown error while loading account'));
         return;
       }
 
@@ -92,7 +91,8 @@ export class AccountsProcessor extends MessageProcessor {
 
       this.characterData.getCharacter(account._id, (err, character) => {
         if (err) {
-          //TODO handle errors
+          msg.client.sendMessage(0, Buffer.from('\0Unknown error while loading character'))
+          return;
         }
 
         if (!character) {
@@ -107,7 +107,7 @@ export class AccountsProcessor extends MessageProcessor {
     });
   }
 
-  createCharacter(msg: Message) {
+  protected createCharacter(msg: Message) {
     let classIndex: number = msg.data.readUInt8(0);
     let female: boolean = msg.data.readUInt8(1) > 0;
     let dataString: string = msg.data.toString('utf-8', 2);
@@ -160,9 +160,9 @@ export class AccountsProcessor extends MessageProcessor {
     data.writeUInt8(client.account.access, 8);
     data.writeUInt8(0, 9); //TODO player index
     data.writeUInt32BE(character.stats.experience, 10);
-    data.write(character.name, 11);
-    data.writeUInt8(0, character.name.length + 11);
-    data.write(character.description, character.name.length + 12);
+    data.write(character.name, 14);
+    data.writeUInt8(0, character.name.length + 14);
+    data.write(character.description, character.name.length + 15);
 
     client.sendMessage(3, data);
   }
