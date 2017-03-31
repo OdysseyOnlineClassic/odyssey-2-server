@@ -1,5 +1,4 @@
 import * as NeDB from 'nedb';
-import * as Q from 'q';
 import * as path from 'path';
 import { DataDocument } from './data';
 
