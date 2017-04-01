@@ -24,3 +24,15 @@ export class Data implements DataInterface {
 export interface DataDocument {
   _id?: string;
 }
+
+/**
+ * Represents game data that's indexed numerically and versioned to reduce load times
+ *
+ * @export
+ * @interface GameDataDocument
+ * @extends {DataDocument}
+ */
+export interface GameDataDocument extends DataDocument {
+  id: number;
+  version: number;
+}
