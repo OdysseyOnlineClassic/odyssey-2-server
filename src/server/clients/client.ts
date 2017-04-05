@@ -26,7 +26,7 @@ export class Client extends events.EventEmitter implements ClientInterface {
   }
 
   set account(account: AccountDocument) {
-    if(this._account) {
+    if (this._account) {
       throw new Error('Client has already been assigned an account.');
     }
 
@@ -48,7 +48,7 @@ export class Client extends events.EventEmitter implements ClientInterface {
       }
 
       let length = data.readInt16BE(0) - 1; //We're not including the Packet ID
-      let msgId = data.readInt8(4);
+      let msgId = data.readUInt8(4);
       this.msg = new Message(msgId, length, this);
       remainingData = this.msg.append(data.slice(5));
     }
@@ -72,7 +72,7 @@ export class Client extends events.EventEmitter implements ClientInterface {
     let checksum: number = id;
     let len = data.length;
 
-    for(let i = 0; i < len; i++) {
+    for (let i = 0; i < len; i++) {
       checksum += data.readInt8(i);
     }
 
@@ -88,7 +88,7 @@ export class Client extends events.EventEmitter implements ClientInterface {
     data.copy(buffer, 5, 0);
 
     this.packetOrder++;
-    if(this.packetOrder > 200) {
+    if (this.packetOrder > 200) {
       this.packetOrder = 0;
     }
 

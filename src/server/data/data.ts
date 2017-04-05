@@ -1,6 +1,7 @@
 import * as NeDB from 'nedb';
 import { AccountDataManager } from './accounts';
 import { CharacterDataManager } from './characters';
+import { ObjectDataManager } from './objects';
 
 export interface DataInterface {
   getManager(name: string);
@@ -12,7 +13,8 @@ export class Data implements DataInterface {
   constructor(dataFolder: string) {
     this.managers = {
       'accounts': new AccountDataManager(dataFolder),
-      'characters': new CharacterDataManager(dataFolder)
+      'characters': new CharacterDataManager(dataFolder),
+      'objects': new ObjectDataManager(dataFolder)
     }
   }
 

@@ -95,7 +95,25 @@ export interface MapDataManagerInterface {
 }
 
 export class MapDataManager implements MapDataManagerInterface {
+  private data: NeDB;
 
+  constructor(dataFolder: string) {
+    let options: NeDB.DataStoreOptions = {
+      filename: dataFolder + path.sep + 'maps.data',
+      autoload: true
+    }
+    this.data = new NeDB(options);
+
+    this.data.ensureIndex({
+      fieldName: 'index',
+      unique: true,
+      sparse: false
+    })
+  }
+
+  getMap(index: number, cb: Callback) {
+    this.data.findOne({ index: index }, cb);
+  }
 }
 
 interface Callback { (Error, MapDocument): void }
