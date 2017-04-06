@@ -47,7 +47,7 @@ export class Client extends events.EventEmitter implements ClientInterface {
         return;
       }
 
-      let length = data.readInt16BE(0) - 1; //We're not including the Packet ID
+      let length = data.readUInt16BE(0) - 1; //We're not including the Packet ID
       let msgId = data.readUInt8(4);
       this.msg = new Message(msgId, length, this);
       remainingData = this.msg.append(data.slice(5));

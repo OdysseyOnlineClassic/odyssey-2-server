@@ -4,6 +4,7 @@ import { Message } from './message';
 import { MessageProcessor } from './process/process';
 import { AccountsProcessor } from './process/accounts';
 import { GameDataProcessor } from './process/game-data';
+import { RawProcessor } from './process/raw';
 
 export interface GameStateInterface {
   readonly data: DataInterface;
@@ -51,6 +52,8 @@ export class GameState implements GameStateInterface {
     this.processors[2] = this.processors[0];
     this.processors[7] = new GameDataProcessor(this);
     //this.processors[61] =
+
+    this.processors[170] = new RawProcessor(this);
   }
 
   processMessage(msg: Message) {
