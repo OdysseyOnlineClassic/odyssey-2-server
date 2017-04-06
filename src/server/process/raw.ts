@@ -35,7 +35,6 @@ export class RawProcessor extends MessageProcessor {
 
       msg.data.copy(extractedMsg.data, 0, offset + headerOffset, offset + headerOffset + length);
 
-      console.log(`Extracted ${extractedMsg.id}`);
       this.game.processMessage(extractedMsg);
 
       offset += length + headerOffset;

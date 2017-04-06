@@ -2,26 +2,23 @@ import * as NeDB from 'nedb';
 import * as path from 'path';
 import { GameDataDocument } from './data';
 
-export interface MagicDocument extends GameDataDocument {
+export interface suffixDocument extends GameDataDocument {
   name: string,
-  level: number,
-  class: number,
-  icon: number,
-  iconType: number,
-  castTimer: number,
-  description: string
+  type: number,
+  value: number,
+  natural: boolean
 }
 
-export interface MagicDataManagerInterface {
+export interface SuffixDataManagerInterface {
 
 }
 
-export class MagicDataManager implements MagicDataManagerInterface {
+export class SuffixDataManager implements SuffixDataManagerInterface {
   private data: NeDB;
 
   constructor(dataFolder: string) {
     let options: NeDB.DataStoreOptions = {
-      filename: dataFolder + path.sep + 'magic.data',
+      filename: dataFolder + path.sep + 'suffixes.data',
       autoload: true
     }
     this.data = new NeDB(options);
@@ -38,4 +35,4 @@ export class MagicDataManager implements MagicDataManagerInterface {
   }
 }
 
-interface Callback { (Error, MagicDocument): void }
+interface Callback { (Error, SuffixDocument): void }

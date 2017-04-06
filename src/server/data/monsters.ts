@@ -26,7 +26,25 @@ export interface MonsterDataManagerInterface {
 }
 
 export class MonsterDataManager implements MonsterDataManagerInterface {
+  private data: NeDB;
 
+  constructor(dataFolder: string) {
+    let options: NeDB.DataStoreOptions = {
+      filename: dataFolder + path.sep + 'monsters.data',
+      autoload: true
+    }
+    this.data = new NeDB(options);
+
+    this.data.ensureIndex({
+      fieldName: 'index',
+      unique: true,
+      sparse: false
+    });
+  }
+
+  getAll(cb: Callback) {
+    this.data.find({}).sort({ index: -1 }).exec(cb);
+  }
 }
 
 interface Callback { (Error, MonsterDocument): void }

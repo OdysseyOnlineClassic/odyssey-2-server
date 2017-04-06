@@ -82,9 +82,9 @@ export class Client extends events.EventEmitter implements ClientInterface {
     //buffer.writeDoubleBE(length, 0);
     buffer.writeUInt8(length >> 8, 0);
     buffer.writeUInt8(length % 256, 1);
-    buffer.writeInt8(checksum, 2);
-    buffer.writeInt8(this.packetOrder, 3);
-    buffer.writeInt8(id, 4);
+    buffer.writeUInt8(checksum, 2);
+    buffer.writeUInt8(this.packetOrder, 3);
+    buffer.writeUInt8(id, 4);
     data.copy(buffer, 5, 0);
 
     this.packetOrder++;

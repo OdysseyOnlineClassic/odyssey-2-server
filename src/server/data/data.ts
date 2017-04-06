@@ -1,8 +1,13 @@
 import * as NeDB from 'nedb';
 import { AccountDataManager } from './accounts';
 import { CharacterDataManager } from './characters';
+import { HallDataManager } from './halls';
+import { MagicDataManager } from './magic';
+import { MonsterDataManager } from './monsters';
 import { NpcDataManager } from './npcs';
 import { ObjectDataManager } from './objects';
+import { PrefixDataManager } from './prefixes';
+import { SuffixDataManager } from './suffixes';
 
 export interface DataInterface {
   getManager(name: string);
@@ -15,8 +20,13 @@ export class Data implements DataInterface {
     this.managers = {
       'accounts': new AccountDataManager(dataFolder),
       'characters': new CharacterDataManager(dataFolder),
+      'halls': new HallDataManager(dataFolder),
+      'magic': new MagicDataManager(dataFolder),
+      'monsters': new MonsterDataManager(dataFolder),
       'npcs': new NpcDataManager(dataFolder),
-      'objects': new ObjectDataManager(dataFolder)
+      'objects': new ObjectDataManager(dataFolder),
+      'prefixes': new PrefixDataManager(dataFolder),
+      'suffixes': new SuffixDataManager(dataFolder)
     }
   }
 

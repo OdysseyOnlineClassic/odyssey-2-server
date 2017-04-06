@@ -43,6 +43,27 @@ export class GameState implements GameStateInterface {
       skill: 10,
       sprite: 643,
       users: 80
+    },
+    stats: {
+      strength: 1,
+      endurance: 1,
+      intelligence: 1,
+      concentration: 1,
+      constitution: 1,
+      stamina: 1,
+      wisdom: 1,
+    },
+    moneyObject: 1,
+    costs: {
+      durability: 1,
+      strength: 1,
+      modifier: 1
+    },
+    guilds: {
+      createLevel: 1,
+      createdPrice: 1,
+      joinLevel: 1,
+      joinPrice: 1,
     }
   }
 
@@ -85,5 +106,26 @@ interface GameOptions {
     skill: number,
     sprite: number,
     users: number
+  },
+  stats: {
+    strength: number,
+    endurance: number,
+    intelligence: number,
+    concentration: number,
+    constitution: number,
+    stamina: number,
+    wisdom: number,
+  },
+  moneyObject: number,
+  costs: {
+    durability: number,
+    strength: number,
+    modifier: number
+  },
+  guilds: {
+    createLevel: number,
+    createdPrice: number
+    joinLevel: number,
+    joinPrice: number,
   }
 }
