@@ -3,7 +3,7 @@ import { DataInterface } from './data/data';
 import { Message } from './message';
 import { MessageProcessor } from './process/process';
 import { AccountsProcessor } from './process/accounts';
-import { GameDataProcessor } from './process/game-data';
+import { GameDataListProcessor } from './process/game-data-lists';
 import { RawProcessor } from './process/raw';
 
 export interface GameStateInterface {
@@ -50,7 +50,7 @@ export class GameState implements GameStateInterface {
     this.processors[0] = new AccountsProcessor(this);
     this.processors[1] = this.processors[0];
     this.processors[2] = this.processors[0];
-    this.processors[7] = new GameDataProcessor(this);
+    this.processors[7] = new GameDataListProcessor(this);
     //this.processors[61] =
 
     this.processors[170] = new RawProcessor(this);
