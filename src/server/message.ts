@@ -14,7 +14,7 @@ export class Message {
   }
 
   append(appendData: Buffer) {
-    if (this.bytesRead >= this.length) {
+    if (this.bytesRead > this.length) {
       throw new RangeError("Attempting to append to Message beyond its length");
     }
     let bytesLeft = this.length - this.bytesRead;

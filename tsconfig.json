@@ -6,7 +6,8 @@
     "noImplicitAny": false,
     "sourceMap": true,
     "alwaysStrict": true,
-    "outDir": "bin"
+    "outDir": "bin",
+    "watch": true
   },
   "include": [
     "src/**/*"
