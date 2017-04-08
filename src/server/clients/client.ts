@@ -9,6 +9,7 @@ export interface ClientInterface {
 }
 
 export class Client extends events.EventEmitter implements ClientInterface {
+  playing: boolean = false;
   readonly socket: net.Socket;
   private msg: Message = null;
   private packetOrder: number = 0;

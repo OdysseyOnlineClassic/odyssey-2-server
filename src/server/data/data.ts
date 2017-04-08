@@ -47,6 +47,6 @@ export interface DataDocument {
  * @extends {DataDocument}
  */
 export interface GameDataDocument extends DataDocument {
-  id: number;
+  index: number;
   version: number;
 }

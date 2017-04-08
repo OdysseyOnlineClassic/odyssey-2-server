@@ -1,9 +1,10 @@
 import { Data } from './data/data';
 import { DataInterface } from './data/data';
 import { Message } from './message';
-import { MessageProcessor } from './process/process';
 import { AccountsProcessor } from './process/accounts';
 import { GameDataListProcessor } from './process/game-data-lists';
+import { GameDataProcessor } from './process/game-data';
+import { MessageProcessor } from './process/process';
 import { RawProcessor } from './process/raw';
 
 export interface GameStateInterface {
@@ -73,6 +74,19 @@ export class GameState implements GameStateInterface {
     this.processors[2] = this.processors[0];
     this.processors[7] = new GameDataListProcessor(this);
     //this.processors[61] =
+
+
+
+    //TODO some of these are duplicate for connected vs playing modes
+    this.processors[19] = new GameDataProcessor(this);
+    this.processors[21] = this.processors[19];
+    this.processors[79] = this.processors[19];
+    this.processors[80] = this.processors[79];
+    this.processors[81] = this.processors[79];
+    this.processors[82] = this.processors[79];
+    this.processors[83] = this.processors[79];
+    this.processors[84] = this.processors[79];
+    this.processors[85] = this.processors[79];
 
     this.processors[170] = new RawProcessor(this);
   }

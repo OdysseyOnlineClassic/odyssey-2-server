@@ -6,8 +6,8 @@ export interface ObjectDocument extends GameDataDocument {
   name: string,
   sprite: number,
   type: number,
-  data: any,
-  flags: {},
+  data: [number],
+  flags: number,
   class: number,
   level: number,
   sellPrice: number
@@ -34,8 +34,16 @@ export class ObjectDataManager implements ObjectDataManagerInterface {
     });
   }
 
+  get(index: number, cb: Callback) {
+    this.data.findOne({ index: index }, cb);
+  }
+
   getAll(cb: Callback) {
     this.data.find({}).sort({ index: -1 }).exec(cb);
+  }
+
+  update(obj: ObjectDocument) {
+    this.data.update({ index: obj.index }, obj, { upsert: true });
   }
 }
 
