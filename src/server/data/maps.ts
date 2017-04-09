@@ -1,6 +1,5 @@
-import * as NeDB from 'nedb';
-import { GameDataDocument } from './data';
-import { GameDataManager } from './data';
+import { GameDataDocument } from './game-data';
+import { GameDataManager } from './game-data';
 
 export interface MapDocument extends GameDataDocument {
   name: string,

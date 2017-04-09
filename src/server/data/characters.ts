@@ -1,6 +1,6 @@
 import * as NeDB from 'nedb';
 import * as path from 'path';
-import { DataDocument } from './data';
+import { DataDocument } from './game-data';
 
 /**
  * Represents a Player's Character

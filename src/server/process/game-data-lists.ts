@@ -78,9 +78,6 @@ export class GameDataListProcessor extends MessageProcessor {
         //TODO, short circuiting some packets to try to skip some client data
         //"All data sent" - still need to send guild data after this
         msg.client.sendMessage(140, Buffer.allocUnsafe(0));
-
-        msg.client.sendMessage(170, Buffer.from([0, 2, 35, 23]));
-        msg.client.sendMessage(170, Buffer.from([0, 1, 24]));
         break;
     }
 

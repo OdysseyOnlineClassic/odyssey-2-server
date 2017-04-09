@@ -6,8 +6,10 @@ import { AccountsProcessor } from './process/accounts';
 import { ClientProcessor } from './process/clients';
 import { GameDataListProcessor } from './process/game-data-lists';
 import { GameDataProcessor } from './process/game-data';
+import { ObjectDataProcessor } from './process/game-data/objects';
 import { GuildProcessor } from './process/guilds';
 import { MessageProcessor } from './process/process';
+import { NpcDataProcessor } from './process/game-data/npcs';
 import { RawProcessor } from './process/raw';
 
 export interface GameStateInterface {
@@ -90,10 +92,14 @@ export class GameState implements GameStateInterface {
     this.processors[24] = this.processors[6];
 
     //TODO some of these are duplicate for connected vs playing modes
-    this.processors[19] = new GameDataProcessor(this);
+    this.processors[19] = new ObjectDataProcessor(this);
     this.processors[21] = this.processors[19];
     this.processors[79] = this.processors[19];
-    this.processors[80] = this.processors[19];
+
+    this.processors[50] = new NpcDataProcessor(this);
+    this.processors[51] = this.processors[50];
+    this.processors[80] = this.processors[50];
+
     this.processors[81] = this.processors[19];
     this.processors[82] = this.processors[19];
     this.processors[83] = this.processors[19];

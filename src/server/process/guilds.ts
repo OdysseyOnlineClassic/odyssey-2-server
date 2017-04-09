@@ -34,19 +34,21 @@ export class GuildProcessor extends MessageProcessor {
     let index = startIndex;
     this.guildData.getAll((err, guilds) => {
       for (; index++; index < this.game.options.max.guilds) {
-        let length = guilds[index].name.length + 5;
-        let guild = Buffer.allocUnsafe(length);
-        guild.writeUInt16BE(3 + guilds[index].name.length, 0);
-        guild.writeUInt8(70, 2);
-        guild.writeUInt8(index, 3);
-        guild.writeUInt8(guilds[index].members.length, 4);
-        guild.write(guilds[index].name, 5);
+        if (guilds[index]) {
+          let length = guilds[index].name.length + 5;
+          let guild = Buffer.allocUnsafe(length);
+          guild.writeUInt16BE(3 + guilds[index].name.length, 0);
+          guild.writeUInt8(70, 2);
+          guild.writeUInt8(index, 3);
+          guild.writeUInt8(guilds[index].members.length, 4);
+          guild.write(guilds[index].name, 5);
 
-        data.push(guild);
-        messageLength += length;
+          data.push(guild);
+          messageLength += length;
 
-        if (messageLength >= 700) {
-          break;
+          if (messageLength >= 700) {
+            break;
+          }
         }
       }
 

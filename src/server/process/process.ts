@@ -6,8 +6,11 @@ export interface ProcessFunction {
 }
 
 export abstract class MessageProcessor {
+  protected processors: { [id: number]: ProcessFunction } = {};
   constructor(protected game: GameStateInterface) {
   }
 
-  abstract process(msg: Message): void;
+  process(msg: Message): void {
+    this.processors[msg.id](msg);
+  }
 }

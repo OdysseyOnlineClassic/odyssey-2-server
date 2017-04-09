@@ -1,5 +1,5 @@
-import { GameDataDocument } from './data';
-import { GameDataManager } from './data';
+import { GameDataDocument } from './game-data';
+import { GameDataManager } from './game-data';
 
 export interface ObjectDocument extends GameDataDocument {
   name: string,

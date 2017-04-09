@@ -1,5 +1,5 @@
 import * as NeDB from 'nedb';
-import { DataDocument } from './data';
+import { DataDocument } from './game-data';
 
 export interface AccountDocument extends DataDocument {
   username: string;
