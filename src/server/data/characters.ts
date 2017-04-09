@@ -108,63 +108,33 @@ export interface CharacterDocument extends DataDocument {
   Bookmark As Variant*/
 }
 
-/**
- *
- * Represents the available Character Classes
- *
- * @export
- * @interface CharacterClassDocument
- * @extends {DataDocument}
- */
-export interface CharacterClassDocument extends DataDocument {
-  index: number; //Old code referenced them by index
-  maxHP: number;
-  maxEnergy: number;
-  maxMana: number;
-  startHP: number;
-  startEnergy: number;
-  startMana: number;
-}
-
 export interface CharacterDataManagerInterface {
   createCharacter(character: CharacterDocument, cb: Callback): void,
   getCharacter(accountId: string, cb: Callback)
 }
 
 export class CharacterDataManager {
-  private characterData: NeDB;
-  private classData: NeDB;
+  private data: NeDB;
 
-  constructor(dataFolder: string) {
-    this.characterData = new NeDB({
-      filename: dataFolder + path.sep + 'characters.data',
+  constructor(dataFile: string) {
+    this.data = new NeDB({
+      filename: dataFile,
       autoload: true
     });
 
-    this.characterData.ensureIndex({
-      fieldName: '_name',
-      unique: true,
-      sparse: false
-    });
-
-    this.classData = new NeDB({
-      filename: dataFolder + path.sep + 'classes.data',
-      autoload: true
-    });
-
-    this.classData.ensureIndex({
-      fieldName: 'index',
+    this.data.ensureIndex({
+      fieldName: 'name',
       unique: true,
       sparse: false
     });
   }
 
   createCharacter(character: CharacterDocument, cb: Callback): void {
-    this.characterData.insert(character, cb);
+    this.data.insert(character, cb);
   }
 
   getCharacter(accountId: string, cb: Callback) {
-    this.characterData.findOne({ accountId: accountId }, cb);
+    this.data.findOne({ accountId: accountId }, cb);
   }
 
 }

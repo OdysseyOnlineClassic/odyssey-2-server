@@ -1,6 +1,6 @@
 import * as NeDB from 'nedb';
-import * as path from 'path';
 import { GameDataDocument } from './data';
+import { GameDataManager } from './data';
 
 export interface BanDocument extends GameDataDocument {
   name: string,
@@ -12,12 +12,5 @@ export interface BanDocument extends GameDataDocument {
   ip: string
 }
 
-export interface BanDataManagerInterface {
-
+export class BanDataManager extends GameDataManager<BanDocument>{
 }
-
-export class BanDataManager implements BanDataManagerInterface {
-
-}
-
-interface Callback { (Error, BanDocument): void }

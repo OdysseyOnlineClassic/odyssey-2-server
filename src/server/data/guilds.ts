@@ -1,6 +1,6 @@
 import * as NeDB from 'nedb';
-import * as path from 'path';
 import { GameDataDocument } from './data';
+import { GameDataManager } from './data';
 
 export interface GuildDocument extends GameDataDocument {
   name: string,
@@ -39,8 +39,5 @@ export interface GuildDataManagerInterface {
 
 }
 
-export class GuildDataManager implements GuildDataManagerInterface {
-
+export class GuildDataManager extends GameDataManager<GuildDocument>{
 }
-
-interface Callback { (Error, GuildDocument): void }

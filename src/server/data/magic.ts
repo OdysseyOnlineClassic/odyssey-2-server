@@ -1,6 +1,6 @@
 import * as NeDB from 'nedb';
-import * as path from 'path';
 import { GameDataDocument } from './data';
+import { GameDataManager } from './data';
 
 export interface MagicDocument extends GameDataDocument {
   name: string,
@@ -12,30 +12,5 @@ export interface MagicDocument extends GameDataDocument {
   description: string
 }
 
-export interface MagicDataManagerInterface {
-
+export class MagicDataManager extends GameDataManager<MagicDocument> {
 }
-
-export class MagicDataManager implements MagicDataManagerInterface {
-  private data: NeDB;
-
-  constructor(dataFolder: string) {
-    let options: NeDB.DataStoreOptions = {
-      filename: dataFolder + path.sep + 'magic.data',
-      autoload: true
-    }
-    this.data = new NeDB(options);
-
-    this.data.ensureIndex({
-      fieldName: 'index',
-      unique: true,
-      sparse: false
-    });
-  }
-
-  getAll(cb: Callback) {
-    this.data.find({}).sort({ index: -1 }).exec(cb);
-  }
-}
-
-interface Callback { (Error, MagicDocument): void }
