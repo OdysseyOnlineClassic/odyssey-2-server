@@ -4,20 +4,19 @@ import { Message } from '../message';
 import { AccountDocument } from '../data/accounts';
 
 export interface ClientInterface {
+  index: number,
   account: AccountDocument,
   sendMessage(id: number, data: Buffer);
 }
 
 export class Client extends events.EventEmitter implements ClientInterface {
   playing: boolean = false;
-  readonly socket: net.Socket;
   private msg: Message = null;
   private packetOrder: number = 0;
   private _account: AccountDocument;
 
-  constructor(socket: net.Socket) {
+  constructor(readonly index: number, readonly socket: net.Socket) {
     super();
-    this.socket = socket;
     socket.on('data', (chunk: Buffer) => { this.onData(chunk); });
     socket.on('end', () => { this.onEnd(); });
   }
@@ -98,5 +97,6 @@ export class Client extends events.EventEmitter implements ClientInterface {
 
   protected onEnd() {
     console.log('end');
+    this.emit('disconnect', this);
   }
 }

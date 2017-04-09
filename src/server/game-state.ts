@@ -1,14 +1,18 @@
+import { ClientManager } from './clients/client-manager';
 import { Data } from './data/data';
 import { DataInterface } from './data/data';
 import { Message } from './message';
 import { AccountsProcessor } from './process/accounts';
+import { ClientProcessor } from './process/clients';
 import { GameDataListProcessor } from './process/game-data-lists';
 import { GameDataProcessor } from './process/game-data';
+import { GuildProcessor } from './process/guilds';
 import { MessageProcessor } from './process/process';
 import { RawProcessor } from './process/raw';
 
 export interface GameStateInterface {
   readonly data: DataInterface;
+  readonly clients: ClientManager;
   processMessage(msg: Message);
   options: GameOptions;
 }
@@ -21,7 +25,8 @@ export interface GameStateInterface {
  */
 export class GameState implements GameStateInterface {
   private processors: Array<MessageProcessor> = new Array<MessageProcessor>(255);
-  readonly emptyBuffer: Buffer = Buffer.from([]);
+  readonly clients: ClientManager;
+  readonly data: DataInterface;
 
   public options = {
     max: {
@@ -39,6 +44,7 @@ export class GameState implements GameStateInterface {
       monsters: 1000,
       npcs: 500,
       objects: 1000,
+      players: 80,
       projectiles: 20,
       requestLength: 200,
       skill: 10,
@@ -68,31 +74,37 @@ export class GameState implements GameStateInterface {
     }
   }
 
-  constructor(public readonly data: DataInterface) {
+  constructor() {
+    this.data = new Data('data/');
+    this.clients = new ClientManager(this);
+
     this.processors[0] = new AccountsProcessor(this);
     this.processors[1] = this.processors[0];
     this.processors[2] = this.processors[0];
     this.processors[7] = new GameDataListProcessor(this);
-    //this.processors[61] =
 
+    this.processors[23] = new ClientProcessor(this);
+    this.processors[61] = this.processors[23];
 
+    this.processors[6] = new GuildProcessor(this);
+    this.processors[24] = this.processors[6];
 
     //TODO some of these are duplicate for connected vs playing modes
     this.processors[19] = new GameDataProcessor(this);
     this.processors[21] = this.processors[19];
     this.processors[79] = this.processors[19];
-    this.processors[80] = this.processors[79];
-    this.processors[81] = this.processors[79];
-    this.processors[82] = this.processors[79];
-    this.processors[83] = this.processors[79];
-    this.processors[84] = this.processors[79];
-    this.processors[85] = this.processors[79];
+    this.processors[80] = this.processors[19];
+    this.processors[81] = this.processors[19];
+    this.processors[82] = this.processors[19];
+    this.processors[83] = this.processors[19];
+    this.processors[84] = this.processors[19];
+    this.processors[85] = this.processors[19];
 
     this.processors[170] = new RawProcessor(this);
   }
 
   processMessage(msg: Message) {
-    console.log(`Message ${msg.id}`);
+    console.log(`Message ${msg.id} [${msg.data.length}]`);
     if (this.processors[msg.id]) {
       this.processors[msg.id].process(msg);
     }
@@ -115,6 +127,7 @@ interface GameOptions {
     monsters: number,
     npcs: number,
     objects: number,
+    players: number,
     projectiles: number,
     requestLength: number,
     skill: number,

@@ -22,7 +22,7 @@ export class GameDataProcessor extends MessageProcessor {
   protected prefixData: PrefixDataManager;
   protected suffixData: SuffixDataManager;
 
-  constructor(protected game: GameStateInterface) {
+  constructor(game: GameStateInterface) {
     super(game);
 
     this.hallData = game.data.getManager('halls');
@@ -35,7 +35,6 @@ export class GameDataProcessor extends MessageProcessor {
 
     this.processors[19] = this.editSendObject.bind(this);
     this.processors[21] = this.updateObject.bind(this);
-
 
     this.processors[79] = this.sendObject.bind(this);
     this.processors[80] = this.sendNpc.bind(this);
@@ -50,30 +49,43 @@ export class GameDataProcessor extends MessageProcessor {
     this.processors[msg.id](msg);
   }
 
+  /**
+   * Serializes an object into the standard MsgId 31 serialization
+   *
+   * @param {number} index Index is required because we may be serializing a null object
+   * @param {ObjectDocument} obj
+   * @returns {Buffer}
+   *
+   * @memberOf GameDataProcessor
+   */
+  serializeObject(index: number, obj?: ObjectDocument): Buffer {
+    let data: Buffer;
+    if (obj) {
+      data = Buffer.allocUnsafe(14 + obj.name.length);
+      data.writeUInt16BE(index, 0);
+      data.writeUInt16BE(obj.sprite, 2);
+      data.writeUInt8(obj.type, 4);
+      data.writeUInt8(obj.data[0], 5);
+      data.writeUInt8(obj.data[1], 6);
+      data.writeUInt8(obj.data[3], 7);
+      data.writeUInt8(obj.flags, 8);
+      data.writeUInt8(obj.class, 9);
+      data.writeUInt8(obj.level, 10);
+      data.writeUInt8(obj.version, 11);
+      data.writeUInt16BE(obj.sellPrice, 12);
+      data.write(obj.name, 14);
+    } else {
+      data = Buffer.allocUnsafe(14).fill(0);
+      data.writeUInt16BE(index, 0);
+    }
+
+    return data;
+  }
+
   sendObject(msg: Message) {
     let index = msg.data.readUInt16BE(0);
     this.objectData.get(index, (err, obj) => {
-      let data: Buffer;
-      if (obj) {
-        data = Buffer.allocUnsafe(14 + obj.name.length);
-        data.writeUInt16BE(index, 0);
-        data.writeUInt16BE(obj.sprite, 2);
-        data.writeUInt8(obj.type, 4);
-        data.writeUInt8(obj.data[0], 5);
-        data.writeUInt8(obj.data[1], 6);
-        data.writeUInt8(obj.data[3], 7);
-        data.writeUInt8(obj.flags, 8);
-        data.writeUInt8(obj.class, 9);
-        data.writeUInt8(obj.level, 10);
-        data.writeUInt8(obj.version, 11);
-        data.writeUInt16BE(obj.sellPrice, 12);
-        data.write(obj.name, 14);
-      } else {
-        data = Buffer.allocUnsafe(14).fill(0);
-        data.writeUInt16BE(index, 0);
-      }
-
-      msg.client.sendMessage(31, data);
+      msg.client.sendMessage(31, this.serializeObject(index, obj));
     });
   }
 
@@ -133,7 +145,13 @@ export class GameDataProcessor extends MessageProcessor {
         version: version
       };
 
-      this.objectData.update(obj);
+      this.objectData.update(obj, (err) => {
+        if (err) {
+          throw err;
+        }
+
+        this.game.clients.sendMessageAll(31, this.serializeObject(obj.index, obj))
+      });
     });
   }
 

@@ -9,5 +9,5 @@ export abstract class MessageProcessor {
   constructor(protected game: GameStateInterface) {
   }
 
-  abstract process(msg: Message);
+  abstract process(msg: Message): void;
 }
