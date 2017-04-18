@@ -10,23 +10,23 @@ export interface MapDocument extends GameDataDocument {
     right: number
   },
   tiles: Tile[][],
-  objects: MapObject[],
-  monsters: MapMonster[],
-  monsterSpawn: MonsterSpawn[],
-  doors: Door,
+  objects?: MapObject[],
+  monsters?: MapMonster[],
+  monsterSpawns: MonsterSpawn[],
+  doors?: Door,
   bootLocation: Location,
   deathLocation: Location,
   flags: {
 
   },
 
-  resetTime: number,
-  hall: number,
+  resetTime?: number,
+  hall?: number,
   npc: number,
   midi: number,
-  keep: boolean,
-  lastUpdate: number,
-  checksum: number
+  keep?: boolean,
+  lastUpdate?: number,
+  checksum?: number
 }
 
 interface Tile {
@@ -35,8 +35,8 @@ interface Tile {
   foreground: Layer,
   attribute: number,
   attribute2: number,
-  attributeData: any,
-  attributeData2: any
+  attributeData: number[],
+  attributeData2?: number[]
 }
 
 interface Layer {

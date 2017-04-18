@@ -35,7 +35,7 @@ export class GameDataListProcessor extends MessageProcessor {
     let list = msg.data.readUInt8(0);
     let max: number = 0;
     let msgId: number = 0;
-    console.log(`List ${list}`);
+
     switch (list) {
       case 1: //Objects
         max = this.game.options.max.objects;

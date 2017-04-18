@@ -3,7 +3,7 @@ import { Client } from './client';
 import { GameState } from '../game-state';
 
 export class ClientManager {
-  private clients: Array<Client>;
+  public clients: Array<Client>;
   constructor(private game: GameState) {
     this.clients = new Array<Client>(game.options.max.players);
   }
@@ -17,7 +17,7 @@ export class ClientManager {
 
     let client = new Client(index, socket);
     client.on('message', (message) => { this.game.processMessage(message) })
-    this.clients.push(client);
+    this.clients[index];
 
     client.on('disconnect', this.clientDisconnect.bind(this));
 

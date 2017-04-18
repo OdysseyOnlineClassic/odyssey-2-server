@@ -35,12 +35,12 @@ export class AccountsProcessor extends MessageProcessor {
     let username = strings[0];
     let password = strings[1];
 
-    if(username.length < 3 || username.length > 15) {
+    if (username.length < 3 || username.length > 15) {
       msg.client.sendMessage(1, Buffer.from([0, Array.from('Username must be between 3 and 15 characters')]));
       return;
     }
 
-    if(password.length < 8) {
+    if (password.length < 8) {
       msg.client.sendMessage(1, Buffer.from([0, Array.from('Password must be at least 8 characters')]));
       return;
     }
@@ -100,10 +100,18 @@ export class AccountsProcessor extends MessageProcessor {
           return;
         }
 
+        if (!character.location) {
+          //TODO define start location
+          character.location = {
+            map: 1,
+            x: 0,
+            y: 0,
+            direction: 0
+          }
+        }
+        msg.client.character = character;
         this.sendCharacter(msg.client, character);
       });
-
-
     });
   }
 
@@ -127,8 +135,19 @@ export class AccountsProcessor extends MessageProcessor {
       sprite: 1, //TODO calculate or load sprite
       description: description,
       status: 1,
-      position: {}, //TODO
-      stats: {}, //TODO
+      location: { //TODO define start location
+        map: 1,
+        x: 0,
+        y: 0,
+        direction: 0
+      },
+      stats: {
+        maxHp: 1,
+        maxEnergy: 1,
+        maxMana: 1,
+        level: 1,
+        experience: 0
+      }, //TODO
       inventory: new Array(20), //TODO
       bank: new Array(20), //TODO
       guild: {
@@ -143,6 +162,7 @@ export class AccountsProcessor extends MessageProcessor {
     };
 
     this.characterData.createCharacter(character, (err, character) => {
+      msg.client.character = character;
       this.sendCharacter(msg.client, character);
     });
   }

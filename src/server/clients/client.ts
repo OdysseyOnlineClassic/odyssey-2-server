@@ -2,10 +2,14 @@ import * as net from 'net';
 import * as events from 'events';
 import { Message } from '../message';
 import { AccountDocument } from '../data/accounts';
+import { CharacterDocument } from '../data/characters';
 
 export interface ClientInterface {
-  index: number,
   account: AccountDocument,
+  character: CharacterDocument,
+  index: number,
+  playing: boolean,
+  readonly socket: net.Socket,
   sendMessage(id: number, data: Buffer);
 }
 
@@ -14,6 +18,7 @@ export class Client extends events.EventEmitter implements ClientInterface {
   private msg: Message = null;
   private packetOrder: number = 0;
   private _account: AccountDocument;
+  character: CharacterDocument;
 
   constructor(readonly index: number, readonly socket: net.Socket) {
     super();
@@ -73,15 +78,12 @@ export class Client extends events.EventEmitter implements ClientInterface {
     let len = data.length;
 
     for (let i = 0; i < len; i++) {
-      checksum += data.readInt8(i);
+      checksum += data.readUInt8(i);
     }
 
     checksum = checksum * 20 % 194;
 
-    //TODO why are we getting range error here?
-    //buffer.writeDoubleBE(length, 0);
-    buffer.writeUInt8(length >> 8, 0);
-    buffer.writeUInt8(length % 256, 1);
+    buffer.writeUInt16BE(length, 0);
     buffer.writeUInt8(checksum, 2);
     buffer.writeUInt8(this.packetOrder, 3);
     buffer.writeUInt8(id, 4);

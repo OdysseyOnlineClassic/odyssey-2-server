@@ -6,15 +6,19 @@ import { AccountsProcessor } from './process/accounts';
 import { ClientProcessor } from './process/clients';
 import { GameDataListProcessor } from './process/game-data-lists';
 import { GameDataProcessor } from './process/game-data';
-import { ObjectDataProcessor } from './process/game-data/objects';
 import { GuildProcessor } from './process/guilds';
+import { MapProcessor } from './process/game-data/maps';
 import { MessageProcessor } from './process/process';
 import { NpcDataProcessor } from './process/game-data/npcs';
+import { ObjectDataProcessor } from './process/game-data/objects';
+import { PingProcessor } from './process/ping';
 import { RawProcessor } from './process/raw';
+import { PlayerEvents } from './events/player';
 
 export interface GameStateInterface {
   readonly data: DataInterface;
   readonly clients: ClientManager;
+  readonly events: any;
   processMessage(msg: Message);
   options: GameOptions;
 }
@@ -26,9 +30,11 @@ export interface GameStateInterface {
  * @class GameState
  */
 export class GameState implements GameStateInterface {
-  private processors: Array<MessageProcessor> = new Array<MessageProcessor>(255);
+  private playingProcessors: Array<MessageProcessor> = new Array<MessageProcessor>(255); //Processors for when a client is playing
+  private connectingProcessors: Array<MessageProcessor> = new Array<MessageProcessor>(255); //Processors before a client is playing
   readonly clients: ClientManager;
   readonly data: DataInterface;
+  readonly events: {};
 
   public options = {
     max: {
@@ -80,39 +86,60 @@ export class GameState implements GameStateInterface {
     this.data = new Data('data/');
     this.clients = new ClientManager(this);
 
-    this.processors[0] = new AccountsProcessor(this);
-    this.processors[1] = this.processors[0];
-    this.processors[2] = this.processors[0];
-    this.processors[7] = new GameDataListProcessor(this);
+    this.events = {
+      player: new PlayerEvents(this)
+    }
 
-    this.processors[23] = new ClientProcessor(this);
-    this.processors[61] = this.processors[23];
+    this.connectingProcessors[0] = new AccountsProcessor(this);
+    this.connectingProcessors[1] = this.connectingProcessors[0];
+    this.connectingProcessors[2] = this.connectingProcessors[0];
+    this.connectingProcessors[7] = new GameDataListProcessor(this);
 
-    this.processors[6] = new GuildProcessor(this);
-    this.processors[24] = this.processors[6];
+    this.connectingProcessors[23] = new ClientProcessor(this);
+    this.connectingProcessors[61] = this.connectingProcessors[23];
+
+    this.connectingProcessors[6] = new GuildProcessor(this);
+    this.connectingProcessors[24] = this.connectingProcessors[6];
 
     //TODO some of these are duplicate for connected vs playing modes
-    this.processors[19] = new ObjectDataProcessor(this);
-    this.processors[21] = this.processors[19];
-    this.processors[79] = this.processors[19];
+    this.connectingProcessors[19] = new ObjectDataProcessor(this);
+    this.connectingProcessors[21] = this.connectingProcessors[19];
+    this.connectingProcessors[79] = this.connectingProcessors[19];
 
-    this.processors[50] = new NpcDataProcessor(this);
-    this.processors[51] = this.processors[50];
-    this.processors[80] = this.processors[50];
+    this.connectingProcessors[50] = new NpcDataProcessor(this);
+    this.connectingProcessors[51] = this.connectingProcessors[50];
+    this.connectingProcessors[80] = this.connectingProcessors[50];
 
-    this.processors[81] = this.processors[19];
-    this.processors[82] = this.processors[19];
-    this.processors[83] = this.processors[19];
-    this.processors[84] = this.processors[19];
-    this.processors[85] = this.processors[19];
+    this.connectingProcessors[81] = this.connectingProcessors[19];
+    this.connectingProcessors[82] = this.connectingProcessors[19];
+    this.connectingProcessors[83] = this.connectingProcessors[19];
+    this.connectingProcessors[84] = this.connectingProcessors[19];
+    this.connectingProcessors[85] = this.connectingProcessors[19];
 
-    this.processors[170] = new RawProcessor(this);
+    this.connectingProcessors[170] = new RawProcessor(this);
+    this.playingProcessors[170] = this.connectingProcessors[170];
+
+    this.playingProcessors[12] = new MapProcessor(this);
+    this.playingProcessors[45] = this.playingProcessors[12];
+
+    this.playingProcessors[96] = new PingProcessor(this);
   }
 
   processMessage(msg: Message) {
-    console.log(`Message ${msg.id} [${msg.data.length}]`);
-    if (this.processors[msg.id]) {
-      this.processors[msg.id].process(msg);
+    console.log(`Message ${msg.id} [${msg.data.length}] - ` + (msg.client.account ? msg.client.account.username : msg.client.socket.address().address));
+    console.log(`Playing: ${msg.client.playing}`);
+
+    let processors: Array<MessageProcessor>;
+    if (msg.client.playing) {
+      processors = this.playingProcessors;
+    } else {
+      processors = this.connectingProcessors;
+    }
+
+    if (processors[msg.id]) {
+      processors[msg.id].process(msg);
+    } else {
+      console.error(`Unhandled Message ${msg.id} [${msg.data.length}] - ` + (msg.client.account ? msg.client.account.username : msg.client.socket.address().address))
     }
   }
 }

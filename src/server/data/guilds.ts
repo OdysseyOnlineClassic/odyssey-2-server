@@ -11,8 +11,8 @@ export interface GuildDocument extends GameDataDocument {
   sprite: number,
   dueDate: number,
   creationDate: number,
-  kills: number, //Possible to aggregate from membership?
-  deaths: number, //Possible to aggregate from membership?
+  kills: number,
+  deaths: number,
   motd: string,
   motdDate: number,
   motdCreatorId: string,

@@ -1,6 +1,7 @@
 import * as NeDB from 'nedb';
 import * as path from 'path';
 import { DataDocument } from './game-data';
+import { Location } from './maps';
 
 /**
  * Represents a Player's Character
@@ -17,8 +18,14 @@ export interface CharacterDocument extends DataDocument {
   sprite: number;
   description?: string;
   status: number;
-  position: any; //Position interface
-  stats: any; //Stats interface
+  location: Location; //Position interface
+  stats: {
+    maxHp: number,
+    maxEnergy: number,
+    maxMana: number,
+    level: number,
+    experience: number
+  }; //Stats interface
   inventory: any; //Inventory interface
   bank: any; //Bank interface (extends inventory?)
   guild: {

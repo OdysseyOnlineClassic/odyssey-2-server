@@ -33,7 +33,7 @@ export class GuildProcessor extends MessageProcessor {
     let messageLength = 0;
     let index = startIndex;
     this.guildData.getAll((err, guilds) => {
-      for (; index++; index < this.game.options.max.guilds) {
+      for (; index < this.game.options.max.guilds; index++) {
         if (guilds[index]) {
           let length = guilds[index].name.length + 5;
           let guild = Buffer.allocUnsafe(length);
