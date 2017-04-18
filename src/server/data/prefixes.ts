@@ -1,6 +1,6 @@
 import * as NeDB from 'nedb';
-import * as path from 'path';
-import { GameDataDocument } from './data';
+import { GameDataDocument } from './game-data';
+import { GameDataManager } from './game-data';
 
 export interface PrefixDocument extends GameDataDocument {
   name: string,
@@ -9,30 +9,5 @@ export interface PrefixDocument extends GameDataDocument {
   natural: boolean
 }
 
-export interface PrefixDataManagerInterface {
-
+export class PrefixDataManager extends GameDataManager<PrefixDocument> {
 }
-
-export class PrefixDataManager implements PrefixDataManagerInterface {
-  private data: NeDB;
-
-  constructor(dataFolder: string) {
-    let options: NeDB.DataStoreOptions = {
-      filename: dataFolder + path.sep + 'prefixes.data',
-      autoload: true
-    }
-    this.data = new NeDB(options);
-
-    this.data.ensureIndex({
-      fieldName: 'index',
-      unique: true,
-      sparse: false
-    });
-  }
-
-  getAll(cb: Callback) {
-    this.data.find({}).sort({ index: -1 }).exec(cb);
-  }
-}
-
-interface Callback { (Error, PrefixDocument): void }

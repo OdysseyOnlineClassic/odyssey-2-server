@@ -1,6 +1,5 @@
 import * as NeDB from 'nedb';
-import * as path from 'path';
-import { DataDocument } from './data';
+import { DataDocument } from './game-data';
 
 export interface AccountDocument extends DataDocument {
   username: string;
@@ -17,9 +16,9 @@ export interface AccountDataManagerInterface {
 export class AccountDataManager implements AccountDataManagerInterface {
   private data: NeDB;
 
-  constructor(dataFolder: string) {
+  constructor(dataFile: string) {
     let options: NeDB.DataStoreOptions = {
-      filename: dataFolder + path.sep + 'accounts.data',
+      filename: dataFile,
       autoload: true
     }
     this.data = new NeDB(options);

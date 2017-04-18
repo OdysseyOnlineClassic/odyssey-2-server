@@ -1,6 +1,6 @@
 import * as NeDB from 'nedb';
-import * as path from 'path';
-import { GameDataDocument } from './data';
+import { GameDataDocument } from './game-data';
+import { GameDataManager } from './game-data';
 
 export interface GuildDocument extends GameDataDocument {
   name: string,
@@ -11,8 +11,8 @@ export interface GuildDocument extends GameDataDocument {
   sprite: number,
   dueDate: number,
   creationDate: number,
-  kills: number, //Possible to aggregate from membership?
-  deaths: number, //Possible to aggregate from membership?
+  kills: number,
+  deaths: number,
   motd: string,
   motdDate: number,
   motdCreatorId: string,
@@ -39,8 +39,5 @@ export interface GuildDataManagerInterface {
 
 }
 
-export class GuildDataManager implements GuildDataManagerInterface {
-
+export class GuildDataManager extends GameDataManager<GuildDocument>{
 }
-
-interface Callback { (Error, GuildDocument): void }

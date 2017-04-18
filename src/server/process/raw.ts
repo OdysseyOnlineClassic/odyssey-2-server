@@ -31,7 +31,7 @@ export class RawProcessor extends MessageProcessor {
     while (offset < msg.data.length - headerOffset) {
       length = msg.data.readUInt16BE(offset) - 1;
       msgId = msg.data.readUInt8(offset + 2);
-      extractedMsg = new Message(msgId, length - 1, msg.client);
+      extractedMsg = new Message(msgId, length, msg.client);
 
       msg.data.copy(extractedMsg.data, 0, offset + headerOffset, offset + headerOffset + length);
 

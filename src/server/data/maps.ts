@@ -1,6 +1,5 @@
-import * as NeDB from 'nedb';
-import * as path from 'path';
-import { GameDataDocument } from './data';
+import { GameDataDocument } from './game-data';
+import { GameDataManager } from './game-data';
 
 export interface MapDocument extends GameDataDocument {
   name: string,
@@ -11,23 +10,23 @@ export interface MapDocument extends GameDataDocument {
     right: number
   },
   tiles: Tile[][],
-  objects: MapObject[],
-  monsters: MapMonster[],
-  monsterSpawn: MonsterSpawn[],
-  doors: Door,
+  objects?: MapObject[],
+  monsters?: MapMonster[],
+  monsterSpawns: MonsterSpawn[],
+  doors?: Door,
   bootLocation: Location,
   deathLocation: Location,
   flags: {
 
   },
 
-  resetTime: number,
-  hall: number,
+  resetTime?: number,
+  hall?: number,
   npc: number,
   midi: number,
-  keep: boolean,
-  lastUpdate: number,
-  checksum: number
+  keep?: boolean,
+  lastUpdate?: number,
+  checksum?: number
 }
 
 interface Tile {
@@ -36,8 +35,8 @@ interface Tile {
   foreground: Layer,
   attribute: number,
   attribute2: number,
-  attributeData: any,
-  attributeData2: any
+  attributeData: number[],
+  attributeData2?: number[]
 }
 
 interface Layer {
@@ -90,30 +89,5 @@ interface MonsterSpawn {
   timer: number
 }
 
-export interface MapDataManagerInterface {
-
+export class MapDataManager extends GameDataManager<MapDocument> {
 }
-
-export class MapDataManager implements MapDataManagerInterface {
-  private data: NeDB;
-
-  constructor(dataFolder: string) {
-    let options: NeDB.DataStoreOptions = {
-      filename: dataFolder + path.sep + 'maps.data',
-      autoload: true
-    }
-    this.data = new NeDB(options);
-
-    this.data.ensureIndex({
-      fieldName: 'index',
-      unique: true,
-      sparse: false
-    })
-  }
-
-  getMap(index: number, cb: Callback) {
-    this.data.findOne({ index: index }, cb);
-  }
-}
-
-interface Callback { (Error, MapDocument): void }
