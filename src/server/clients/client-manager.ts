@@ -17,7 +17,7 @@ export class ClientManager {
 
     let client = new Client(index, socket);
     client.on('message', (message) => { this.game.processMessage(message) })
-    this.clients[index];
+    this.clients[index] = client;
 
     client.on('disconnect', this.clientDisconnect.bind(this));
 
@@ -26,10 +26,29 @@ export class ClientManager {
 
   sendMessageAll(id: number, data: Buffer, ignoreIndex?: number) {
     for (let i = 0; i < this.clients.length; i++) {
-      if (i != ignoreIndex && this.clients[i]) {
+      if (i != ignoreIndex && this.clients[i]) { //TODO All clients or All clients playing?
         this.clients[i].sendMessage(id, data);
       }
     }
+  }
+
+  sendMessageMap(id: number, data: Buffer, mapIndex: number) {
+    for (let i = 0; i < this.clients.length; i++) {
+      if (this.clients[i] && this.clients[i].character && this.clients[i].character.location.map == mapIndex) {
+        this.clients[i].sendMessage(id, data);
+      }
+    }
+  }
+
+  getClientsByMap(mapIndex: number): Client[] {
+    let mapClients: Client[] = [];
+    for (let i = 0; i < this.clients.length; i++) {
+      if (this.clients[i] && this.clients[i].character && this.clients[i].character.location.map == mapIndex) {
+        mapClients.push(this.clients[i]);
+      }
+    }
+
+    return mapClients;
   }
 
   protected clientDisconnect(client: Client) {

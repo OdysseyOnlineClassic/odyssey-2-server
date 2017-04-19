@@ -172,7 +172,11 @@ export class MapProcessor extends MessageProcessor {
     }
 
     this.mapData.update(map, (err, map) => {
-
+      let mapClients = this.game.clients.getClientsByMap(mapIndex);
+      for (let i = 0; i < mapClients.length; i++) {
+        this.game.events.player.partMap(mapClients[i], mapClients[i].character.location.map);
+        this.game.events.player.joinMap(mapClients[i], mapClients[i].character.location);
+      }
     });
   }
 }

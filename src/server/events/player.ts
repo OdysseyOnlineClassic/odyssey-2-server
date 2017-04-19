@@ -24,4 +24,8 @@ export class PlayerEvents {
       client.sendMessage(12, data);
     });
   }
+
+  partMap(client: Client, mapIndex: number) {
+    client.sendMessage(88, Buffer.from([0, 0]));
+  }
 }
