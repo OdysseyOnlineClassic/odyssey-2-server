@@ -35,7 +35,9 @@ export interface CharacterDocument extends DataDocument {
     invite: number //Current invite to join Guild by number id
   },
   extended: any; //Extended data to hold whatever scripts want
-  timers: any; //Flood, walk, etc.
+  timers?: {
+    walk: number
+  }, //Flood, walk, etc.
   alive: boolean;
 
   /*'Character Data

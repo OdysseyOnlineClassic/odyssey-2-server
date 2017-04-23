@@ -44,7 +44,7 @@ export class ClientProcessor extends MessageProcessor {
 
     msg.client.sendMessage(143, Buffer.from([0])); //TODO this pins outdoor light to 0
 
-    this.game.events.player.joinMap(msg.client, msg.client.character.location);
+    this.game.events.player.joinMap(msg.client);
   }
 
   protected serializeJoinCharacter(index, character) {
