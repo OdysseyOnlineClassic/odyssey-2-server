@@ -5,7 +5,7 @@
   "main": "bin/odyssey.js",
   "repository": "https://github.com/OdysseyClassicHistoryBook/odyssey-2-server.git",
   "bin": {
-    "ts-ody": "odyssey.js"
+    "odyssey": "bin/odyssey.js"
   },
   "scripts": {
     "start": "tsc --target ES6 && node bin/odyssey.js",
