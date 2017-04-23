@@ -157,7 +157,9 @@ export class AccountsProcessor extends MessageProcessor {
         invite: 0
       },
       extended: null,
-      timers: {}, //TODO
+      timers: {
+        walk: 0
+      }, //TODO
       alive: true
     };
 
