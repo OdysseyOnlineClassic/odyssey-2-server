@@ -2,15 +2,13 @@ import { ClientInterface } from './clients/client';
 
 export class Message {
   data: Buffer;
+  timestamp: number;
 
   private bytesRead = 0;
 
   constructor(public id: number, public length: number, public client: ClientInterface) {
-    this.id = id;
-    this.length = length;
-    this.client = client;
-
     this.data = Buffer.allocUnsafe(length);
+    this.timestamp = Date.now();
   }
 
   append(appendData: Buffer) {

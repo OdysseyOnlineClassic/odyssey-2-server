@@ -32,9 +32,9 @@ export class ClientManager {
     }
   }
 
-  sendMessageMap(id: number, data: Buffer, mapIndex: number) {
+  sendMessageMap(id: number, data: Buffer, mapIndex: number, ignoreIndex?: number) {
     for (let i = 0; i < this.clients.length; i++) {
-      if (this.clients[i] && this.clients[i].character && this.clients[i].character.location.map == mapIndex) {
+      if (i != ignoreIndex && this.clients[i] && this.clients[i].character && this.clients[i].character.location.map == mapIndex) {
         this.clients[i].sendMessage(id, data);
       }
     }
