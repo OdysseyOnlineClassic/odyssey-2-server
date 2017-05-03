@@ -13,7 +13,7 @@ export class RawProcessor extends MessageProcessor {
     super(game);
   }
 
-  process(msg: Message): void {
+  async process(msg: Message): Promise<any> {
     const headerOffset: number = 3;
     let offset: number = 0;
     let length: number;

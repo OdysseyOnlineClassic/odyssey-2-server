@@ -13,7 +13,7 @@ export class MovementProcessor extends MessageProcessor {
     this.processors[13] = this.switchMap.bind(this);
   }
 
-  process(msg: Message): void {
+  async process(msg: Message): Promise<any> {
     this.processors[msg.id](msg);
   }
 

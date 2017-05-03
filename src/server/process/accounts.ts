@@ -24,7 +24,7 @@ export class AccountsProcessor extends MessageProcessor {
     this.characterData = game.data.getManager('characters');
   }
 
-  process(msg: Message): void {
+  async process(msg: Message): Promise<any> {
     this.processors[msg.id](msg);
   }
 

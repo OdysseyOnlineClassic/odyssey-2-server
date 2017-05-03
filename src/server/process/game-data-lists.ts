@@ -31,7 +31,7 @@ export class GameDataListProcessor extends MessageProcessor {
     this.suffixData = game.data.getManager('suffixes');
   }
 
-  process(msg: Message): void {
+  async process(msg: Message): Promise<any> {
     let list = msg.data.readUInt8(0);
     let max: number = 0;
     let msgId: number = 0;

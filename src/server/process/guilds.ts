@@ -17,7 +17,7 @@ export class GuildProcessor extends MessageProcessor {
     this.processors[24] = this.guildList.bind(this);
   }
 
-  process(msg: Message): void {
+  async process(msg: Message): Promise<any> {
     this.processors[msg.id](msg);
   }
 

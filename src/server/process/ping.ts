@@ -12,7 +12,7 @@ export class PingProcessor extends MessageProcessor {
     this.processors[96] = this.ping.bind(this);
   }
 
-  process(msg: Message): void {
+  async process(msg: Message): Promise<any> {
     this.processors[msg.id](msg);
   }
 
