@@ -22,7 +22,7 @@ export class MovementProcessor extends MessageProcessor {
     let walk = character.timers.walk || 0;
     if (msg.timestamp > walk) {
 
-      character.timers.walk = msg.timestamp + 500 //TODO make movement speed configurable
+      character.timers.walk = msg.timestamp + 500; //TODO make movement speed configurable
 
       let dx = character.location.x - msg.data.readUInt8(0);
       let dy = character.location.y - msg.data.readUInt8(1);

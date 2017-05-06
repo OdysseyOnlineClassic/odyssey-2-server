@@ -26,7 +26,9 @@ export interface CharacterDocument extends DataDocument {
     level: number,
     experience: number
   }; //Stats interface
-  inventory: any; //Inventory interface
+  inventory: InventoryItemInterface[]; //Inventory interface
+  ammo: number;
+  equipped: InventoryItemInterface[];
   bank: any; //Bank interface (extends inventory?)
   guild: {
     id: number, //Guild numeric id, old system used byte (255)
@@ -115,6 +117,13 @@ export interface CharacterDocument extends DataDocument {
 
   'Database Data
   Bookmark As Variant*/
+}
+
+interface InventoryItemInterface {
+  index: number,
+  value: number,
+  prefix: number,
+  suffix: number
 }
 
 export interface CharacterDataManagerInterface {

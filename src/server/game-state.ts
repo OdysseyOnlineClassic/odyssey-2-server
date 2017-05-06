@@ -9,6 +9,7 @@ import { GameDataProcessor } from './process/game-data';
 import { GuildProcessor } from './process/guilds';
 import { MapProcessor } from './process/game-data/maps';
 import { MessageProcessor } from './process/process';
+import { MovementProcessor } from './process/movement';
 import { NpcDataProcessor } from './process/game-data/npcs';
 import { ObjectDataProcessor } from './process/game-data/objects';
 import { PingProcessor } from './process/ping';
@@ -118,6 +119,9 @@ export class GameState implements GameStateInterface {
 
     this.connectingProcessors[170] = new RawProcessor(this);
     this.playingProcessors[170] = this.connectingProcessors[170];
+
+    this.playingProcessors[7] = new MovementProcessor(this);
+    this.playingProcessors[13] = this.playingProcessors[7];
 
     this.playingProcessors[12] = new MapProcessor(this);
     this.playingProcessors[45] = this.playingProcessors[12];

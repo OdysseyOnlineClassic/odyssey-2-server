@@ -1,8 +1,9 @@
-import { GameStateInterface } from '../game-state';
-import { ClientInterface } from '../clients/client';
-import { MapDataManager } from '../data/maps';
-import { Location } from '../data/maps';
 import { CharacterDocument } from '../data/characters';
+import { ClientInterface } from '../clients/client';
+import { GameStateInterface } from '../game-state';
+import { Location } from '../data/maps';
+import { MapDataManager } from '../data/maps';
+import { RawMessage } from '../message';
 
 export class PlayerEvents {
   protected mapData: MapDataManager;
@@ -20,27 +21,60 @@ export class PlayerEvents {
    */
   joinGame(client: ClientInterface) {
     return new Promise((resolve, reject) => {
+      let raw = new RawMessage();
       this.game.clients.sendMessageAll(6, this.serializeJoinCharacter(client.index, client.character), client.index);
       client.sendMessage(24, Buffer.from([]));
-
-      let data: Buffer[] = [];
 
       for (let i = 0; i < this.game.clients.clients.length; i++) {
         if (this.game.clients.clients[i] && this.game.clients.clients[i].playing) {
           if (i === client.index) {
             continue;
           }
-          data.push(this.serializeJoinCharacter(i, this.game.clients.clients[i].character));
+          raw.addMessage(6, this.serializeJoinCharacter(i, this.game.clients.clients[i].character));
         }
       }
 
+      //TODO Map Boot Location
+
       //Compile inventory data
+      let invData: Buffer;
+      for (let i = 0; i < this.game.options.max.inventoryObjects; i++) {
+        if (client.character.inventory[i]) {
+          invData = Buffer.allocUnsafe(9);
+          invData.writeUInt8(i, 0);
+          invData.writeUInt16BE(client.character.inventory[i].index, 1);
+          invData.writeUInt32BE(client.character.inventory[i].value, 3);
+          invData.writeUInt8(client.character.inventory[i].prefix, 7);
+          invData.writeUInt8(client.character.inventory[i].suffix, 8);
 
-      //Compile equipped data
+          raw.addMessage(17, invData);
+        }
+      }
 
-      client.sendMessage(143, Buffer.from([0])); //TODO this pins outdoor light to 0
+      if (client.character.ammo) {
+        raw.addMessage(19, Buffer.from([client.character.ammo]));
+      }
+
+      for (let i = 0; i < 5; i++) {
+        if (client.character.equipped[i]) {
+          invData = Buffer.allocUnsafe(8);
+          invData.writeUInt16BE(client.character.equipped[i].index, 0);
+          invData.writeUInt32BE(client.character.equipped[i].value, 2);
+          invData.writeUInt8(client.character.inventory[i].prefix, 6);
+          invData.writeUInt8(client.character.inventory[i].suffix, 7);
+
+          raw.addMessage(115, invData);
+        }
+      }
+
+      raw.sendMessage(client);
+
+      //TODO outdoor light set to 0, need to implement outdoor light
+      client.sendMessage(143, Buffer.from([0]));
 
       this.game.events.player.joinMap(client);
+
+      client.playing = true;
 
       resolve();
     });

@@ -1,5 +1,42 @@
 import { ClientInterface } from './clients/client';
 
+export class RawMessage {
+  protected readonly maxLength: number = 2048;
+  messages: { id: number, data: Buffer }[] = [];
+
+  addMessage(id: number, data: Buffer) {
+    this.messages.push({ id: id, data: data });
+  }
+
+  sendMessage(client: ClientInterface) {
+    let concatBuffer: Buffer = Buffer.allocUnsafe(this.maxLength);
+    let sendBuffer: Buffer;
+    let length = 0;
+
+    for (let i = 0; i < this.messages.length; i++) {
+
+      if (length + 3 + this.messages[i].data.length > this.maxLength) {
+        sendBuffer = Buffer.allocUnsafe(length);
+        concatBuffer.copy(sendBuffer, 0, 0, length - 1);
+        client.sendMessage(170, sendBuffer);
+        length = 0;
+      }
+
+      this.messages[i].data.copy(concatBuffer, length + 3, 0);
+      concatBuffer.writeDoubleBE(this.messages[i].data.length, length);
+      concatBuffer.writeUInt8(this.messages[i].id, length + 2);
+      length += 3 + this.messages[i].data.length;
+    }
+
+    sendBuffer = Buffer.allocUnsafe(length);
+    concatBuffer.copy(sendBuffer, 0, 0, length - 1);
+    client.sendMessage(170, sendBuffer);
+    length = 0;
+
+    this.messages = [];
+  }
+}
+
 export class Message {
   data: Buffer;
   timestamp: number;
