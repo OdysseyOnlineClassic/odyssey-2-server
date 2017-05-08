@@ -128,7 +128,8 @@ interface InventoryItemInterface {
 
 export interface CharacterDataManagerInterface {
   createCharacter(character: CharacterDocument, cb: Callback): void,
-  getCharacter(accountId: string, cb: Callback)
+  getCharacter(accountId: string, cb: Callback),
+  update(character: CharacterDocument, cb: Callback): void
 }
 
 export class CharacterDataManager {
@@ -153,6 +154,10 @@ export class CharacterDataManager {
 
   getCharacter(accountId: string, cb: Callback) {
     this.data.findOne({ accountId: accountId }, cb);
+  }
+
+  update(character: CharacterDocument, cb: Callback) {
+    this.data.update({ name: character.name }, character, { upsert: true }, cb);
   }
 
 }
