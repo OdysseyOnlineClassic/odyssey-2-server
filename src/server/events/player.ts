@@ -25,6 +25,18 @@ export class PlayerEvents {
       this.game.clients.sendMessageAll(6, this.serializeJoinCharacter(client.index, client.character), client.index);
       client.sendMessage(24, Buffer.from([]));
 
+      let dataHp = Buffer.allocUnsafe(1);
+      dataHp.writeUInt8(client.character.stats.maxHp, 0);
+      client.sendMessage(46, dataHp);
+
+      let dataEnergy = Buffer.allocUnsafe(1);
+      dataEnergy.writeUInt8(client.character.stats.maxEnergy, 0);
+      client.sendMessage(47, dataEnergy);
+
+      let dataMana = Buffer.allocUnsafe(1);
+      dataMana.writeUInt8(client.character.stats.maxMana, 0);
+      client.sendMessage(48, dataMana);
+
       for (let i = 0; i < this.game.clients.clients.length; i++) {
         if (this.game.clients.clients[i] && this.game.clients.clients[i].playing) {
           if (i === client.index) {

@@ -33,6 +33,16 @@ export interface GameStateInterface {
 export class GameState implements GameStateInterface {
   private playingProcessors: Array<MessageProcessor> = new Array<MessageProcessor>(255); //Processors for when a client is playing
   private connectingProcessors: Array<MessageProcessor> = new Array<MessageProcessor>(255); //Processors before a client is playing
+  private intervalId: number;
+  private updateInProgress: boolean = false;
+  private performance: {
+    updateAverage: number,
+    latestUpdate: number,
+    diff: [number, number]
+  }
+  private timestamp: [number, number];
+  private counter: number = 0;
+
   readonly clients: ClientManager;
   readonly data: DataInterface;
   readonly events: {};
@@ -129,6 +139,14 @@ export class GameState implements GameStateInterface {
     this.playingProcessors[96] = new PingProcessor(this);
   }
 
+  /**
+   * Get current timer in ms
+   */
+  get tick(): number {
+    let tick = process.hrtime();
+    return (tick[0] * 1e9 + tick[1]) / 1000000
+  }
+
   processMessage(msg: Message) {
     console.log(`Message ${msg.id} [${msg.data.length}] - ` + (msg.client.account ? msg.client.account.username : msg.client.socket.address().address));
     console.log(`Playing: ${msg.client.playing}`);
@@ -145,6 +163,37 @@ export class GameState implements GameStateInterface {
     } else {
       console.error(`Unhandled Message ${msg.id} [${msg.data.length}] - ` + (msg.client.account ? msg.client.account.username : msg.client.socket.address().address))
     }
+  }
+
+  start(interval: number = 10) {
+    this.performance = {
+      updateAverage: 0.0,
+      latestUpdate: 0.0,
+      diff: [0, 0]
+    };
+
+    this.intervalId = setInterval(this.update.bind(this), interval);
+    setInterval(() => {
+      console.log(this.performance.updateAverage);
+    }, 1000);
+  }
+
+  stop() {
+    clearInterval(this.intervalId);
+  }
+
+  protected update() {
+    if (this.updateInProgress) {
+      return;
+    }
+    this.updateInProgress = true;
+    this.timestamp = process.hrtime();
+
+    this.performance.diff = process.hrtime(this.timestamp)
+    this.performance.updateAverage -= this.performance.updateAverage / 100;
+    this.performance.latestUpdate = (this.performance.diff[0] * 1e9 + this.performance.diff[1])
+    this.performance.updateAverage += this.performance.latestUpdate / 1000000 / 100;
+    this.updateInProgress = false;
   }
 }
 
