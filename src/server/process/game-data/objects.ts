@@ -20,7 +20,7 @@ export class ObjectDataProcessor extends MessageProcessor {
     this.processors[79] = this.sendObject.bind(this);
   }
 
-  process(msg: Message): void {
+  async process(msg: Message): Promise<any> {
     this.processors[msg.id](msg);
   }
 

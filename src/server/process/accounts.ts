@@ -24,7 +24,7 @@ export class AccountsProcessor extends MessageProcessor {
     this.characterData = game.data.getManager('characters');
   }
 
-  process(msg: Message): void {
+  async process(msg: Message): Promise<any> {
     this.processors[msg.id](msg);
   }
 
@@ -149,6 +149,8 @@ export class AccountsProcessor extends MessageProcessor {
         experience: 0
       }, //TODO
       inventory: new Array(20), //TODO
+      equipped: new Array(5),
+      ammo: null,
       bank: new Array(20), //TODO
       guild: {
         id: null,

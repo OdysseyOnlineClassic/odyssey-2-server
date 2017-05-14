@@ -36,7 +36,7 @@ export class GameDataProcessor extends MessageProcessor {
     this.processors[85] = this.sendSuffix.bind(this);
   }
 
-  process(msg: Message): void {
+  async process(msg: Message): Promise<any> {
     this.processors[msg.id](msg);
   }
 

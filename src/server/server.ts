@@ -14,6 +14,7 @@ export class OdysseyServer {
 
   start() {
     console.log(`Listeneing on ${this.port}`);
+    this.gameState.start();
     this.server.listen(this.port);
   }
 

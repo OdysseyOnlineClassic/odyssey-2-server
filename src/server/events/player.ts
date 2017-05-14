@@ -1,7 +1,9 @@
+import { CharacterDocument } from '../data/characters';
+import { ClientInterface } from '../clients/client';
 import { GameStateInterface } from '../game-state';
-import { Client } from '../clients/client';
-import { MapDataManager } from '../data/maps';
 import { Location } from '../data/maps';
+import { MapDataManager } from '../data/maps';
+import { RawMessage } from '../message';
 
 export class PlayerEvents {
   protected mapData: MapDataManager;
@@ -11,15 +13,95 @@ export class PlayerEvents {
   }
 
   /**
+   * When a client joins the game.
+   * 
+   * @param {ClientInterface} client 
+   * 
+   * @memberOf PlayerEvents
+   */
+  joinGame(client: ClientInterface) {
+    return new Promise((resolve, reject) => {
+      let raw = new RawMessage();
+      this.game.clients.sendMessageAll(6, this.serializeJoinCharacter(client.index, client.character), client.index);
+      client.sendMessage(24, Buffer.from([]));
+
+      let dataHp = Buffer.allocUnsafe(1);
+      dataHp.writeUInt8(client.character.stats.maxHp, 0);
+      client.sendMessage(46, dataHp);
+
+      let dataEnergy = Buffer.allocUnsafe(1);
+      dataEnergy.writeUInt8(client.character.stats.maxEnergy, 0);
+      client.sendMessage(47, dataEnergy);
+
+      let dataMana = Buffer.allocUnsafe(1);
+      dataMana.writeUInt8(client.character.stats.maxMana, 0);
+      client.sendMessage(48, dataMana);
+
+      for (let i = 0; i < this.game.clients.clients.length; i++) {
+        if (this.game.clients.clients[i] && this.game.clients.clients[i].playing) {
+          if (i === client.index) {
+            continue;
+          }
+          raw.addMessage(6, this.serializeJoinCharacter(i, this.game.clients.clients[i].character));
+        }
+      }
+
+      //TODO Map Boot Location
+
+      //Compile inventory data
+      let invData: Buffer;
+      for (let i = 0; i < this.game.options.max.inventoryObjects; i++) {
+        if (client.character.inventory[i]) {
+          invData = Buffer.allocUnsafe(9);
+          invData.writeUInt8(i, 0);
+          invData.writeUInt16BE(client.character.inventory[i].index, 1);
+          invData.writeUInt32BE(client.character.inventory[i].value, 3);
+          invData.writeUInt8(client.character.inventory[i].prefix, 7);
+          invData.writeUInt8(client.character.inventory[i].suffix, 8);
+
+          raw.addMessage(17, invData);
+        }
+      }
+
+      if (client.character.ammo) {
+        raw.addMessage(19, Buffer.from([client.character.ammo]));
+      }
+
+      for (let i = 0; i < 5; i++) {
+        if (client.character.equipped[i]) {
+          invData = Buffer.allocUnsafe(8);
+          invData.writeUInt16BE(client.character.equipped[i].index, 0);
+          invData.writeUInt32BE(client.character.equipped[i].value, 2);
+          invData.writeUInt8(client.character.inventory[i].prefix, 6);
+          invData.writeUInt8(client.character.inventory[i].suffix, 7);
+
+          raw.addMessage(115, invData);
+        }
+      }
+
+      raw.sendMessage(client);
+
+      //TODO outdoor light set to 0, need to implement outdoor light
+      client.sendMessage(143, Buffer.from([0]));
+
+      this.game.events.player.joinMap(client);
+
+      client.playing = true;
+
+      resolve();
+    });
+  }
+
+  /**
    * Must set character location before calling JoinMap
    * Sends Map Data to Client
    * Sends Client Location Update to other Clients on map
    *
-   * @param {Client} client
+   * @param {ClientInterface} client
    *
    * @memberOf PlayerEvents
    */
-  joinMap(client: Client) {
+  joinMap(client: ClientInterface) {
     let location = client.character.location;
     this.mapData.get(location.map, (err, map) => {
       let data = Buffer.allocUnsafe(13);
@@ -44,12 +126,12 @@ export class PlayerEvents {
     });
   }
 
-  partMap(client: Client, mapIndex: number) {
+  partMap(client: ClientInterface, mapIndex: number) {
     //TODO need to handle npc exit text
     client.sendMessage(88, Buffer.from([0, 0]));
   }
 
-  warp(client: Client, location: Location) {
+  warp(client: ClientInterface, location: Location) {
     let map = client.character.location.map;
     if (map == location.map) {
       client.character.location = location;
@@ -64,9 +146,13 @@ export class PlayerEvents {
 
   /**
    * Sends client's location to all others on that map
-   * @param client
+   * 
+   * @protected
+   * @param {ClientInterface} client 
+   * 
+   * @memberOf PlayerEvents
    */
-  protected updateLocationToMap(client: Client) {
+  protected updateLocationToMap(client: ClientInterface) {
     let location = client.character.location;
     let dataToMap: Buffer = Buffer.allocUnsafe(7);
     dataToMap.writeUInt8(client.index, 0);
@@ -77,5 +163,27 @@ export class PlayerEvents {
     dataToMap.writeUInt8(client.character.status, 6);
 
     this.game.clients.sendMessageMap(8, dataToMap, location.map, client.index);
+  }
+
+  /**
+   * Serializes basic character data when player joins a game
+   * 
+   * @protected
+   * @param {number} index 
+   * @param {CharacterDocument} character 
+   * @returns 
+   * 
+   * @memberOf PlayerEvents
+   */
+  protected serializeJoinCharacter(index: number, character: CharacterDocument) {
+    let joinChar = Buffer.allocUnsafe(6 + character.name.length);
+    joinChar.writeUInt8(index, 0);
+    joinChar.writeUInt16BE(character.sprite, 1);
+    joinChar.writeUInt8(character.status, 3);
+    joinChar.writeUInt8(character.guild.id, 4);
+    joinChar.writeUInt8(character.stats.maxHp, 5);
+    joinChar.write(character.name, 6);
+
+    return joinChar;
   }
 }

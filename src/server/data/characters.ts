@@ -26,7 +26,9 @@ export interface CharacterDocument extends DataDocument {
     level: number,
     experience: number
   }; //Stats interface
-  inventory: any; //Inventory interface
+  inventory: InventoryItemInterface[]; //Inventory interface
+  ammo: number;
+  equipped: InventoryItemInterface[];
   bank: any; //Bank interface (extends inventory?)
   guild: {
     id: number, //Guild numeric id, old system used byte (255)
@@ -117,9 +119,17 @@ export interface CharacterDocument extends DataDocument {
   Bookmark As Variant*/
 }
 
+interface InventoryItemInterface {
+  index: number,
+  value: number,
+  prefix: number,
+  suffix: number
+}
+
 export interface CharacterDataManagerInterface {
   createCharacter(character: CharacterDocument, cb: Callback): void,
-  getCharacter(accountId: string, cb: Callback)
+  getCharacter(accountId: string, cb: Callback),
+  update(character: CharacterDocument, cb: Callback): void
 }
 
 export class CharacterDataManager {
@@ -144,6 +154,10 @@ export class CharacterDataManager {
 
   getCharacter(accountId: string, cb: Callback) {
     this.data.findOne({ accountId: accountId }, cb);
+  }
+
+  update(character: CharacterDocument, cb: Callback) {
+    this.data.update({ name: character.name }, character, { upsert: true }, cb);
   }
 
 }
