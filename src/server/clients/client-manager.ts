@@ -1,6 +1,12 @@
 import * as net from 'net';
 import { Client } from './client';
+import { ClassicClient } from './classic/classic-client';
 import { GameState } from '../game-state';
+
+export enum ClientType {
+  Classic,
+  WebAdmin
+}
 
 export class ClientManager {
   public clients: Array<Client>;
@@ -8,20 +14,17 @@ export class ClientManager {
     this.clients = new Array<Client>(game.options.max.players);
   }
 
-  createClient(socket: net.Socket) {
+  createClient(socket: net.Socket, type: ClientType = ClientType.Classic) {
     let index = this.getAvailablePlayerIndex();
 
     if (index == null) {
       //TODO Server Full
     }
 
-    let client = new Client(index, socket);
-    client.on('message', (message) => { this.game.processMessage(message) })
-    this.clients[index] = client;
-
-    client.on('disconnect', this.clientDisconnect.bind(this));
-
-    return client;
+    switch (type) {
+      case ClientType.Classic:
+        return this.createClassicClient(index, socket);
+    }
   }
 
   /**
@@ -90,5 +93,15 @@ export class ClientManager {
 
       return null;
     }
+  }
+
+  protected createClassicClient(index, socket) {
+    let client = new ClassicClient(index, socket);
+    client.on('message', (message) => { this.game.processMessage(message) })
+    this.clients[index] = client;
+
+    client.on('disconnect', this.clientDisconnect.bind(this));
+
+    return client;
   }
 }
