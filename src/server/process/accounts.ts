@@ -142,9 +142,9 @@ export class AccountsProcessor extends MessageProcessor {
         direction: 0
       },
       stats: {
-        maxHp: 1,
-        maxEnergy: 1,
-        maxMana: 1,
+        maxHp: 10,
+        maxEnergy: 10,
+        maxMana: 10,
         level: 1,
         experience: 0
       }, //TODO

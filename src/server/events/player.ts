@@ -39,9 +39,6 @@ export class PlayerEvents {
 
       for (let i = 0; i < this.game.clients.clients.length; i++) {
         if (this.game.clients.clients[i] && this.game.clients.clients[i].playing) {
-          if (i === client.index) {
-            continue;
-          }
           raw.addMessage(6, this.serializeJoinCharacter(i, this.game.clients.clients[i].character));
         }
       }

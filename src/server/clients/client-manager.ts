@@ -24,22 +24,49 @@ export class ClientManager {
     return client;
   }
 
+  /**
+   * Sends a message to all players
+   * 
+   * @param {number} id 
+   * @param {Buffer} data 
+   * @param {number} [ignoreIndex] Index of the client to not send to
+   * 
+   * @memberOf ClientManager
+   */
   sendMessageAll(id: number, data: Buffer, ignoreIndex?: number) {
     for (let i = 0; i < this.clients.length; i++) {
-      if (i != ignoreIndex && this.clients[i]) { //TODO All clients or All clients playing?
+      if (i != ignoreIndex && this.clients[i] && this.clients[i].playing) {
         this.clients[i].sendMessage(id, data);
       }
     }
   }
 
+  /**
+   * Sends a message to all players on a map
+   * 
+   * @param {number} id 
+   * @param {Buffer} data 
+   * @param {number} mapIndex 
+   * @param {number} [ignoreIndex] 
+   * 
+   * @memberOf ClientManager
+   */
   sendMessageMap(id: number, data: Buffer, mapIndex: number, ignoreIndex?: number) {
-    for (let i = 0; i < this.clients.length; i++) {
-      if (i != ignoreIndex && this.clients[i] && this.clients[i].character && this.clients[i].character.location.map == mapIndex) {
-        this.clients[i].sendMessage(id, data);
-      }
+    let clients = this.getClientsByMap(mapIndex);
+    for (let i = 0; i < clients.length; i++) {
+      clients[i].sendMessage(id, data);
     }
   }
 
+  /**
+   * Gets a list of all clients on the map.
+   * Index in result is not their global index
+   * 
+   * @param {number} mapIndex 
+   * @returns {Client[]} 
+   * 
+   * @memberOf ClientManager
+   */
   getClientsByMap(mapIndex: number): Client[] {
     let mapClients: Client[] = [];
     for (let i = 0; i < this.clients.length; i++) {

@@ -174,7 +174,7 @@ export class GameState implements GameStateInterface {
 
     this.intervalId = setInterval(this.update.bind(this), interval);
     setInterval(() => {
-      console.log(this.performance.updateAverage);
+      //console.log(this.performance.updateAverage);
     }, 1000);
   }
 
