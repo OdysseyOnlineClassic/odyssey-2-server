@@ -10,6 +10,7 @@ export enum ClientType {
 
 export class ClientManager {
   public clients: Array<Client>;
+  private min = 1;
   constructor(private game: GameState) {
     this.clients = new Array<Client>(game.options.max.players);
   }
@@ -37,7 +38,7 @@ export class ClientManager {
    * @memberOf ClientManager
    */
   sendMessageAll(id: number, data: Buffer, ignoreIndex?: number) {
-    for (let i = 0; i < this.clients.length; i++) {
+    for (let i = this.min; i < this.clients.length; i++) {
       if (i != ignoreIndex && this.clients[i] && this.clients[i].playing) {
         this.clients[i].sendMessage(id, data);
       }
@@ -56,7 +57,7 @@ export class ClientManager {
    */
   sendMessageMap(id: number, data: Buffer, mapIndex: number, ignoreIndex?: number) {
     let clients = this.getClientsByMap(mapIndex);
-    for (let i = 0; i < clients.length; i++) {
+    for (let i = this.min; i < clients.length; i++) {
       clients[i].sendMessage(id, data);
     }
   }
@@ -72,7 +73,7 @@ export class ClientManager {
    */
   getClientsByMap(mapIndex: number): Client[] {
     let mapClients: Client[] = [];
-    for (let i = 0; i < this.clients.length; i++) {
+    for (let i = this.min; i < this.clients.length; i++) {
       if (this.clients[i] && this.clients[i].character && this.clients[i].character.location.map == mapIndex) {
         mapClients.push(this.clients[i]);
       }
@@ -86,7 +87,7 @@ export class ClientManager {
   }
 
   protected getAvailablePlayerIndex() {
-    for (let i = 0; i < this.clients.length; i++) {
+    for (let i = this.min; i < this.clients.length; i++) {
       if (!this.clients[i]) {
         return i;
       }
