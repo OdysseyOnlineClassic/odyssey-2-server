@@ -69,6 +69,10 @@ export class ClassicClient extends Client {
         }
     }
 
+    getAddress() {
+        return this.socket.address().address;
+    }
+
     sendMessage(id: number, data: Buffer) {
         let length: number = data.length + 1;
         let buffer: Buffer = Buffer.allocUnsafe(length + 4);

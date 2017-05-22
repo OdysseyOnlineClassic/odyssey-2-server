@@ -10,6 +10,7 @@ export interface ClientInterface {
   index: number,
   playing: boolean,
   sendMessage(id: number, data: Buffer);
+  getAddress();
 }
 
 export abstract class Client extends events.EventEmitter implements ClientInterface {
@@ -18,4 +19,5 @@ export abstract class Client extends events.EventEmitter implements ClientInterf
   index: number;
   playing: boolean;
   abstract sendMessage(id: number, data: Buffer);
+  abstract getAddress();
 }

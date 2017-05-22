@@ -142,6 +142,9 @@ export class AccountsProcessor extends MessageProcessor {
         direction: 0
       },
       stats: {
+        attack: 1,
+        defense: 1,
+        magicDefense: 1,
         maxHp: 10,
         maxEnergy: 10,
         maxMana: 10,
@@ -189,5 +192,26 @@ export class AccountsProcessor extends MessageProcessor {
     data.write(character.description, character.name.length + 15);
 
     client.sendMessage(3, data);
+
+    let dataStats = Buffer.allocUnsafe(6);
+    dataStats.writeUInt8(client.character.stats.maxHp, 0);
+    dataStats.writeUInt8(client.character.stats.maxEnergy, 1);
+    dataStats.writeUInt8(client.character.stats.maxMana, 2);
+    dataStats.writeUInt8(client.character.stats.attack, 3);
+    dataStats.writeUInt8(client.character.stats.defense, 4);
+    dataStats.writeUInt8(client.character.stats.magicDefense, 5);
+    client.sendMessage(130, dataStats);
+
+    let dataHp = Buffer.allocUnsafe(1);
+    dataHp.writeUInt8(client.character.stats.maxHp, 0);
+    client.sendMessage(46, dataHp);
+
+    let dataEnergy = Buffer.allocUnsafe(1);
+    dataEnergy.writeUInt8(client.character.stats.maxEnergy, 0);
+    client.sendMessage(47, dataEnergy);
+
+    let dataMana = Buffer.allocUnsafe(1);
+    dataMana.writeUInt8(client.character.stats.maxMana, 0);
+    client.sendMessage(48, dataMana);
   }
 }

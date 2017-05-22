@@ -20,11 +20,14 @@ export interface CharacterDocument extends DataDocument {
   status: number;
   location: Location; //Position interface
   stats: {
+    attack: number,
+    defense: number,
+    experience: number
+    level: number,
+    magicDefense: number,
     maxHp: number,
     maxEnergy: number,
     maxMana: number,
-    level: number,
-    experience: number
   }; //Stats interface
   inventory: InventoryItemInterface[]; //Inventory interface
   ammo: number;
