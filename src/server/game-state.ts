@@ -4,6 +4,7 @@ import { DataInterface } from './data/data';
 import { Message } from './message';
 import { AccountsProcessor } from './process/accounts';
 import { ClientProcessor } from './process/clients';
+import { DebugProcessor } from './process/debug';
 import { GameDataListProcessor } from './process/game-data-lists';
 import { GameDataProcessor } from './process/game-data';
 import { GuildProcessor } from './process/guilds';
@@ -137,6 +138,8 @@ export class GameState implements GameStateInterface {
     this.playingProcessors[45] = this.playingProcessors[12];
 
     this.playingProcessors[96] = new PingProcessor(this);
+
+    this.playingProcessors[100] = new DebugProcessor(this);
   }
 
   /**
@@ -148,7 +151,7 @@ export class GameState implements GameStateInterface {
   }
 
   processMessage(msg: Message) {
-    console.log(`Message ${msg.id} [${msg.data.length}] - ` + (msg.client.account ? msg.client.account.username : msg.client.socket.address().address));
+    console.log(`Message ${msg.id} [${msg.data.length}] - ` + (msg.client.account ? msg.client.account.username : msg.client.getAddress().address));
     console.log(`Playing: ${msg.client.playing}`);
 
     let processors: Array<MessageProcessor>;
@@ -161,7 +164,7 @@ export class GameState implements GameStateInterface {
     if (processors[msg.id]) {
       processors[msg.id].process(msg);
     } else {
-      console.error(`Unhandled Message ${msg.id} [${msg.data.length}] - ` + (msg.client.account ? msg.client.account.username : msg.client.socket.address().address))
+      console.error(`Unhandled Message ${msg.id} [${msg.data.length}] - ` + (msg.client.account ? msg.client.account.username : msg.client.getAddress().address))
     }
   }
 
