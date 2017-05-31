@@ -9,6 +9,11 @@ export class RawMessage {
   }
 
   sendMessage(client: ClientInterface) {
+    if (this.messages.length == 0) {
+      console.error('RawMessage.sendMessage called on empty message array');
+      return;
+    }
+
     let concatBuffer: Buffer = Buffer.allocUnsafe(this.maxLength);
     let sendBuffer: Buffer;
     let length = 0;

@@ -8,28 +8,28 @@
     "odyssey": "bin/odyssey.js"
   },
   "scripts": {
-    "start": "tsc --target ES6 && node bin/odyssey.js",
+    "start": "tsc --target ES2017 && node bin/odyssey.js",
     "test": "mocha --recursive -r ts-node/register tests/**/*.spec.ts"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@types/bcrypt": "^1.0.0",
-    "@types/chai": "^3.4.35",
-    "@types/mocha": "^2.2.40",
-    "@types/nedb": "^1.8.0",
-    "@types/node": "^7.0.8",
+    "@types/bcryptjs": "^2.4.0",
+    "@types/chai": "^3.5.2",
+    "@types/mocha": "^2.2.41",
+    "@types/nedb": "^1.8.3",
+    "@types/node": "^7.0.22",
     "@types/sinon": "^1.16.36",
     "chai": "^3.5.0",
     "gulp": "^3.9.1",
-    "mocha": "^3.2.0",
-    "sinon": "^2.1.0",
-    "ts-node": "^3.0.2",
+    "mocha": "^3.4.2",
+    "sinon": "^2.3.2",
+    "ts-node": "^3.0.4",
     "tslint": "^4.5.1",
-    "typescript": "^2.2.1"
+    "typescript": "^2.3.4"
   },
   "dependencies": {
-    "bcrypt": "^1.0.2",
+    "bcryptjs": "^2.4.3",
     "commander": "^2.9.0",
     "nedb": "^1.8.0"
   }

@@ -25,23 +25,8 @@ export class PlayerEvents {
       this.game.clients.sendMessageAll(6, this.serializeJoinCharacter(client.index, client.character), client.index);
       client.sendMessage(24, Buffer.from([]));
 
-      let dataHp = Buffer.allocUnsafe(1);
-      dataHp.writeUInt8(client.character.stats.maxHp, 0);
-      client.sendMessage(46, dataHp);
-
-      let dataEnergy = Buffer.allocUnsafe(1);
-      dataEnergy.writeUInt8(client.character.stats.maxEnergy, 0);
-      client.sendMessage(47, dataEnergy);
-
-      let dataMana = Buffer.allocUnsafe(1);
-      dataMana.writeUInt8(client.character.stats.maxMana, 0);
-      client.sendMessage(48, dataMana);
-
-      for (let i = 0; i < this.game.clients.clients.length; i++) {
+      for (let i = 1; i <= this.game.clients.clients.length; i++) {
         if (this.game.clients.clients[i] && this.game.clients.clients[i].playing) {
-          if (i === client.index) {
-            continue;
-          }
           raw.addMessage(6, this.serializeJoinCharacter(i, this.game.clients.clients[i].character));
         }
       }
@@ -104,6 +89,12 @@ export class PlayerEvents {
   joinMap(client: ClientInterface) {
     let location = client.character.location;
     this.mapData.get(location.map, (err, map) => {
+      if (!map) {
+        //initialize blank map
+        map = {
+          version: 0
+        };
+      }
       let data = Buffer.allocUnsafe(13);
       data.writeUInt16BE(location.map, 0);
       data.writeUInt8(location.x, 2);
@@ -126,7 +117,7 @@ export class PlayerEvents {
     });
   }
 
-  partMap(client: ClientInterface, mapIndex: number) {
+  partMap(client: ClientInterface) {
     //TODO need to handle npc exit text
     client.sendMessage(88, Buffer.from([0, 0]));
   }
@@ -138,8 +129,8 @@ export class PlayerEvents {
       client.sendMessage(147, Buffer.from([location.x, location.y, location.direction]));
       this.updateLocationToMap(client);
     } else {
+      this.partMap(client);
       client.character.location = location;
-      this.partMap(client, map);
       this.joinMap(client);
     }
   }

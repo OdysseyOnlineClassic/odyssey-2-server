@@ -13,6 +13,7 @@ import { Location } from './maps';
 export interface CharacterDocument extends DataDocument {
   accountId: string;
   name: string;
+  _name: string; //Internal, lower cased version for uniqueness
   class: any; //Class interface?
   female: boolean;
   sprite: number;
@@ -20,11 +21,14 @@ export interface CharacterDocument extends DataDocument {
   status: number;
   location: Location; //Position interface
   stats: {
+    attack: number,
+    defense: number,
+    experience: number
+    level: number,
+    magicDefense: number,
     maxHp: number,
     maxEnergy: number,
     maxMana: number,
-    level: number,
-    experience: number
   }; //Stats interface
   inventory: InventoryItemInterface[]; //Inventory interface
   ammo: number;
@@ -142,7 +146,7 @@ export class CharacterDataManager {
     });
 
     this.data.ensureIndex({
-      fieldName: 'name',
+      fieldName: '_name',
       unique: true,
       sparse: false
     });
@@ -159,7 +163,6 @@ export class CharacterDataManager {
   update(character: CharacterDocument, cb: Callback) {
     this.data.update({ name: character.name }, character, { upsert: true }, cb);
   }
-
 }
 
 interface Callback { (Error, CharacterDocument): void }

@@ -1,4 +1,4 @@
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import { GameStateInterface } from '../game-state';
 import { MessageProcessor } from './process';
 import { ProcessFunction } from './process';
@@ -36,12 +36,12 @@ export class AccountsProcessor extends MessageProcessor {
     let password = strings[1];
 
     if (username.length < 3 || username.length > 15) {
-      msg.client.sendMessage(1, Buffer.from([0, Array.from('Username must be between 3 and 15 characters')]));
+      msg.client.sendMessage(1, Buffer.concat([Buffer.from([0]), Buffer.from('Username must be between 3 and 15 characters', 'utf8')]));
       return;
     }
 
     if (password.length < 8) {
-      msg.client.sendMessage(1, Buffer.from([0, Array.from('Password must be at least 8 characters')]));
+      msg.client.sendMessage(1, Buffer.concat([Buffer.from([0]), Buffer.from('Password must be at least 8 characters', 'utf8')]));
       return;
     }
 
@@ -130,6 +130,7 @@ export class AccountsProcessor extends MessageProcessor {
     let character: CharacterDocument = {
       accountId: msg.client.account._id,
       name: name,
+      _name: name.toLowerCase(),
       class: classIndex,
       female: female,
       sprite: 1, //TODO calculate or load sprite
@@ -142,9 +143,12 @@ export class AccountsProcessor extends MessageProcessor {
         direction: 0
       },
       stats: {
-        maxHp: 1,
-        maxEnergy: 1,
-        maxMana: 1,
+        attack: 1,
+        defense: 1,
+        magicDefense: 1,
+        maxHp: 10,
+        maxEnergy: 10,
+        maxMana: 10,
         level: 1,
         experience: 0
       }, //TODO
@@ -166,6 +170,9 @@ export class AccountsProcessor extends MessageProcessor {
     };
 
     this.characterData.createCharacter(character, (err, character) => {
+      if (err) {
+        throw err;
+      }
       msg.client.character = character;
       this.sendCharacter(msg.client, character);
     });
@@ -189,5 +196,26 @@ export class AccountsProcessor extends MessageProcessor {
     data.write(character.description, character.name.length + 15);
 
     client.sendMessage(3, data);
+
+    let dataStats = Buffer.allocUnsafe(6);
+    dataStats.writeUInt8(client.character.stats.maxHp, 0);
+    dataStats.writeUInt8(client.character.stats.maxEnergy, 1);
+    dataStats.writeUInt8(client.character.stats.maxMana, 2);
+    dataStats.writeUInt8(client.character.stats.attack, 3);
+    dataStats.writeUInt8(client.character.stats.defense, 4);
+    dataStats.writeUInt8(client.character.stats.magicDefense, 5);
+    client.sendMessage(130, dataStats);
+
+    let dataHp = Buffer.allocUnsafe(1);
+    dataHp.writeUInt8(client.character.stats.maxHp, 0);
+    client.sendMessage(46, dataHp);
+
+    let dataEnergy = Buffer.allocUnsafe(1);
+    dataEnergy.writeUInt8(client.character.stats.maxEnergy, 0);
+    client.sendMessage(47, dataEnergy);
+
+    let dataMana = Buffer.allocUnsafe(1);
+    dataMana.writeUInt8(client.character.stats.maxMana, 0);
+    client.sendMessage(48, dataMana);
   }
 }

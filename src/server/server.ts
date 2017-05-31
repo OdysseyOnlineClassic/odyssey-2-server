@@ -19,6 +19,8 @@ export class OdysseyServer {
   }
 
   protected onConnection(socket: net.Socket) {
+    console.log(socket.remoteAddress);
+    console.log(socket.remotePort);
     let client = this.gameState.clients.createClient(socket);
   }
 }
