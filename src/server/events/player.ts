@@ -25,7 +25,7 @@ export class PlayerEvents {
       this.game.clients.sendMessageAll(6, this.serializeJoinCharacter(client.index, client.character), client.index);
       client.sendMessage(24, Buffer.from([]));
 
-      for (let i = 0; i < this.game.clients.clients.length; i++) {
+      for (let i = 1; i <= this.game.clients.clients.length; i++) {
         if (this.game.clients.clients[i] && this.game.clients.clients[i].playing) {
           raw.addMessage(6, this.serializeJoinCharacter(i, this.game.clients.clients[i].character));
         }
@@ -89,6 +89,12 @@ export class PlayerEvents {
   joinMap(client: ClientInterface) {
     let location = client.character.location;
     this.mapData.get(location.map, (err, map) => {
+      if (!map) {
+        //initialize blank map
+        map = {
+          version: 0
+        };
+      }
       let data = Buffer.allocUnsafe(13);
       data.writeUInt16BE(location.map, 0);
       data.writeUInt8(location.x, 2);
@@ -111,7 +117,7 @@ export class PlayerEvents {
     });
   }
 
-  partMap(client: ClientInterface, mapIndex: number) {
+  partMap(client: ClientInterface) {
     //TODO need to handle npc exit text
     client.sendMessage(88, Buffer.from([0, 0]));
   }
@@ -123,8 +129,8 @@ export class PlayerEvents {
       client.sendMessage(147, Buffer.from([location.x, location.y, location.direction]));
       this.updateLocationToMap(client);
     } else {
+      this.partMap(client);
       client.character.location = location;
-      this.partMap(client, map);
       this.joinMap(client);
     }
   }
