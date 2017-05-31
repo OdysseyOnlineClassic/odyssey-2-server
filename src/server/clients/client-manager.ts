@@ -12,7 +12,7 @@ export class ClientManager {
   public clients: Array<Client>;
   private min = 1;
   constructor(private game: GameState) {
-    this.clients = new Array<Client>(game.options.max.players);
+    this.clients = new Array<Client>(game.options.max.players + 1);
   }
 
   createClient(socket: net.Socket, type: ClientType = ClientType.Classic) {
@@ -91,9 +91,8 @@ export class ClientManager {
       if (!this.clients[i]) {
         return i;
       }
-
-      return null;
     }
+    return null;
   }
 
   protected createClassicClient(index, socket) {
