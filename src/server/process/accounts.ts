@@ -1,4 +1,4 @@
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import { GameStateInterface } from '../game-state';
 import { MessageProcessor } from './process';
 import { ProcessFunction } from './process';
@@ -36,12 +36,12 @@ export class AccountsProcessor extends MessageProcessor {
     let password = strings[1];
 
     if (username.length < 3 || username.length > 15) {
-      msg.client.sendMessage(1, Buffer.from([0, Array.from('Username must be between 3 and 15 characters')]));
+      msg.client.sendMessage(1, Buffer.concat([Buffer.from([0]), Buffer.from('Username must be between 3 and 15 characters', 'utf8')]));
       return;
     }
 
     if (password.length < 8) {
-      msg.client.sendMessage(1, Buffer.from([0, Array.from('Password must be at least 8 characters')]));
+      msg.client.sendMessage(1, Buffer.concat([Buffer.from([0]), Buffer.from('Password must be at least 8 characters', 'utf8')]));
       return;
     }
 
@@ -130,6 +130,7 @@ export class AccountsProcessor extends MessageProcessor {
     let character: CharacterDocument = {
       accountId: msg.client.account._id,
       name: name,
+      _name: name.toLowerCase(),
       class: classIndex,
       female: female,
       sprite: 1, //TODO calculate or load sprite
@@ -169,6 +170,9 @@ export class AccountsProcessor extends MessageProcessor {
     };
 
     this.characterData.createCharacter(character, (err, character) => {
+      if (err) {
+        throw err;
+      }
       msg.client.character = character;
       this.sendCharacter(msg.client, character);
     });
