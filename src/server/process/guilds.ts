@@ -1,4 +1,3 @@
-import { GameStateInterface } from '../game-state';
 import { MessageProcessor } from './process';
 import { Message } from '../message';
 import { ProcessFunction } from './process';
@@ -8,7 +7,7 @@ export class GuildProcessor extends MessageProcessor {
   protected guildData: GuildDataManager;
   protected processors: { [id: number]: ProcessFunction } = {};
 
-  constructor(game: GameStateInterface) {
+  constructor(game: Odyssey.GameState) {
     super(game);
 
     this.guildData = game.data.getManager('guilds');

@@ -1,6 +1,5 @@
 import { ClientManager } from './clients/client-manager';
 import { Data } from './data/data';
-import { DataInterface } from './data/data';
 import { Message } from './message';
 import { AccountsProcessor } from './process/accounts';
 import { ClientProcessor } from './process/clients';
@@ -15,15 +14,9 @@ import { NpcDataProcessor } from './process/game-data/npcs';
 import { ObjectDataProcessor } from './process/game-data/objects';
 import { PingProcessor } from './process/ping';
 import { RawProcessor } from './process/raw';
-import { PlayerEvents } from './events/player';
-
-export interface GameStateInterface {
-  readonly data: DataInterface;
-  readonly clients: ClientManager;
-  readonly events: any;
-  processMessage(msg: Message);
-  options: GameOptions;
-}
+import { AccountManager } from './managers/accounts';
+import { CharacterManager } from './managers/characters';
+import { PlayerManager } from './managers/player';
 
 /**
  * IOC Container for different aspects of the Odyssey Server
@@ -31,7 +24,7 @@ export interface GameStateInterface {
  * @export
  * @class GameState
  */
-export class GameState implements GameStateInterface {
+export class GameState implements Odyssey.GameState {
   private playingProcessors: Array<MessageProcessor> = new Array<MessageProcessor>(255); //Processors for when a client is playing
   private connectingProcessors: Array<MessageProcessor> = new Array<MessageProcessor>(255); //Processors before a client is playing
   private intervalId: number;
@@ -45,10 +38,10 @@ export class GameState implements GameStateInterface {
   private counter: number = 0;
 
   readonly clients: ClientManager;
-  readonly data: DataInterface;
-  readonly events: {};
+  readonly data: Odyssey.Data;
+  readonly managers: {};
 
-  public options = {
+  public options: Odyssey.GameOptions = {
     max: {
       attributes: 22,
       classes: 4,
@@ -98,8 +91,10 @@ export class GameState implements GameStateInterface {
     this.data = new Data('data/');
     this.clients = new ClientManager(this);
 
-    this.events = {
-      player: new PlayerEvents(this)
+    this.managers = {
+      accounts: new AccountManager(this),
+      characters: new CharacterManager(this),
+      player: new PlayerManager(this)
     }
 
     this.connectingProcessors[0] = new AccountsProcessor(this);
@@ -197,51 +192,5 @@ export class GameState implements GameStateInterface {
     this.performance.latestUpdate = (this.performance.diff[0] * 1e9 + this.performance.diff[1])
     this.performance.updateAverage += this.performance.latestUpdate / 1000000 / 100;
     this.updateInProgress = false;
-  }
-}
-
-interface GameOptions {
-  max: {
-    attributes: number,
-    classes: number,
-    floatText: number,
-    guilds: number,
-    halls: number,
-    inventoryObjects: number,
-    magic: number,
-    mapMonsters: number,
-    mapObjects: number,
-    maps: number,
-    modifications: number, //prefix and suffix ?
-    monsters: number,
-    npcs: number,
-    objects: number,
-    players: number,
-    projectiles: number,
-    requestLength: number,
-    skill: number,
-    sprite: number,
-    users: number
-  },
-  stats: {
-    strength: number,
-    endurance: number,
-    intelligence: number,
-    concentration: number,
-    constitution: number,
-    stamina: number,
-    wisdom: number,
-  },
-  moneyObject: number,
-  costs: {
-    durability: number,
-    strength: number,
-    modifier: number
-  },
-  guilds: {
-    createLevel: number,
-    createdPrice: number
-    joinLevel: number,
-    joinPrice: number,
   }
 }

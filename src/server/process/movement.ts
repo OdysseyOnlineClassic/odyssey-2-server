@@ -1,4 +1,3 @@
-import { GameStateInterface } from '../game-state';
 import { MessageProcessor } from './process';
 import { Message } from '../message';
 import { ProcessFunction } from './process';
@@ -14,7 +13,7 @@ export class MovementProcessor extends MessageProcessor {
   protected mapData: MapDataManager;
   protected playerEvents: PlayerEvents;
 
-  constructor(game: GameStateInterface) {
+  constructor(game: Odyssey.GameState) {
     super(game);
 
     this.processors[7] = this.move.bind(this);
@@ -22,7 +21,7 @@ export class MovementProcessor extends MessageProcessor {
 
     this.characterData = game.data.getManager('characters');
     this.mapData = game.data.getManager('maps');
-    this.playerEvents = game.events.player;
+    this.playerEvents = game.managers.player;
   }
 
   async process(msg: Message): Promise<any> {

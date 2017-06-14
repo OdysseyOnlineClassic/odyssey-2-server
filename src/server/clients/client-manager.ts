@@ -8,33 +8,30 @@ export enum ClientType {
   WebAdmin
 }
 
-export class ClientManager {
-  public clients: Array<Client>;
+export class ClientManager implements Odyssey.ClientManager {
+  public readonly clients: Array<Client>;
   private min = 1;
   constructor(private game: GameState) {
     this.clients = new Array<Client>(game.options.max.players + 1);
   }
 
-  createClient(socket: net.Socket, type: ClientType = ClientType.Classic) {
+  createClient(socket: net.Socket) {
     let index = this.getAvailablePlayerIndex();
 
     if (index == null) {
       //TODO Server Full
     }
 
-    switch (type) {
-      case ClientType.Classic:
-        return this.createClassicClient(index, socket);
-    }
+    return this.createClassicClient(index, socket);
   }
 
   /**
    * Sends a message to all players
-   * 
-   * @param {number} id 
-   * @param {Buffer} data 
+   *
+   * @param {number} id
+   * @param {Buffer} data
    * @param {number} [ignoreIndex] Index of the client to not send to
-   * 
+   *
    * @memberOf ClientManager
    */
   sendMessageAll(id: number, data: Buffer, ignoreIndex?: number) {
@@ -47,12 +44,12 @@ export class ClientManager {
 
   /**
    * Sends a message to all players on a map
-   * 
-   * @param {number} id 
-   * @param {Buffer} data 
-   * @param {number} mapIndex 
-   * @param {number} [ignoreIndex] 
-   * 
+   *
+   * @param {number} id
+   * @param {Buffer} data
+   * @param {number} mapIndex
+   * @param {number} [ignoreIndex]
+   *
    * @memberOf ClientManager
    */
   sendMessageMap(id: number, data: Buffer, mapIndex: number, ignoreIndex?: number) {
@@ -65,10 +62,10 @@ export class ClientManager {
   /**
    * Gets a list of all clients on the map.
    * Index in result is not their global index
-   * 
-   * @param {number} mapIndex 
-   * @returns {Client[]} 
-   * 
+   *
+   * @param {number} mapIndex
+   * @returns {Client[]}
+   *
    * @memberOf ClientManager
    */
   getClientsByMap(mapIndex: number): Client[] {

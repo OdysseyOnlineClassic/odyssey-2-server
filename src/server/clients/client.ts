@@ -4,16 +4,7 @@ import { Message } from '../message';
 import { AccountDocument } from '../data/accounts';
 import { CharacterDocument } from '../data/characters';
 
-export interface ClientInterface {
-  account: AccountDocument,
-  character: CharacterDocument,
-  index: number,
-  playing: boolean,
-  sendMessage(id: number, data: Buffer);
-  getAddress();
-}
-
-export abstract class Client extends events.EventEmitter implements ClientInterface {
+export abstract class Client extends events.EventEmitter implements Odyssey.Client {
   account: AccountDocument;
   character: CharacterDocument;
   index: number;

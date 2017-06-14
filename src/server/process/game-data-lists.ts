@@ -1,4 +1,3 @@
-import { GameStateInterface } from '../game-state';
 import { MessageProcessor } from './process';
 import { ProcessFunction } from './process';
 import { Message } from '../message';
@@ -19,7 +18,7 @@ export class GameDataListProcessor extends MessageProcessor {
   protected prefixData: PrefixDataManager;
   protected suffixData: SuffixDataManager;
 
-  constructor(protected game: GameStateInterface) {
+  constructor(protected game: Odyssey.GameState) {
     super(game);
 
     this.hallData = game.data.getManager('halls');

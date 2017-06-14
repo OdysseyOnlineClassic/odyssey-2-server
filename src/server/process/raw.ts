@@ -1,4 +1,3 @@
-import { GameStateInterface } from '../game-state';
 import { MessageProcessor } from './process';
 import { ProcessFunction } from './process';
 import { Message } from '../message';
@@ -9,7 +8,7 @@ export class RawProcessor extends MessageProcessor {
 
   protected objectData: ObjectDataManager;
 
-  constructor(protected game: GameStateInterface) {
+  constructor(protected game: Odyssey.GameState) {
     super(game);
   }
 

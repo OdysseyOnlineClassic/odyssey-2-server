@@ -4,11 +4,9 @@ import { Data } from './data/data';
 import { GameState } from './game-state';
 
 export class OdysseyServer {
-  private gameState: GameState;
   private server: net.Server;
 
-  constructor(readonly port: number = 5150) {
-    this.gameState = new GameState();
+  constructor(private gameState: GameState, readonly port: number = 5150) {
     this.server = net.createServer((socket: net.Socket) => { this.onConnection(socket) });
   }
 

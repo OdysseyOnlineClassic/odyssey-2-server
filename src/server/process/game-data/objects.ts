@@ -1,4 +1,3 @@
-import { GameStateInterface } from '../../game-state';
 import { MessageProcessor } from '../process';
 import { ProcessFunction } from '../process';
 import { Message } from '../../message';
@@ -10,7 +9,7 @@ export class ObjectDataProcessor extends MessageProcessor {
 
   protected objectData: ObjectDataManager;
 
-  constructor(game: GameStateInterface) {
+  constructor(game: Odyssey.GameState) {
     super(game);
 
     this.objectData = game.data.getManager('objects');

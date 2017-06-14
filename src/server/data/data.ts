@@ -12,11 +12,9 @@ import { ObjectDataManager } from './objects';
 import { PrefixDataManager } from './prefixes';
 import { SuffixDataManager } from './suffixes';
 
-export interface DataInterface {
-  getManager(name: string);
-}
 
-export class Data implements DataInterface {
+
+export class Data implements Odyssey.Data {
   private managers: any;
 
   constructor(dataFolder: string) {

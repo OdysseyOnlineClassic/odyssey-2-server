@@ -1,4 +1,3 @@
-import { GameStateInterface } from '../game-state';
 import { MessageProcessor } from './process';
 import { Message } from '../message';
 import { ProcessFunction } from './process';
@@ -6,7 +5,7 @@ import { ProcessFunction } from './process';
 export class DebugProcessor extends MessageProcessor {
     protected processors: { [id: number]: ProcessFunction } = {};
 
-    constructor(game: GameStateInterface) {
+    constructor(game: Odyssey.GameState) {
         super(game);
 
         this.processors[100] = this.debug.bind(this);
