@@ -1,3 +1,3 @@
 export class AdminWebClient {
-    playing: boolean = false;
+  playing: boolean = false;
 }
