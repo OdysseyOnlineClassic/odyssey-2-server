@@ -60,8 +60,8 @@ export class AccountsProcessor extends MessageProcessor {
     try {
       account = await this.accounts.login(username, password);
       character = await this.characters.getCharacter(account._id);
-    } catch (ex) {
-      msg.client.sendMessage(0, Buffer.from(ex.message));
+    } catch (err) {
+      msg.client.sendMessage(0, Buffer.concat([Buffer.from([0]), Buffer.from(err)]));
       return;
     }
 
