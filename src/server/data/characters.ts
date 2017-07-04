@@ -13,7 +13,6 @@ import { Location } from './maps';
 export interface CharacterDocument extends DataDocument {
   accountId: string;
   name: string;
-  _name: string; //Internal, lower cased version for uniqueness
   class: any; //Class interface?
   female: boolean;
   sprite: number;

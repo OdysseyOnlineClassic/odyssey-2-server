@@ -10,9 +10,9 @@ export class CharacterManager {
   public createCharacter(accountId, name, description, classIndex, female) {
     return new Promise((resolve, reject) => {
       let character: CharacterDocument = {
+        _id: name.toLowerCast(),
         accountId: accountId,
         name: name,
-        _name: name.toLowerCase(),
         class: classIndex,
         female: female,
         sprite: 1, //TODO calculate or load sprite
