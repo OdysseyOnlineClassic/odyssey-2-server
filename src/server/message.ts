@@ -26,7 +26,7 @@ export class RawMessage {
       }
 
       this.messages[i].data.copy(concatBuffer, length + 3, 0);
-      concatBuffer.writeDoubleBE(this.messages[i].data.length, length);
+      concatBuffer.writeUInt16BE(this.messages[i].data.length + 1, length);
       concatBuffer.writeUInt8(this.messages[i].id, length + 2);
       length += 3 + this.messages[i].data.length;
     }
