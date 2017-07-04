@@ -1,7 +1,7 @@
 import { MessageProcessor } from './process';
 import { Message } from '../message';
 import { ProcessFunction } from './process';
-import { PlayerEvents } from '../events/player';
+import { PlayerManager } from '../managers/player';
 import { CharacterDataManagerInterface } from '../data/characters';
 import { MapDataManager } from '../data/maps';
 import { MapDocument } from '../data/maps';
@@ -11,7 +11,7 @@ export class MovementProcessor extends MessageProcessor {
 
   protected characterData: CharacterDataManagerInterface;
   protected mapData: MapDataManager;
-  protected playerEvents: PlayerEvents;
+  protected playerEvents: PlayerManager;
 
   constructor(game: Odyssey.GameState) {
     super(game);

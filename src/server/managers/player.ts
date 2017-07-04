@@ -67,7 +67,7 @@ export class PlayerManager {
       //TODO outdoor light set to 0, need to implement outdoor light
       client.sendMessage(143, Buffer.from([0]));
 
-      this.game.managers.player.joinMap(client);
+      this.joinMap(client);
 
       client.playing = true;
 

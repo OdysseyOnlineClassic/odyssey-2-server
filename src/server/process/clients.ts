@@ -1,11 +1,11 @@
 import { MessageProcessor } from './process';
 import { ProcessFunction } from './process';
 import { Message } from '../message';
-import { PlayerEvents } from '../events/player';
+import { PlayerManager } from '../managers/player';
 
 export class ClientProcessor extends MessageProcessor {
   protected processors: { [id: number]: ProcessFunction } = {};
-  protected playerEvents: PlayerEvents;
+  protected playerEvents: PlayerManager;
 
   constructor(game: Odyssey.GameState) {
     super(game);
