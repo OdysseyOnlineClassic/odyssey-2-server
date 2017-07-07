@@ -13,7 +13,7 @@ export class MapProcessor extends MessageProcessor {
   constructor(game: Odyssey.GameState) {
     super(game);
 
-    this.mapData = game.data.getManager('maps');
+    this.mapData = game.data.managers.maps;
 
     this.processors[12] = this.uploadMap.bind(this);
     this.processors[45] = this.requestMap.bind(this);

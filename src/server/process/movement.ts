@@ -19,8 +19,8 @@ export class MovementProcessor extends MessageProcessor {
     this.processors[7] = this.move.bind(this);
     this.processors[13] = this.switchMap.bind(this);
 
-    this.characterData = game.data.getManager('characters');
-    this.mapData = game.data.getManager('maps');
+    this.characterData = game.data.managers.characters;
+    this.mapData = game.data.managers.maps;
     this.playerEvents = game.managers.player;
   }
 

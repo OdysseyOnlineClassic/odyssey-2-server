@@ -7,18 +7,23 @@ export class PlayerManager {
   protected mapData: MapDataManager;
 
   constructor(protected game: Odyssey.GameState) {
-    this.mapData = game.data.getManager('maps');
+    this.mapData = game.data.managers.maps;
   }
 
   /**
    * When a client joins the game.
    *
    * @param {Odyssey.Client} client
+   * @throws {Error} Expects client to have a character
    *
    * @memberOf PlayerEvents
    */
   joinGame(client: Odyssey.Client) {
     return new Promise((resolve, reject) => {
+      if (!client.character) {
+        throw new Error('Client does not have a character');
+      }
+
       let raw = new RawMessage();
       this.game.clients.sendMessageAll(6, this.serializeJoinCharacter(client.index, client.character), client.index);
       client.sendMessage(24, Buffer.from([]));

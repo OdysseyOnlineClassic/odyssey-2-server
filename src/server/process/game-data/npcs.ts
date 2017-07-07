@@ -12,7 +12,7 @@ export class NpcDataProcessor extends MessageProcessor {
   constructor(game: Odyssey.GameState) {
     super(game);
 
-    this.npcData = game.data.getManager('npcs');
+    this.npcData = game.data.managers.npcs;
 
     this.processors[80] = this.sendNpc.bind(this);
   }

@@ -12,12 +12,10 @@ import { ObjectDataManager } from './objects';
 import { PrefixDataManager } from './prefixes';
 import { SuffixDataManager } from './suffixes';
 
-
-
 export class Data implements Odyssey.Data {
-  private managers: any;
+  public readonly managers: any;
 
-  constructor(dataFolder: string) {
+  constructor(public readonly dataFolder: string) {
     let dataRoot = dataFolder + path.sep;
     this.managers = {
       'accounts': new AccountDataManager(dataRoot + 'accounts.data'),

@@ -5,8 +5,8 @@ export class AccountManager {
   private characterData;
 
   constructor(private gameState: Odyssey.GameState) {
-    this.accountData = gameState.data.getManager('accounts');
-    this.characterData = gameState.data.getManager('characters');
+    this.accountData = gameState.data.managers.accounts;
+    this.characterData = gameState.data.managers.characters;
   }
 
   public createAccount(username: string, password: string): Promise<void> {

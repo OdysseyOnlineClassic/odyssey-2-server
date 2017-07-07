@@ -10,7 +10,7 @@ export class GuildProcessor extends MessageProcessor {
   constructor(game: Odyssey.GameState) {
     super(game);
 
-    this.guildData = game.data.getManager('guilds');
+    this.guildData = game.data.managers.guilds;
 
     this.processors[6] = this.guildList.bind(this);
     this.processors[24] = this.guildList.bind(this);

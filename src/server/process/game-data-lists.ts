@@ -21,13 +21,13 @@ export class GameDataListProcessor extends MessageProcessor {
   constructor(protected game: Odyssey.GameState) {
     super(game);
 
-    this.hallData = game.data.getManager('halls');
-    this.magicData = game.data.getManager('magic');
-    this.monsterData = game.data.getManager('monsters');
-    this.npcData = game.data.getManager('npcs');
-    this.objectData = game.data.getManager('objects');
-    this.prefixData = game.data.getManager('prefixes');
-    this.suffixData = game.data.getManager('suffixes');
+    this.hallData = game.data.managers.halls;
+    this.magicData = game.data.managers.magic;
+    this.monsterData = game.data.managers.monsters;
+    this.npcData = game.data.managers.npcs;
+    this.objectData = game.data.managers.objects;
+    this.prefixData = game.data.managers.prefixes;
+    this.suffixData = game.data.managers.suffixes;
   }
 
   async process(msg: Message): Promise<any> {

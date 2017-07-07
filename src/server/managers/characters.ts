@@ -4,7 +4,7 @@ export class CharacterManager {
   private characterData;
 
   constructor(private game: Odyssey.GameState) {
-    this.characterData = game.data.getManager('characters');
+    this.characterData = game.data.managers.characters;
   }
 
   public createCharacter(accountId, name, description, classIndex, female) {

@@ -12,7 +12,7 @@ export class ObjectDataProcessor extends MessageProcessor {
   constructor(game: Odyssey.GameState) {
     super(game);
 
-    this.objectData = game.data.getManager('objects');
+    this.objectData = game.data.managers.objects;
 
     this.processors[19] = this.editSendObject.bind(this);
     this.processors[21] = this.updateObject.bind(this);

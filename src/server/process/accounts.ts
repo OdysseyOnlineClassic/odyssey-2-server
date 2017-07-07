@@ -21,8 +21,8 @@ export class AccountsProcessor extends MessageProcessor {
     this.processors[1] = this.login.bind(this);
     this.processors[2] = this.createCharacter.bind(this);
 
-    this.accountData = game.data.getManager('accounts');
-    this.characterData = game.data.getManager('characters');
+    this.accountData = game.data.managers.accounts;
+    this.characterData = game.data.managers.characters;
 
     this.accounts = game.managers.accounts;
     this.characters = game.managers.characters;

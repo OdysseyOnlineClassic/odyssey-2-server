@@ -21,7 +21,7 @@ export default function (app: express.Application) {
       if (clients[i] && clients[i].playing) {
         if (clients[i].character && clients[i].character.name.toLowerCase() == req.params.characterName.toLowerCase()) {
           clients[i].account.access = req.body.access;
-          req.gameState.data.getManager('accounts').updateAccount(clients[i].account, (err, account) => {
+          req.gameState.data.managers.accounts.updateAccount(clients[i].account, (err, account) => {
             if (err) {
               res.status(500);
               res.send(err);
