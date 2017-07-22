@@ -87,7 +87,7 @@ export class GameState implements Odyssey.GameState {
     }
   }
 
-  constructor() {
+  constructor(private readonly config: Odyssey.Config) {
     this.data = new Data('data/');
     this.clients = new ClientManager(this);
 
@@ -97,6 +97,67 @@ export class GameState implements Odyssey.GameState {
       player: new PlayerManager(this)
     }
 
+    this.setListeners();
+
+    let interval = config.server.interval || 100;
+    this.start(interval);
+  }
+
+  /**
+   * Get current timer in ms
+   */
+  get tick(): number {
+    let tick = process.hrtime();
+    return (tick[0] * 1e9 + tick[1]) / 1000000
+  }
+
+  processMessage(msg: Message) {
+    console.log(`Message ${msg.id} [${msg.data.length}] - ` + (msg.client.account ? msg.client.account.username : msg.client.getAddress().address));
+    console.log(`Playing: ${msg.client.playing}`);
+
+    let processors: Array<MessageProcessor>;
+    if (msg.client.playing) {
+      processors = this.playingProcessors;
+    } else {
+      processors = this.connectingProcessors;
+    }
+
+    if (processors[msg.id]) {
+      processors[msg.id].process(msg);
+    } else {
+      console.error(`Unhandled Message ${msg.id} [${msg.data.length}] - ` + (msg.client.account ? msg.client.account.username : msg.client.getAddress().address))
+    }
+  }
+
+  start(interval: number = 10) {
+    this.performance = {
+      updateAverage: 0.0,
+      latestUpdate: 0.0,
+      diff: [0, 0]
+    };
+
+    this.intervalId = setInterval(this.update.bind(this), interval);
+  }
+
+  stop() {
+    clearInterval(this.intervalId);
+  }
+
+  protected update() {
+    if (this.updateInProgress) {
+      return;
+    }
+    this.updateInProgress = true;
+    this.timestamp = process.hrtime();
+
+    this.performance.diff = process.hrtime(this.timestamp)
+    this.performance.updateAverage -= this.performance.updateAverage / 100;
+    this.performance.latestUpdate = (this.performance.diff[0] * 1e9 + this.performance.diff[1])
+    this.performance.updateAverage += this.performance.latestUpdate / 1000000 / 100;
+    this.updateInProgress = false;
+  }
+
+  private setListeners() {
     this.connectingProcessors[0] = new AccountsProcessor(this);
     this.connectingProcessors[1] = this.connectingProcessors[0];
     this.connectingProcessors[2] = this.connectingProcessors[0];
@@ -135,62 +196,5 @@ export class GameState implements Odyssey.GameState {
     this.playingProcessors[96] = new PingProcessor(this);
 
     this.playingProcessors[100] = new DebugProcessor(this);
-  }
-
-  /**
-   * Get current timer in ms
-   */
-  get tick(): number {
-    let tick = process.hrtime();
-    return (tick[0] * 1e9 + tick[1]) / 1000000
-  }
-
-  processMessage(msg: Message) {
-    console.log(`Message ${msg.id} [${msg.data.length}] - ` + (msg.client.account ? msg.client.account.username : msg.client.getAddress().address));
-    console.log(`Playing: ${msg.client.playing}`);
-
-    let processors: Array<MessageProcessor>;
-    if (msg.client.playing) {
-      processors = this.playingProcessors;
-    } else {
-      processors = this.connectingProcessors;
-    }
-
-    if (processors[msg.id]) {
-      processors[msg.id].process(msg);
-    } else {
-      console.error(`Unhandled Message ${msg.id} [${msg.data.length}] - ` + (msg.client.account ? msg.client.account.username : msg.client.getAddress().address))
-    }
-  }
-
-  start(interval: number = 10) {
-    this.performance = {
-      updateAverage: 0.0,
-      latestUpdate: 0.0,
-      diff: [0, 0]
-    };
-
-    this.intervalId = setInterval(this.update.bind(this), interval);
-    setInterval(() => {
-      //console.log(this.performance.updateAverage);
-    }, 1000);
-  }
-
-  stop() {
-    clearInterval(this.intervalId);
-  }
-
-  protected update() {
-    if (this.updateInProgress) {
-      return;
-    }
-    this.updateInProgress = true;
-    this.timestamp = process.hrtime();
-
-    this.performance.diff = process.hrtime(this.timestamp)
-    this.performance.updateAverage -= this.performance.updateAverage / 100;
-    this.performance.latestUpdate = (this.performance.diff[0] * 1e9 + this.performance.diff[1])
-    this.performance.updateAverage += this.performance.latestUpdate / 1000000 / 100;
-    this.updateInProgress = false;
   }
 }

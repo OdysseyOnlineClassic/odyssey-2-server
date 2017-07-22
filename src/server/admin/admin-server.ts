@@ -6,7 +6,7 @@ import players from './controllers/players';
 export class AdminServer {
   private server: express.Application;
 
-  constructor(protected gameState: GameState) {
+  constructor(protected gameState: GameState, private readonly config: Odyssey.Config) {
     this.server = express();
 
     this.server.use(bodyParser.json());
@@ -18,8 +18,9 @@ export class AdminServer {
 
     players(this.server);
 
-    this.server.listen(3000, "127.0.0.1", () => {
-      console.log('Admin server listening on 3000');
+    let port = this.config.server.adminPort;
+    this.server.listen(port, "127.0.0.1", () => {
+      console.log(`Admin server listening on ${port}`);
     });
   }
 }
