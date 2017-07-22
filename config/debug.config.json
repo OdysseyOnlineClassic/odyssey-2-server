@@ -1,7 +1,7 @@
 {
   "server": {
     "port": 5751,
-    "adminPort": 4000,
+    "adminPort": 3000,
     "log": {
       "level": "error",
       "file": "odyssey.log"
