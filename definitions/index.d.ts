@@ -15,6 +15,7 @@ declare namespace Odyssey {
     sendMessageMap(id: number, data: Buffer, mapIndex: number, ignoreIndex?: number);
     getClientsByMap(mapIndex: number);
   }
+
   export interface Data {
     readonly managers: any;
     readonly dataFolder: string;

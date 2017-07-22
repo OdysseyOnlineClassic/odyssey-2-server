@@ -9,7 +9,7 @@
     "outDir": "bin"
   },
   "include": [
-    "index.d.ts",
+    "definitions/**/*.d.ts",
     "src/**/*"
   ],
   "exclude": [

@@ -1,20 +1,21 @@
 #!/usr/bin/env node
 
-import * as Commander from "commander";
+import * as fs from "fs";
 import { OdysseyServer } from "./server/server";
 import { AdminServer } from './server/admin/admin-server';
 import { GameState } from './server/game-state';
 
-interface InterfaceCLI extends Commander.ICommand {
-  port: number
+let config: Odyssey.Config;
+try {
+  config = JSON.parse(fs.readFileSync('odyssey.config.json', 'utf-8'));
+} catch (ex) {
+  console.error('Unable to read odyssey.config.json');
+  console.error(ex);
+  process.exit(-1);
 }
 
-Commander
-  .option('-p, --port [port]', 'Server Port')
-  .parse(process.argv);
+let gameState = new GameState(config);
+this.gameState.start();
 
-let gameState = new GameState();
-
-let server = new OdysseyServer(gameState, Commander.port || 5751);
-server.start();
-let adminServer = new AdminServer(gameState);
+let server = new OdysseyServer(gameState, config);
+let adminServer = new AdminServer(gameState, config);
