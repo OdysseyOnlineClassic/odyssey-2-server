@@ -34,6 +34,7 @@ export class GameState implements Odyssey.GameState {
     latestUpdate: number,
     diff: [number, number]
   }
+  private firstTick: [number, number];
   private timestamp: [number, number];
   private counter: number = 0;
 
@@ -101,13 +102,15 @@ export class GameState implements Odyssey.GameState {
 
     let interval = config.server.interval || 100;
     this.start(interval);
+
+    this.firstTick = process.hrtime();
   }
 
   /**
    * Get current timer in ms
    */
   get tick(): number {
-    let tick = process.hrtime();
+    let tick = process.hrtime(this.firstTick);
     return (tick[0] * 1e9 + tick[1]) / 1000000
   }
 
