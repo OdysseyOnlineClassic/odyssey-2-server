@@ -22,5 +22,5 @@ try {
 }
 
 let gameState = new GameState(config);
-let server = new OdysseyServer(gameState, config);
-let adminServer = new AdminServer(gameState, config);
+let server = new OdysseyServer(gameState);
+let adminServer = new AdminServer(gameState);

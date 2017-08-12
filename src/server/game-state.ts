@@ -88,7 +88,7 @@ export class GameState implements Odyssey.GameState {
     }
   }
 
-  constructor(private readonly config: Odyssey.Config) {
+  constructor(readonly config: Odyssey.Config) {
     this.data = new Data('data/');
     this.clients = new ClientManager(this);
 
