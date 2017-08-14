@@ -10,7 +10,7 @@ export class CharacterManager {
   public createCharacter(accountId, name, description, classIndex, female) {
     return new Promise((resolve, reject) => {
       let character: CharacterDocument = {
-        _id: name.toLowerCast(),
+        _id: name.toLowerCase(),
         accountId: accountId,
         name: name,
         class: classIndex,

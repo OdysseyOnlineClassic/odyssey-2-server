@@ -32,7 +32,7 @@ export class RawMessage {
     }
 
     sendBuffer = Buffer.allocUnsafe(length);
-    concatBuffer.copy(sendBuffer, 0, 0, length - 1);
+    concatBuffer.copy(sendBuffer, 0, 0, length);
     client.sendMessage(170, sendBuffer);
     length = 0;
 
