@@ -117,6 +117,7 @@ export class PlayerManager {
       //TODO Send Map Object Data
 
       this.updateLocationToMap(client);
+      this.sendMapPlayers(client);
     });
   }
 
@@ -136,6 +137,28 @@ export class PlayerManager {
       client.character.location = location;
       this.joinMap(client);
     }
+  }
+
+  protected sendMapPlayers(client: Odyssey.Client) {
+    let map = client.character.location.map;
+    let clients = this.game.clients.getClientsByMap(map);
+    let msg = new RawMessage();
+
+    let buffer = Buffer.allocUnsafe(7);
+    for (let i = 0; i < clients.length; i++) {
+      if (clients[i].index != client.index) {
+        buffer.writeUInt8(clients[i].index, 0);
+        buffer.writeUInt8(clients[i].character.location.x, 1);
+        buffer.writeUInt8(clients[i].character.location.y, 2);
+        buffer.writeUInt8(clients[i].character.location.direction, 3);
+        buffer.writeUInt16BE(clients[i].character.sprite, 4);
+        buffer.writeUInt8(clients[i].character.status, 6);
+
+        msg.addMessage(8, buffer);
+      }
+    }
+
+    msg.sendMessage(client);
   }
 
   /**
