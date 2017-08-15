@@ -4,6 +4,8 @@ import { MapDocument } from '../data/maps';
 import { CharacterDataManagerInterface } from '../data/characters';
 import { RawMessage } from '../message';
 
+const BlockingAttributes = [1, 3, 13, 14, 15, 16];
+
 export class PlayerManager {
   protected mapData: MapDataManager;
   protected characterData: CharacterDataManagerInterface;
@@ -138,23 +140,39 @@ export class PlayerManager {
     if (Math.abs(dx) + Math.abs(dy) > 1) {
       this.warp(client, character.location);
       return;
-    } else if (//Check if player is already facing that direction
-      (dy == -1 && location.direction == 0) ||
-      (dy == 1 && location.direction == 1) ||
-      (dx == -1 && location.direction == 2) ||
-      (dx == 1 && location.direction == 3)
-    ) {
-      //TODO Check Map Tiles
-
-      character.location.x += dx;
-      character.location.y += dy;
-
-      //TODO Check If Monsters Notice
-
     }
+    new Promise((resolve, reject) => {
+      if (//Check if player is already facing that direction
+        (dy == -1 && location.direction == 0) ||
+        (dy == 1 && location.direction == 1) ||
+        (dx == -1 && location.direction == 2) ||
+        (dx == 1 && location.direction == 3)
+      ) {
+        //TODO need to sync promise with character update and sendmessage
 
-    this.characterData.update(character, (err, character) => { });
-    this.game.clients.sendMessageMap(10, Buffer.from([client.index, character.location.x, character.location.y, character.location.direction, walkStep]), character.location.map, client.index);
+        this.mapData.get(character.location.map, (err, map: MapDocument) => {
+          //TODO Check Map Tiles
+          let tile = map.tiles[location.x][location.y];
+          if (BlockingAttributes.indexOf(tile.attribute) >= 0 || BlockingAttributes.indexOf(tile.attribute2) >= 0) {
+            return reject();
+          }
+          character.location.x += dx;
+          character.location.y += dy;
+          return resolve();
+        });
+
+      } else {
+        character.direction = location.direction;
+        resolve();
+      }
+    })
+      .then(() => {
+        this.characterData.update(character, (err, character) => { });
+        this.game.clients.sendMessageMap(10, Buffer.from([client.index, character.location.x, character.location.y, character.location.direction, walkStep]), character.location.map, client.index);
+      })
+      .catch(() => {
+        //TODO What to do?
+      });
   }
 
   partMap(client: Odyssey.Client) {
@@ -167,6 +185,7 @@ export class PlayerManager {
   }
 
   exitMap(client: Odyssey.Client, exit: number) {
+    //TODO check map switch timer
     this.mapData.get(client.character.location.map, (err, map: MapDocument) => {
       let newMap: number;
       let warp: boolean = false;
