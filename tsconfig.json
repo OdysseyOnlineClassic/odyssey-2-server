@@ -9,6 +9,7 @@
     "outDir": "bin"
   },
   "include": [
+    "definitions/**/*.d.ts",
     "src/**/*"
   ],
   "exclude": [

@@ -1,20 +1,19 @@
-import { GameStateInterface } from '../game-state';
 import { MessageProcessor } from './process';
 import { ProcessFunction } from './process';
 import { Message } from '../message';
-import { PlayerEvents } from '../events/player';
+import { PlayerManager } from '../managers/player';
 
 export class ClientProcessor extends MessageProcessor {
   protected processors: { [id: number]: ProcessFunction } = {};
-  protected playerEvents: PlayerEvents;
+  protected playerEvents: PlayerManager;
 
-  constructor(game: GameStateInterface) {
+  constructor(game: Odyssey.GameState) {
     super(game);
 
     this.processors[23] = this.joinGame.bind(this);
     this.processors[61] = this.clientInfo.bind(this);
 
-    this.playerEvents = game.events.player;
+    this.playerEvents = game.managers.player;
   }
 
   async process(msg: Message): Promise<any> {

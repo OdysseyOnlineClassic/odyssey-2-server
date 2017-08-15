@@ -1,4 +1,3 @@
-import { GameStateInterface } from '../game-state';
 import { MessageProcessor } from './process';
 import { ProcessFunction } from './process';
 import { Message } from '../message';
@@ -20,14 +19,14 @@ export class GameDataProcessor extends MessageProcessor {
   protected prefixData: PrefixDataManager;
   protected suffixData: SuffixDataManager;
 
-  constructor(game: GameStateInterface) {
+  constructor(game: Odyssey.GameState) {
     super(game);
 
-    this.hallData = game.data.getManager('halls');
-    this.magicData = game.data.getManager('magic');
-    this.monsterData = game.data.getManager('monsters');
-    this.prefixData = game.data.getManager('prefixes');
-    this.suffixData = game.data.getManager('suffixes');
+    this.hallData = game.data.managers.halls;
+    this.magicData = game.data.managers.magic;
+    this.monsterData = game.data.managers.monsters;
+    this.prefixData = game.data.managers.prefixes;
+    this.suffixData = game.data.managers.suffixes;
 
     this.processors[81] = this.sendHall.bind(this);
     this.processors[82] = this.sendMonster.bind(this);

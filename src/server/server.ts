@@ -4,18 +4,16 @@ import { Data } from './data/data';
 import { GameState } from './game-state';
 
 export class OdysseyServer {
-  private gameState: GameState;
   private server: net.Server;
 
-  constructor(readonly port: number = 5150) {
-    this.gameState = new GameState();
+  constructor(private gameState: GameState) {
     this.server = net.createServer((socket: net.Socket) => { this.onConnection(socket) });
+    this.start();
   }
 
   start() {
-    console.log(`Listeneing on ${this.port}`);
-    this.gameState.start();
-    this.server.listen(this.port);
+    console.log(`Listeneing on ${this.gameState.config.server.port}`);
+    this.server.listen(this.gameState.config.server.port);
   }
 
   protected onConnection(socket: net.Socket) {

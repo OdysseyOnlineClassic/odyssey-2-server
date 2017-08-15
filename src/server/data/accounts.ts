@@ -37,6 +37,10 @@ export class AccountDataManager implements AccountDataManagerInterface {
   getAccount(username: string, cb: Callback): void {
     this.data.findOne({ username: username }, cb);
   }
+
+  updateAccount(doc: AccountDocument, cb: { (Error, AccountDocument) }) {
+    this.data.update({ username: doc.username }, doc, { upsert: true }, cb);
+  }
 }
 
 interface Callback { (Error, AccountDocument): void }

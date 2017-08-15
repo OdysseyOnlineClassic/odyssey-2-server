@@ -1,5 +1,3 @@
-import * as bcrypt from 'bcryptjs';
-import { GameStateInterface } from '../game-state';
 import { MessageProcessor } from './process';
 import { ProcessFunction } from './process';
 import { Message } from '../message';
@@ -7,115 +5,77 @@ import { AccountDataManager } from '../data/accounts';
 import { AccountDocument } from '../data/accounts';
 import { CharacterDataManager } from '../data/characters';
 import { CharacterDocument } from '../data/characters';
-import { ClientInterface } from '../clients/client';
+import { AccountManager } from '../managers/accounts';
+import { CharacterManager } from '../managers/characters';
 
 export class AccountsProcessor extends MessageProcessor {
   protected processors: { [id: number]: ProcessFunction } = {};
   private accountData: AccountDataManager;
   private characterData: CharacterDataManager;
+  private accounts: AccountManager;
+  private characters: CharacterManager;
 
-  constructor(protected game: GameStateInterface) {
+  constructor(protected game: Odyssey.GameState) {
     super(game);
     this.processors[0] = this.createAccount.bind(this);
     this.processors[1] = this.login.bind(this);
     this.processors[2] = this.createCharacter.bind(this);
 
-    this.accountData = game.data.getManager('accounts');
-    this.characterData = game.data.getManager('characters');
+    this.accountData = game.data.managers.accounts;
+    this.characterData = game.data.managers.characters;
+
+    this.accounts = game.managers.accounts;
+    this.characters = game.managers.characters;
   }
 
   async process(msg: Message): Promise<any> {
     this.processors[msg.id](msg);
   }
 
-  createAccount(msg: Message) {
+  protected async createAccount(msg: Message) {
     let dataString: string = msg.data.toString('utf-8');
 
     let strings = dataString.split('\0');
     let username = strings[0];
     let password = strings[1];
 
-    if (username.length < 3 || username.length > 15) {
-      msg.client.sendMessage(1, Buffer.concat([Buffer.from([0]), Buffer.from('Username must be between 3 and 15 characters', 'utf8')]));
+    try {
+      await this.accounts.createAccount(username, password);
+    } catch (ex) {
+      msg.client.sendMessage(1, Buffer.concat([Buffer.from([0]), Buffer.from(ex.message, 'utf8')]));
       return;
     }
 
-    if (password.length < 8) {
-      msg.client.sendMessage(1, Buffer.concat([Buffer.from([0]), Buffer.from('Password must be at least 8 characters', 'utf8')]));
-      return;
-    }
-
-    let salt = bcrypt.genSaltSync();
-    password = bcrypt.hashSync(password, salt);
-
-    this.accountData.createAccount(username, password, (err, account) => {
-      if (err) {
-        if (err.errorType == 'uniqueViolated') {
-          //Account already exists
-          msg.client.sendMessage(1, Buffer.from([1]));
-        } else {
-          //Database Error
-          msg.client.sendMessage(1, Buffer.from([0, Array.from('\0Unknown Error')]));
-        }
-        return;
-      }
-
-      msg.client.sendMessage(2, Buffer.allocUnsafe(0));
-    });
+    msg.client.sendMessage(2, Buffer.allocUnsafe(0));
   }
 
-  login(msg: Message) {
+  protected async login(msg: Message) {
     let dataString: string = msg.data.toString('utf-8');
 
     let strings = dataString.split('\0');
     let username = strings[0];
     let password = strings[1];
 
-    this.accountData.getAccount(username, (err, account) => {
-      if (err) {
-        msg.client.sendMessage(0, Buffer.from('\0Unknown error while loading account'));
-        return;
-      }
+    let account, character;
+    try {
+      account = await this.accounts.login(username, password);
+      character = await this.characters.getCharacter(account._id);
+    } catch (err) {
+      msg.client.sendMessage(0, Buffer.concat([Buffer.from([0]), Buffer.from(err)]));
+      return;
+    }
 
-      if (!(account && bcrypt.compareSync(password, account.password))) {
-        //Invalid user/pass
-        msg.client.sendMessage(0, Buffer.from([1]));
-        return;
-      }
+    msg.client.account = account
+    if (!character) {
+      msg.client.sendMessage(3, Buffer.allocUnsafe(0));
+      return;
+    }
 
-      //TODO Check if already logged in
-
-      //TODO Check for Ban
-
-      msg.client.account = account;
-
-      this.characterData.getCharacter(account._id, (err, character) => {
-        if (err) {
-          msg.client.sendMessage(0, Buffer.from('\0Unknown error while loading character'))
-          return;
-        }
-
-        if (!character) {
-          msg.client.sendMessage(3, Buffer.allocUnsafe(0));
-          return;
-        }
-
-        if (!character.location) {
-          //TODO define start location
-          character.location = {
-            map: 1,
-            x: 0,
-            y: 0,
-            direction: 0
-          }
-        }
-        msg.client.character = character;
-        this.sendCharacter(msg.client, character);
-      });
-    });
+    msg.client.character = character;
+    this.sendCharacter(msg.client, character);
   }
 
-  protected createCharacter(msg: Message) {
+  protected async createCharacter(msg: Message) {
     let classIndex: number = msg.data.readUInt8(0);
     let female: boolean = msg.data.readUInt8(1) > 0;
     let dataString: string = msg.data.toString('utf-8', 2);
@@ -127,58 +87,18 @@ export class AccountsProcessor extends MessageProcessor {
       description = strings[1];
     }
 
-    let character: CharacterDocument = {
-      accountId: msg.client.account._id,
-      name: name,
-      _name: name.toLowerCase(),
-      class: classIndex,
-      female: female,
-      sprite: 1, //TODO calculate or load sprite
-      description: description,
-      status: 1,
-      location: { //TODO define start location
-        map: 1,
-        x: 0,
-        y: 0,
-        direction: 0
-      },
-      stats: {
-        attack: 1,
-        defense: 1,
-        magicDefense: 1,
-        maxHp: 10,
-        maxEnergy: 10,
-        maxMana: 10,
-        level: 1,
-        experience: 0
-      }, //TODO
-      inventory: new Array(20), //TODO
-      equipped: new Array(5),
-      ammo: null,
-      bank: new Array(20), //TODO
-      guild: {
-        id: null,
-        rank: 0,
-        slot: 0,
-        invite: 0
-      },
-      extended: null,
-      timers: {
-        walk: 0
-      }, //TODO
-      alive: true
-    };
+    let character;
+    try {
+      character = await this.characters.createCharacter(msg.client.account._id, name, description, classIndex, female);
+    } catch (ex) {
+      throw ex;
+    }
 
-    this.characterData.createCharacter(character, (err, character) => {
-      if (err) {
-        throw err;
-      }
-      msg.client.character = character;
-      this.sendCharacter(msg.client, character);
-    });
+    msg.client.character = character;
+    this.sendCharacter(msg.client, character);
   }
 
-  protected sendCharacter(client: ClientInterface, character: CharacterDocument): void {
+  protected sendCharacter(client: Odyssey.Client, character: CharacterDocument): void {
     let length = 15 + character.name.length + character.description.length;
     let data = Buffer.allocUnsafe(length);
     data.writeUInt8(character.class, 0);

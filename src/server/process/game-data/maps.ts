@@ -1,5 +1,4 @@
 const zlib = require('zlib');
-import { GameStateInterface } from '../../game-state';
 import { MessageProcessor } from '../process';
 import { ProcessFunction } from '../process';
 import { Message } from '../../message';
@@ -11,10 +10,10 @@ export class MapProcessor extends MessageProcessor {
 
   protected mapData: MapDataManager;
 
-  constructor(game: GameStateInterface) {
+  constructor(game: Odyssey.GameState) {
     super(game);
 
-    this.mapData = game.data.getManager('maps');
+    this.mapData = game.data.managers.maps;
 
     this.processors[12] = this.uploadMap.bind(this);
     this.processors[45] = this.requestMap.bind(this);
@@ -174,8 +173,8 @@ export class MapProcessor extends MessageProcessor {
     this.mapData.update(map, (err, map) => {
       let mapClients = this.game.clients.getClientsByMap(mapIndex);
       for (let i = 0; i < mapClients.length; i++) {
-        this.game.events.player.partMap(mapClients[i], mapClients[i].character.location.map);
-        this.game.events.player.joinMap(mapClients[i], mapClients[i].character.location);
+        this.game.managers.player.partMap(mapClients[i], mapClients[i].character.location.map);
+        this.game.managers.player.joinMap(mapClients[i], mapClients[i].character.location);
       }
     });
   }

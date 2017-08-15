@@ -1,26 +1,29 @@
 import { CharacterDocument } from '../data/characters';
-import { ClientInterface } from '../clients/client';
-import { GameStateInterface } from '../game-state';
 import { Location } from '../data/maps';
 import { MapDataManager } from '../data/maps';
 import { RawMessage } from '../message';
 
-export class PlayerEvents {
+export class PlayerManager {
   protected mapData: MapDataManager;
 
-  constructor(protected game: GameStateInterface) {
-    this.mapData = game.data.getManager('maps');
+  constructor(protected game: Odyssey.GameState) {
+    this.mapData = game.data.managers.maps;
   }
 
   /**
    * When a client joins the game.
-   * 
-   * @param {ClientInterface} client 
-   * 
+   *
+   * @param {Odyssey.Client} client
+   * @throws {Error} Expects client to have a character
+   *
    * @memberOf PlayerEvents
    */
-  joinGame(client: ClientInterface) {
+  joinGame(client: Odyssey.Client) {
     return new Promise((resolve, reject) => {
+      if (!client.character) {
+        throw new Error('Client does not have a character');
+      }
+
       let raw = new RawMessage();
       this.game.clients.sendMessageAll(6, this.serializeJoinCharacter(client.index, client.character), client.index);
       client.sendMessage(24, Buffer.from([]));
@@ -69,7 +72,7 @@ export class PlayerEvents {
       //TODO outdoor light set to 0, need to implement outdoor light
       client.sendMessage(143, Buffer.from([0]));
 
-      this.game.events.player.joinMap(client);
+      this.joinMap(client);
 
       client.playing = true;
 
@@ -82,11 +85,11 @@ export class PlayerEvents {
    * Sends Map Data to Client
    * Sends Client Location Update to other Clients on map
    *
-   * @param {ClientInterface} client
+   * @param {Odyssey.Client} client
    *
    * @memberOf PlayerEvents
    */
-  joinMap(client: ClientInterface) {
+  joinMap(client: Odyssey.Client) {
     let location = client.character.location;
     this.mapData.get(location.map, (err, map) => {
       if (!map) {
@@ -114,15 +117,20 @@ export class PlayerEvents {
       //TODO Send Map Object Data
 
       this.updateLocationToMap(client);
+      this.sendMapPlayers(client);
     });
   }
 
-  partMap(client: ClientInterface) {
+  partMap(client: Odyssey.Client) {
     //TODO need to handle npc exit text
     client.sendMessage(88, Buffer.from([0, 0]));
+
+    let map = client.character.location.map;
+
+    this.game.clients.sendMessageMap(9, Buffer.from([client.index]), map, client.index);
   }
 
-  warp(client: ClientInterface, location: Location) {
+  warp(client: Odyssey.Client, location: Location) {
     let map = client.character.location.map;
     if (map == location.map) {
       client.character.location = location;
@@ -135,35 +143,36 @@ export class PlayerEvents {
     }
   }
 
-  /**
-   * Sends client's location to all others on that map
-   * 
-   * @protected
-   * @param {ClientInterface} client 
-   * 
-   * @memberOf PlayerEvents
-   */
-  protected updateLocationToMap(client: ClientInterface) {
-    let location = client.character.location;
-    let dataToMap: Buffer = Buffer.allocUnsafe(7);
-    dataToMap.writeUInt8(client.index, 0);
-    dataToMap.writeUInt8(location.x, 1);
-    dataToMap.writeUInt8(location.y, 2);
-    dataToMap.writeUInt8(location.direction, 3);
-    dataToMap.writeUInt16BE(client.character.sprite, 4);
-    dataToMap.writeUInt8(client.character.status, 6);
+  protected sendMapPlayers(client: Odyssey.Client) {
+    let map = client.character.location.map;
+    let clients = this.game.clients.getClientsByMap(map);
+    let msg = new RawMessage();
 
-    this.game.clients.sendMessageMap(8, dataToMap, location.map, client.index);
+    let buffer = Buffer.allocUnsafe(7);
+    for (let i = 0; i < clients.length; i++) {
+      if (clients[i].index != client.index) {
+        buffer.writeUInt8(clients[i].index, 0);
+        buffer.writeUInt8(clients[i].character.location.x, 1);
+        buffer.writeUInt8(clients[i].character.location.y, 2);
+        buffer.writeUInt8(clients[i].character.location.direction, 3);
+        buffer.writeUInt16BE(clients[i].character.sprite, 4);
+        buffer.writeUInt8(clients[i].character.status, 6);
+
+        msg.addMessage(8, buffer);
+      }
+    }
+
+    msg.sendMessage(client);
   }
 
   /**
    * Serializes basic character data when player joins a game
-   * 
+   *
    * @protected
-   * @param {number} index 
-   * @param {CharacterDocument} character 
-   * @returns 
-   * 
+   * @param {number} index
+   * @param {CharacterDocument} character
+   * @returns
+   *
    * @memberOf PlayerEvents
    */
   protected serializeJoinCharacter(index: number, character: CharacterDocument) {
@@ -176,5 +185,26 @@ export class PlayerEvents {
     joinChar.write(character.name, 6);
 
     return joinChar;
+  }
+
+  /**
+   * Sends client's location to all others on that map
+   *
+   * @protected
+   * @param {Odyssey.Client} client
+   *
+   * @memberOf PlayerEvents
+   */
+  protected updateLocationToMap(client: Odyssey.Client) {
+    let location = client.character.location;
+    let dataToMap: Buffer = Buffer.allocUnsafe(7);
+    dataToMap.writeUInt8(client.index, 0);
+    dataToMap.writeUInt8(location.x, 1);
+    dataToMap.writeUInt8(location.y, 2);
+    dataToMap.writeUInt8(location.direction, 3);
+    dataToMap.writeUInt16BE(client.character.sprite, 4);
+    dataToMap.writeUInt8(client.character.status, 6);
+
+    this.game.clients.sendMessageMap(8, dataToMap, location.map, client.index);
   }
 }

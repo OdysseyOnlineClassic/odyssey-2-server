@@ -1,4 +1,3 @@
-import { GameStateInterface } from '../../game-state';
 import { MessageProcessor } from '../process';
 import { ProcessFunction } from '../process';
 import { Message } from '../../message';
@@ -10,10 +9,10 @@ export class NpcDataProcessor extends MessageProcessor {
 
   protected npcData: NpcDataManager;
 
-  constructor(game: GameStateInterface) {
+  constructor(game: Odyssey.GameState) {
     super(game);
 
-    this.npcData = game.data.getManager('npcs');
+    this.npcData = game.data.managers.npcs;
 
     this.processors[80] = this.sendNpc.bind(this);
   }

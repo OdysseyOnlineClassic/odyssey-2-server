@@ -1,5 +1,3 @@
-import { ClientInterface } from './clients/client';
-
 export class RawMessage {
   protected readonly maxLength: number = 2048;
   messages: { id: number, data: Buffer }[] = [];
@@ -8,7 +6,7 @@ export class RawMessage {
     this.messages.push({ id: id, data: data });
   }
 
-  sendMessage(client: ClientInterface) {
+  sendMessage(client: Odyssey.Client) {
     if (this.messages.length == 0) {
       console.error('RawMessage.sendMessage called on empty message array');
       return;
@@ -28,13 +26,13 @@ export class RawMessage {
       }
 
       this.messages[i].data.copy(concatBuffer, length + 3, 0);
-      concatBuffer.writeDoubleBE(this.messages[i].data.length, length);
+      concatBuffer.writeUInt16BE(this.messages[i].data.length + 1, length);
       concatBuffer.writeUInt8(this.messages[i].id, length + 2);
       length += 3 + this.messages[i].data.length;
     }
 
     sendBuffer = Buffer.allocUnsafe(length);
-    concatBuffer.copy(sendBuffer, 0, 0, length - 1);
+    concatBuffer.copy(sendBuffer, 0, 0, length);
     client.sendMessage(170, sendBuffer);
     length = 0;
 
@@ -48,7 +46,7 @@ export class Message {
 
   private bytesRead = 0;
 
-  constructor(public id: number, public length: number, public client: ClientInterface) {
+  constructor(public id: number, public length: number, public client: Odyssey.Client) {
     this.data = Buffer.allocUnsafe(length);
     this.timestamp = Date.now();
   }
