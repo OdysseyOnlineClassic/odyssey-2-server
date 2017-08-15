@@ -1,7 +1,6 @@
 import * as NeDB from 'nedb';
 import * as path from 'path';
 import { DataDocument } from './game-data';
-import { Location } from './maps';
 
 /**
  * Represents a Player's Character
@@ -18,7 +17,7 @@ export interface CharacterDocument extends DataDocument {
   sprite: number;
   description?: string;
   status: number;
-  location: Location; //Position interface
+  location: Odyssey.Location; //Position interface
   stats: {
     attack: number,
     defense: number,
