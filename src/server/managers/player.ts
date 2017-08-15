@@ -1,5 +1,6 @@
 import { CharacterDocument } from '../data/characters';
 import { MapDataManager } from '../data/maps';
+import { MapDocument } from '../data/maps';
 import { CharacterDataManagerInterface } from '../data/characters';
 import { RawMessage } from '../message';
 
@@ -163,6 +164,50 @@ export class PlayerManager {
     let map = client.character.location.map;
 
     this.game.clients.sendMessageMap(9, Buffer.from([client.index]), map, client.index);
+  }
+
+  exitMap(client: Odyssey.Client, exit: number) {
+    this.mapData.get(client.character.location.map, (err, map: MapDocument) => {
+      let newMap: number;
+      let warp: boolean = false;
+      let location = client.character.location;
+      let newX = location.x;
+      let newY = location.y;
+      switch (exit) {
+        case 0:
+          warp = location.y == 0;
+          newY = 11;
+          newMap = map.exits.up;
+          break;
+        case 1:
+          warp = location.y == 11;
+          newY = 0;
+          newMap = map.exits.down;
+          break;
+        case 2:
+          warp = location.x == 0;
+          newX = 11;
+          newMap = map.exits.left;
+          break;
+        case 3:
+          newMap = map.exits.right
+          newX = 0;
+          warp = location.x == 11;
+          break;
+      }
+      if (newMap > 0 && newMap <= this.game.options.max.maps) {
+        if (warp) {
+          this.warp(client, { map: newMap, x: newX, y: newY })
+        } else {
+          this.partMap(client);
+          client.character.location = { map: newMap, x: location.x, y: location.y };
+          this.joinMap(client);
+        }
+      } else {
+        this.partMap(client);
+        this.joinMap(client);
+      }
+    });
   }
 
   warp(client: Odyssey.Client, location: Odyssey.Location) {
