@@ -14,8 +14,8 @@ export interface MapDocument extends GameDataDocument {
   monsters?: MapMonster[],
   monsterSpawns: MonsterSpawn[],
   doors?: Door,
-  bootLocation: Location,
-  deathLocation: Location,
+  bootLocation: Odyssey.Location,
+  deathLocation: Odyssey.Location,
   flags: {
 
   },
@@ -67,13 +67,6 @@ interface MapObject {
   y: number,
   prefixId: number,
   suffixId: number
-}
-
-export interface Location {
-  map: number,
-  x: number,
-  y: number,
-  direction?: number
 }
 
 interface Door {

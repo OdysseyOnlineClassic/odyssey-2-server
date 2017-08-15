@@ -75,6 +75,13 @@ declare namespace Odyssey {
     }
   }
 
+  export interface Location {
+    map: number,
+    x: number,
+    y: number,
+    direction?: number
+  }
+
   export interface Message {
 
   }

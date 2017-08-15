@@ -1,5 +1,4 @@
 import { CharacterDocument } from '../data/characters';
-import { Location } from '../data/maps';
 import { MapDataManager } from '../data/maps';
 import { RawMessage } from '../message';
 
@@ -121,6 +120,10 @@ export class PlayerManager {
     });
   }
 
+  move(client: Odyssey.Client, location: Odyssey.Location) {
+
+  }
+
   partMap(client: Odyssey.Client) {
     //TODO need to handle npc exit text
     client.sendMessage(88, Buffer.from([0, 0]));
@@ -130,7 +133,7 @@ export class PlayerManager {
     this.game.clients.sendMessageMap(9, Buffer.from([client.index]), map, client.index);
   }
 
-  warp(client: Odyssey.Client, location: Location) {
+  warp(client: Odyssey.Client, location: Odyssey.Location) {
     let map = client.character.location.map;
     if (map == location.map) {
       client.character.location = location;
