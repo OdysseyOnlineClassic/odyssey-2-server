@@ -72,6 +72,10 @@ declare namespace Odyssey {
       createdPrice: number
       joinLevel: number,
       joinPrice: number,
+    },
+    timers?: {
+      mapSwitch: number,
+      movement: number
     }
   }
 

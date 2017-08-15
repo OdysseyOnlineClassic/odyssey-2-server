@@ -69,16 +69,16 @@ export class MapProcessor extends MessageProcessor {
           data.writeUInt16BE(map.tiles[y][x].background.alternate, tileOffset + 6);
           data.writeUInt16BE(map.tiles[y][x].foreground.tile, tileOffset + 8);
           data.writeUInt16BE(map.tiles[y][x].foreground.alternate, tileOffset + 10);
-          data.writeUInt8(map.attribute, tileOffset + 12);
+          data.writeUInt8(map.tiles[y][x].attribute, tileOffset + 12);
           if (map.attributeData) {
-            data.writeUInt8(map.attributeData[0] || 0, tileOffset + 13);
-            data.writeUInt8(map.attributeData[1] || 0, tileOffset + 14);
-            data.writeUInt8(map.attributeData[2] || 0, tileOffset + 15);
-            data.writeUInt8(map.attributeData[3] || 0, tileOffset + 16);
+            data.writeUInt8(map.tiles[y][x].attributeData[0] || 0, tileOffset + 13);
+            data.writeUInt8(map.tiles[y][x].attributeData[1] || 0, tileOffset + 14);
+            data.writeUInt8(map.tiles[y][x].attributeData[2] || 0, tileOffset + 15);
+            data.writeUInt8(map.tiles[y][x].attributeData[3] || 0, tileOffset + 16);
           } else {
             data.fill(0, tileOffset + 13, tileOffset + 16);
           }
-          data.writeUInt8(map.attribute2, tileOffset + 17);
+          data.writeUInt8(map.tiles[y][x].attribute2, tileOffset + 17);
         }
       }
 
