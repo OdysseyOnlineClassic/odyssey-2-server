@@ -29,43 +29,16 @@ export class MovementProcessor extends MessageProcessor {
   }
 
   move(msg: Message): void {
-    let character = msg.client.character;
+    let location: Odyssey.Location = {
+      map: msg.client.character.map,
+      x: msg.data.readUInt8(0),
+      y: msg.data.readUInt8(1),
+      direction: msg.data.readUInt8(2)
+    };
 
-    let dx = msg.data.readUInt8(0) - character.location.x;
-    let dy = msg.data.readUInt8(1) - character.location.y;
-    let direction = msg.data.readUInt8(2);
     let walkStep = msg.data.readUInt8(3);
 
-    //TODO if WalkStep is run (4), check energy
-
-    character.location.direction = direction;
-
-    //Only moving in one direction
-    if (Math.abs(dx) + Math.abs(dy) > 1) {
-      this.playerEvents.warp(msg.client, character.location);
-      return;
-    } else {
-      if (//Check if player is already facing that direction
-        (dy == -1 && direction == 0) ||
-        (dy == 1 && direction == 1) ||
-        (dx == -1 && direction == 2) ||
-        (dx == 1 && direction == 3)
-      ) {
-        //TODO Check Map Tiles
-
-        character.location.x += dx;
-        character.location.y += dy;
-
-        //TODO Check If Monsters Notice
-
-      } else {
-        character.location.direction = direction;
-      }
-
-      this.characterData.update(character, (err, character) => { });
-
-      this.game.clients.sendMessageMap(10, Buffer.from([msg.client.index, character.location.x, character.location.y, character.location.direction, walkStep]), character.location.map, msg.client.index);
-    }
+    this.playerEvents.move(msg.client, location, walkStep);
   }
 
   switchMap(msg: Message): void {

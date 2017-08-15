@@ -1,12 +1,15 @@
 import { CharacterDocument } from '../data/characters';
 import { MapDataManager } from '../data/maps';
+import { CharacterDataManagerInterface } from '../data/characters';
 import { RawMessage } from '../message';
 
 export class PlayerManager {
   protected mapData: MapDataManager;
+  protected characterData: CharacterDataManagerInterface;
 
   constructor(protected game: Odyssey.GameState) {
     this.mapData = game.data.managers.maps;
+    this.characterData = game.data.managers.characters;
   }
 
   /**
@@ -120,8 +123,37 @@ export class PlayerManager {
     });
   }
 
-  move(client: Odyssey.Client, location: Odyssey.Location) {
+  move(client: Odyssey.Client, location: Odyssey.Location, walkStep: number) {
+    //TODO if WalkStep is run (4), check energy
 
+    let character = client.character;
+
+    let dx = location.x - character.location.x;
+    let dy = location.y - character.location.y;
+
+    character.location.direction = location.direction;
+
+    //Only moving in one direction
+    if (Math.abs(dx) + Math.abs(dy) > 1) {
+      this.warp(client, character.location);
+      return;
+    } else if (//Check if player is already facing that direction
+      (dy == -1 && location.direction == 0) ||
+      (dy == 1 && location.direction == 1) ||
+      (dx == -1 && location.direction == 2) ||
+      (dx == 1 && location.direction == 3)
+    ) {
+      //TODO Check Map Tiles
+
+      character.location.x += dx;
+      character.location.y += dy;
+
+      //TODO Check If Monsters Notice
+
+    }
+
+    this.characterData.update(character, (err, character) => { });
+    this.game.clients.sendMessageMap(10, Buffer.from([client.index, character.location.x, character.location.y, character.location.direction, walkStep]), character.location.map, client.index);
   }
 
   partMap(client: Odyssey.Client) {
