@@ -55,7 +55,9 @@ export class ClientManager implements Odyssey.ClientManager {
   sendMessageMap(id: number, data: Buffer, mapIndex: number, ignoreIndex?: number) {
     let clients = this.getClientsByMap(mapIndex);
     for (let i = 0; i < clients.length; i++) {
-      clients[i].sendMessage(id, data);
+      if (clients[i].index != ignoreIndex) {
+        clients[i].sendMessage(id, data);
+      }
     }
   }
 

@@ -124,6 +124,10 @@ export class PlayerManager {
   partMap(client: Odyssey.Client) {
     //TODO need to handle npc exit text
     client.sendMessage(88, Buffer.from([0, 0]));
+
+    let map = client.character.location.map;
+
+    this.game.clients.sendMessageMap(9, Buffer.from([client.index]), map, client.index);
   }
 
   warp(client: Odyssey.Client, location: Location) {
@@ -162,27 +166,6 @@ export class PlayerManager {
   }
 
   /**
-   * Sends client's location to all others on that map
-   *
-   * @protected
-   * @param {Odyssey.Client} client
-   *
-   * @memberOf PlayerEvents
-   */
-  protected updateLocationToMap(client: Odyssey.Client) {
-    let location = client.character.location;
-    let dataToMap: Buffer = Buffer.allocUnsafe(7);
-    dataToMap.writeUInt8(client.index, 0);
-    dataToMap.writeUInt8(location.x, 1);
-    dataToMap.writeUInt8(location.y, 2);
-    dataToMap.writeUInt8(location.direction, 3);
-    dataToMap.writeUInt16BE(client.character.sprite, 4);
-    dataToMap.writeUInt8(client.character.status, 6);
-
-    this.game.clients.sendMessageMap(8, dataToMap, location.map, client.index);
-  }
-
-  /**
    * Serializes basic character data when player joins a game
    *
    * @protected
@@ -202,5 +185,26 @@ export class PlayerManager {
     joinChar.write(character.name, 6);
 
     return joinChar;
+  }
+
+  /**
+   * Sends client's location to all others on that map
+   *
+   * @protected
+   * @param {Odyssey.Client} client
+   *
+   * @memberOf PlayerEvents
+   */
+  protected updateLocationToMap(client: Odyssey.Client) {
+    let location = client.character.location;
+    let dataToMap: Buffer = Buffer.allocUnsafe(7);
+    dataToMap.writeUInt8(client.index, 0);
+    dataToMap.writeUInt8(location.x, 1);
+    dataToMap.writeUInt8(location.y, 2);
+    dataToMap.writeUInt8(location.direction, 3);
+    dataToMap.writeUInt16BE(client.character.sprite, 4);
+    dataToMap.writeUInt8(client.character.status, 6);
+
+    this.game.clients.sendMessageMap(8, dataToMap, location.map, client.index);
   }
 }
