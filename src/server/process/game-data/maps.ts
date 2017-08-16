@@ -53,32 +53,34 @@ export class MapProcessor extends MessageProcessor {
       const offset = 85;
       const tileLength = 18;
       let tileOffset;
+      let tile;
       for (let y = 0; y < 12; y++) {
         for (let x = 0; x < 12; x++) {
           tileOffset = (12 * y + x) * tileLength;
           tileOffset += offset;
 
+          tile = MapDataManager.getTile(map, x, y);
           if (!map.tiles[y] || !map.tiles[y][x]) {
             data.fill(0, tileOffset, tileOffset + tileLength - 1)
             continue;
           }
 
-          data.writeUInt16BE(map.tiles[y][x].ground.tile, tileOffset);
-          data.writeUInt16BE(map.tiles[y][x].ground.alternate, tileOffset + 2);
-          data.writeUInt16BE(map.tiles[y][x].background.tile, tileOffset + 4);
-          data.writeUInt16BE(map.tiles[y][x].background.alternate, tileOffset + 6);
-          data.writeUInt16BE(map.tiles[y][x].foreground.tile, tileOffset + 8);
-          data.writeUInt16BE(map.tiles[y][x].foreground.alternate, tileOffset + 10);
-          data.writeUInt8(map.tiles[y][x].attribute, tileOffset + 12);
-          if (map.attributeData) {
-            data.writeUInt8(map.tiles[y][x].attributeData[0] || 0, tileOffset + 13);
-            data.writeUInt8(map.tiles[y][x].attributeData[1] || 0, tileOffset + 14);
-            data.writeUInt8(map.tiles[y][x].attributeData[2] || 0, tileOffset + 15);
-            data.writeUInt8(map.tiles[y][x].attributeData[3] || 0, tileOffset + 16);
+          data.writeUInt16BE(tile.ground.tile, tileOffset);
+          data.writeUInt16BE(tile.ground.alternate, tileOffset + 2);
+          data.writeUInt16BE(tile.background.tile, tileOffset + 4);
+          data.writeUInt16BE(tile.background.alternate, tileOffset + 6);
+          data.writeUInt16BE(tile.foreground.tile, tileOffset + 8);
+          data.writeUInt16BE(tile.foreground.alternate, tileOffset + 10);
+          data.writeUInt8(tile.attribute, tileOffset + 12);
+          if (tile.attributeData) {
+            data.writeUInt8(tile.attributeData[0] || 0, tileOffset + 13);
+            data.writeUInt8(tile.attributeData[1] || 0, tileOffset + 14);
+            data.writeUInt8(tile.attributeData[2] || 0, tileOffset + 15);
+            data.writeUInt8(tile.attributeData[3] || 0, tileOffset + 16);
           } else {
             data.fill(0, tileOffset + 13, tileOffset + 16);
           }
-          data.writeUInt8(map.tiles[y][x].attribute2, tileOffset + 17);
+          data.writeUInt8(tile.attribute2, tileOffset + 17);
         }
       }
 
