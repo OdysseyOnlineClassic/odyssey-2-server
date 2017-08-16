@@ -292,6 +292,8 @@ export class PlayerManager {
 
     let attribute = newTile.attribute;
     let data = newTile.attributeData;
+
+    //TODO: Implement all attributes
     switch (attribute) {
       case Att.Warp:
         passable = false;
@@ -306,7 +308,10 @@ export class PlayerManager {
       case Att.Script:
         break;
       case Att.Light:
+        passable = data[2] > 0;
+        break;
       case Att.LightDampening:
+        passable = data[3] > 0;
         break;
       default: //Likekly empty Attribute2
         passable = true;
