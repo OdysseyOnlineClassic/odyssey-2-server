@@ -100,6 +100,7 @@ export class PlayerManager {
    * @memberOf PlayerEvents
    */
   joinMap(client: Odyssey.Client) {
+    this.game.scripts.runScript('JoinMap', client);
     let location = client.character.location;
     this.mapData.get(location.map, (err, map) => {
       if (!map) {

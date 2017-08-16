@@ -8,6 +8,9 @@ declare namespace Odyssey {
         file: string
       },
       interval: number
+    },
+    scripts: {
+      directory: string
     }
   }
 }

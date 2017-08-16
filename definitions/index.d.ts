@@ -4,6 +4,7 @@ declare namespace Odyssey {
     character: any,
     index: number,
     playing: boolean,
+    scriptContext?: any, //TODO can we define this as a context object
     sendMessage(id: number, data: Buffer);
     getAddress();
   }
@@ -25,6 +26,7 @@ declare namespace Odyssey {
     readonly data: Data;
     readonly clients: ClientManager;
     readonly managers: any;
+    readonly scripts: any;
     processMessage(msg: Message);
     options: GameOptions;
   }
