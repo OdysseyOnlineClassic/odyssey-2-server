@@ -1,10 +1,15 @@
 import { CharacterDocument } from '../data/characters';
 import { MapDataManager } from '../data/maps';
 import { MapDocument } from '../data/maps';
+import { AttributeTypes } from '../data/maps';
+import { Directions } from '../data/maps';
 import { CharacterDataManagerInterface } from '../data/characters';
 import { RawMessage } from '../message';
 
-const BlockingAttributes = [1, 3, 13, 14, 15, 16];
+let Att = AttributeTypes;
+const BlockingAttributes = [Att.Wall, Att.Key, Att.Fish, Att.Ore, Att.ProjectileWall, Att.Tree]; //Attribute indexes that out right stop the player always
+const InteractiveAttributes = [Att.Warp, Att.Door, Att.TouchPlate, Att.Damage, Att.Script, Att.DirectionalWall, Att.Light, Att.LightDampening]; //Attribute indexes that need to do something when a player moves into the tile
+const CheckAttributes = [].concat(BlockingAttributes, InteractiveAttributes);
 
 export class PlayerManager {
   protected mapData: MapDataManager;
@@ -148,30 +153,36 @@ export class PlayerManager {
         (dx == -1 && location.direction == 2) ||
         (dx == 1 && location.direction == 3)
       ) {
-        //TODO need to sync promise with character update and sendmessage
-
         this.mapData.get(character.location.map, (err, map: MapDocument) => {
           //TODO Check Map Tiles
-          let tile = map.tiles[location.x][location.y];
-          if (BlockingAttributes.indexOf(tile.attribute) >= 0 || BlockingAttributes.indexOf(tile.attribute2) >= 0) {
-            return reject();
+          let tile = map.tiles[location.y][location.x];
+          if (CheckAttributes.indexOf(tile.attribute) >= 0 || CheckAttributes.indexOf(tile.attribute2) >= 0) {
+            if (BlockingAttributes.indexOf(tile.attribute) >= 0 || BlockingAttributes.indexOf(tile.attribute2) >= 0) {
+              return resolve(false);
+            }
+
+            let passable = this.resolveAttributeInteraction(client, location, map);
+            return resolve(passable)
           }
           character.location.x += dx;
           character.location.y += dy;
-          return resolve();
+          return resolve(true);
         });
 
       } else {
         character.direction = location.direction;
-        resolve();
+        resolve(true);
       }
     })
-      .then(() => {
-        this.characterData.update(character, (err, character) => { });
-        this.game.clients.sendMessageMap(10, Buffer.from([client.index, character.location.x, character.location.y, character.location.direction, walkStep]), character.location.map, client.index);
+      .then((moved) => {
+        if (moved) {
+          this.characterData.update(character, (err, character) => { });
+          this.game.clients.sendMessageMap(10, Buffer.from([client.index, character.location.x, character.location.y, character.location.direction, walkStep]), character.location.map, client.index);
+        }
       })
-      .catch(() => {
-        //TODO What to do?
+      .catch((err) => {
+        //TODO Error Handling
+        console.error(err);
       });
   }
 
@@ -239,6 +250,90 @@ export class PlayerManager {
       this.partMap(client);
       client.character.location = location;
       this.joinMap(client);
+    }
+  }
+
+  /**
+   * Resolves any interaction with complex Attributes
+   * Returns boolean determining if the player can move into the tile
+   * @param client
+   * @param attribute
+   * @param data
+   */
+  protected resolveAttributeInteraction(client, location, map: MapDocument): boolean {
+    let currentTile = MapDataManager.getTile(map, client.character.location.x, client.character.location.y);
+    let newTile = MapDataManager.getTile(map, location.x, location.y);
+    let passable = true;
+
+    //Check for Directional Walls
+    if (currentTile.attribute == Att.DirectionalWall) {
+      if (!processDirectionalWall(currentTile.attributeData, location.direction, true)) {
+        return false;
+      }
+    }
+
+    if (currentTile.attribute2 == Att.DirectionalWall) {
+      if (!processDirectionalWall(currentTile.attributeData2, location.direction, true)) {
+        return false;
+      }
+    }
+
+    if (newTile.attribute == Att.DirectionalWall) {
+      if (!processDirectionalWall(newTile.attributeData, location.direction, false)) {
+        return false;
+      }
+    }
+
+    if (newTile.attribute2 == Att.DirectionalWall) {
+      if (!processDirectionalWall(newTile.attributeData2, location.direction, false)) {
+        return false;
+      }
+    }
+
+    let attribute = newTile.attribute;
+    let data = newTile.attributeData;
+    switch (attribute) {
+      case Att.Warp:
+        passable = false;
+        this.warp(client, { map: data[1], x: data[2], y: data[3], direction: client.character.location.direction })
+        break;
+      case Att.Door:
+        break;
+      case Att.TouchPlate:
+        break;
+      case Att.Damage:
+        break;
+      case Att.Script:
+        break;
+      case Att.Light:
+      case Att.LightDampening:
+        break;
+      default: //Likekly empty Attribute2
+        passable = true;
+    }
+    return passable;
+
+    /**
+     *
+     * @param data Attribute Data
+     * @param direction
+     * @param from True if the player is on this tile. False if the player is moving to this tile.
+     */
+    function processDirectionalWall(data, direction, from: boolean) {
+      let passableBit;
+      switch (direction) {
+        case Directions.up:
+          passableBit = from ? 1 : 3 //To Above, From Below
+        case Directions.down:
+          passableBit = from ? 2 : 0 //To Below, From Above
+        case Directions.left:
+          passableBit = from ? 4 : 6 //To Left, From Right
+        case Directions.right:
+          passableBit = from ? 7 : 5 //To Right, From Left
+      }
+
+      //Checks if the bit at passableBit location is set
+      return (data[0] & (Math.pow(2, passableBit))) == 0;
     }
   }
 
