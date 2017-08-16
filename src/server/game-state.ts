@@ -17,6 +17,7 @@ import { RawProcessor } from './process/raw';
 import { AccountManager } from './managers/accounts';
 import { CharacterManager } from './managers/characters';
 import { PlayerManager } from './managers/player';
+import { ScriptManager } from './script';
 
 /**
  * IOC Container for different aspects of the Odyssey Server
@@ -38,9 +39,10 @@ export class GameState implements Odyssey.GameState {
   private timestamp: [number, number];
   private counter: number = 0;
 
-  readonly clients: ClientManager;
+  readonly clients: Odyssey.ClientManager;
   readonly data: Odyssey.Data;
   readonly managers: {};
+  readonly scripts = new ScriptManager(this);
 
   public options: Odyssey.GameOptions = {
     max: {

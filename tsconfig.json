@@ -9,6 +9,7 @@
     "outDir": "bin"
   },
   "include": [
+    "node_modules/@types/node/index.d.ts",
     "definitions/**/*.d.ts",
     "src/**/*"
   ],
