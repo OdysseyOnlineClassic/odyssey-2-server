@@ -268,55 +268,63 @@ export class PlayerManager {
     //Check for Directional Walls
     if (currentTile.attribute == Att.DirectionalWall) {
       if (!processDirectionalWall(currentTile.attributeData, location.direction, true)) {
-        return false;
+        passable = false;
       }
     }
 
     if (currentTile.attribute2 == Att.DirectionalWall) {
       if (!processDirectionalWall(currentTile.attributeData2, location.direction, true)) {
-        return false;
+        passable = false;
       }
     }
 
     if (newTile.attribute == Att.DirectionalWall) {
       if (!processDirectionalWall(newTile.attributeData, location.direction, false)) {
-        return false;
+        passable = false;
       }
     }
 
     if (newTile.attribute2 == Att.DirectionalWall) {
       if (!processDirectionalWall(newTile.attributeData2, location.direction, false)) {
-        return false;
+        passable = false;
       }
     }
 
     let attribute = newTile.attribute;
     let data = newTile.attributeData;
+    let attribute2 = newTile.attribute2;
+    let data2 = newTile.attributeData2;
 
-    //TODO: Implement all attributes
-    switch (attribute) {
-      case Att.Warp:
-        passable = false;
-        this.warp(client, { map: data[1], x: data[2], y: data[3], direction: client.character.location.direction })
-        break;
-      case Att.Door:
-        break;
-      case Att.TouchPlate:
-        break;
-      case Att.Damage:
-        break;
-      case Att.Script:
-        break;
-      case Att.Light:
-        passable = data[2] > 0;
-        break;
-      case Att.LightDampening:
-        passable = data[3] > 0;
-        break;
-      default: //Likekly empty Attribute2
-        passable = true;
+    passable = attributeSwitch(attribute, data) && passable;
+    return attributeSwitch(attribute2, data2) && passable;
+
+    function attributeSwitch(attribute, data) {
+      //TODO: Implement all attributes
+      switch (attribute) {
+        case Att.Warp:
+          passable = false;
+          this.warp(client, { map: data[1], x: data[2], y: data[3], direction: client.character.location.direction })
+          break;
+        case Att.Door:
+          break;
+        case Att.TouchPlate:
+          break;
+        case Att.Damage:
+          break;
+        case Att.Script:
+          break;
+        case Att.Light:
+          passable = data[2] > 0;
+          break;
+        case Att.LightDampening:
+          passable = data[3] > 0;
+          break;
+        default: //Likekly empty Attribute2
+          passable = true;
+      }
+      return passable;
     }
-    return passable;
+
 
     /**
      *
