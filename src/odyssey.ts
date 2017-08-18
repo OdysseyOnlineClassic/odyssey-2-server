@@ -13,7 +13,7 @@ Commander
 
 let configFile = Commander.config || 'config/odyssey.config.json';
 
-let config: Odyssey.Config;
+let config: Server.Config;
 try {
   config = JSON.parse(fs.readFileSync(configFile, 'utf-8'));
 } catch (ex) {

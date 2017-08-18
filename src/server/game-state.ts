@@ -42,9 +42,9 @@ export class GameState implements Server.GameState {
   readonly clients: Server.Managers.ClientManager;
   readonly data: Server.Data;
   readonly managers: {
-    accounts: AccountManager,
-    characters: CharacterManager,
-    player: PlayerManager
+    accounts: Server.Managers.AccountManager,
+    characters: Server.Managers.CharacterManager,
+    player: Server.Managers.PlayerManager
   };
   readonly scripts = new ScriptManager(this);
 
@@ -94,7 +94,7 @@ export class GameState implements Server.GameState {
     }
   }
 
-  constructor(readonly config: Odyssey.Config) {
+  constructor(readonly config: Server.Config) {
     this.data = new Data('data/');
     this.clients = new ClientManager(this);
 

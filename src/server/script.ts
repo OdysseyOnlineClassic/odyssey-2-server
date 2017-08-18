@@ -1,5 +1,6 @@
 
-import { GameState } from './game-state';
+import GameState = Server.GameState;
+import { Player } from '../script/player';
 import * as vm from 'vm';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -49,7 +50,8 @@ export class ScriptManager {
   public runScript(name: string, client: Server.Client) {
     this.loading.then(() => {
       if (!client.scriptContext) {
-        client.scriptContext = vm.createContext({ game: this.gameState, player: client, Buffer: Buffer });
+        let player = new Player(this.gameState, client);
+        client.scriptContext = vm.createContext({ game: this.gameState, player: new Player(this.gameState, client), Buffer: Buffer });
       }
       //TODO might we need to run this in a new context?
       this.scripts[name].runInContext(client.scriptContext);

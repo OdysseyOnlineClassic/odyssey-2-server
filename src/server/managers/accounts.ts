@@ -38,7 +38,7 @@ export class AccountManager implements Server.Managers.AccountManager {
     })
   }
 
-  public login(username, password) {
+  public login(username: string, password: string): Promise<Account> {
     return new Promise((resolve, reject) => {
       this.accountData.getAccount(username, (err, account) => {
         if (err) {
