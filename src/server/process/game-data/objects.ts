@@ -9,7 +9,7 @@ export class ObjectDataProcessor extends MessageProcessor {
 
   protected objectData: ObjectDataManager;
 
-  constructor(game: Odyssey.GameState) {
+  constructor(game: Server.GameState) {
     super(game);
 
     this.objectData = game.data.managers.objects;

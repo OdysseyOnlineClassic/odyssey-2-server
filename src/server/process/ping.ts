@@ -5,7 +5,7 @@ import { ProcessFunction } from './process';
 export class PingProcessor extends MessageProcessor {
   protected processors: { [id: number]: ProcessFunction } = {};
 
-  constructor(game: Odyssey.GameState) {
+  constructor(game: Server.GameState) {
     super(game);
 
     this.processors[96] = this.ping.bind(this);

@@ -7,7 +7,7 @@ export class GuildProcessor extends MessageProcessor {
   protected guildData: GuildDataManager;
   protected processors: { [id: number]: ProcessFunction } = {};
 
-  constructor(game: Odyssey.GameState) {
+  constructor(game: Server.GameState) {
     super(game);
 
     this.guildData = game.data.managers.guilds;

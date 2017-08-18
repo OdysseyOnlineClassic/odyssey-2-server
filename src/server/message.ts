@@ -6,7 +6,7 @@ export class RawMessage {
     this.messages.push({ id: id, data: data });
   }
 
-  sendMessage(client: Odyssey.Client) {
+  sendMessage(client: Server.Client) {
     if (this.messages.length == 0) {
       console.error('RawMessage.sendMessage called on empty message array');
       return;
@@ -40,13 +40,13 @@ export class RawMessage {
   }
 }
 
-export class Message {
+export class Message implements Server.Message {
   data: Buffer;
   timestamp: number;
 
   private bytesRead = 0;
 
-  constructor(public id: number, public length: number, public client: Odyssey.Client) {
+  constructor(public id: number, public length: number, public client: Server.Client) {
     this.data = Buffer.allocUnsafe(length);
     this.timestamp = Date.now();
   }

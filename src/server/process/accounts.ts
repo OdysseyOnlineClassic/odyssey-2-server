@@ -12,10 +12,10 @@ export class AccountsProcessor extends MessageProcessor {
   protected processors: { [id: number]: ProcessFunction } = {};
   private accountData: AccountDataManager;
   private characterData: CharacterDataManager;
-  private accounts: AccountManager;
-  private characters: CharacterManager;
+  private accounts: Server.Managers.AccountManager;
+  private characters: Server.Managers.CharacterManager;
 
-  constructor(protected game: Odyssey.GameState) {
+  constructor(protected game: Server.GameState) {
     super(game);
     this.processors[0] = this.createAccount.bind(this);
     this.processors[1] = this.login.bind(this);
@@ -98,7 +98,7 @@ export class AccountsProcessor extends MessageProcessor {
     this.sendCharacter(msg.client, character);
   }
 
-  protected sendCharacter(client: Odyssey.Client, character: CharacterDocument): void {
+  protected sendCharacter(client: Server.Client, character: CharacterDocument): void {
     let length = 15 + character.name.length + character.description.length;
     let data = Buffer.allocUnsafe(length);
     data.writeUInt8(character.class, 0);

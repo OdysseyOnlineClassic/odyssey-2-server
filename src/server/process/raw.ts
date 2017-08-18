@@ -8,7 +8,7 @@ export class RawProcessor extends MessageProcessor {
 
   protected objectData: ObjectDataManager;
 
-  constructor(protected game: Odyssey.GameState) {
+  constructor(protected game: Server.GameState) {
     super(game);
   }
 

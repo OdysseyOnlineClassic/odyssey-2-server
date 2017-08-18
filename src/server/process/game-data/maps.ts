@@ -10,7 +10,7 @@ export class MapProcessor extends MessageProcessor {
 
   protected mapData: MapDataManager;
 
-  constructor(game: Odyssey.GameState) {
+  constructor(game: Server.GameState) {
     super(game);
 
     this.mapData = game.data.managers.maps;
@@ -175,8 +175,8 @@ export class MapProcessor extends MessageProcessor {
     this.mapData.update(map, (err, map) => {
       let mapClients = this.game.clients.getClientsByMap(mapIndex);
       for (let i = 0; i < mapClients.length; i++) {
-        this.game.managers.player.partMap(mapClients[i], mapClients[i].character.location.map);
-        this.game.managers.player.joinMap(mapClients[i], mapClients[i].character.location);
+        this.game.managers.player.partMap(mapClients[i]);
+        this.game.managers.player.joinMap(mapClients[i]);
       }
     });
   }

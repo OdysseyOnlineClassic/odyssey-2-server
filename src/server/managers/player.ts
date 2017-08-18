@@ -11,11 +11,11 @@ const BlockingAttributes = [Att.Wall, Att.Key, Att.Fish, Att.Ore, Att.Projectile
 const InteractiveAttributes = [Att.Warp, Att.Door, Att.TouchPlate, Att.Damage, Att.Script, Att.DirectionalWall, Att.Light, Att.LightDampening]; //Attribute indexes that need to do something when a player moves into the tile
 const CheckAttributes = [].concat(BlockingAttributes, InteractiveAttributes);
 
-export class PlayerManager implements Odyssey.PlayerManager {
+export class PlayerManager implements Server.Managers.PlayerManager {
   protected mapData: MapDataManager;
   protected characterData: CharacterDataManagerInterface;
 
-  constructor(protected game: Odyssey.GameState) {
+  constructor(protected game: Server.GameState) {
     this.mapData = game.data.managers.maps;
     this.characterData = game.data.managers.characters;
   }
@@ -23,12 +23,12 @@ export class PlayerManager implements Odyssey.PlayerManager {
   /**
    * When a client joins the game.
    *
-   * @param {Odyssey.Client} client
+   * @param {Server.Client} client
    * @throws {Error} Expects client to have a character
    *
    * @memberOf PlayerEvents
    */
-  joinGame(client: Odyssey.Client) {
+  joinGame(client: Server.Client) {
     return new Promise((resolve, reject) => {
       if (!client.character) {
         throw new Error('Client does not have a character');
@@ -95,11 +95,11 @@ export class PlayerManager implements Odyssey.PlayerManager {
    * Sends Map Data to Client
    * Sends Client Location Update to other Clients on map
    *
-   * @param {Odyssey.Client} client
+   * @param {Server.Client} client
    *
    * @memberOf PlayerEvents
    */
-  joinMap(client: Odyssey.Client) {
+  joinMap(client: Server.Client) {
     this.game.scripts.runScript('JoinMap', client);
     let location = client.character.location;
     this.mapData.get(location.map, (err, map) => {
@@ -132,7 +132,7 @@ export class PlayerManager implements Odyssey.PlayerManager {
     });
   }
 
-  move(client: Odyssey.Client, location: Odyssey.Location, walkStep: number) {
+  move(client: Server.Client, location: Odyssey.Location, walkStep: number) {
     //TODO if WalkStep is run (4), check energy
 
     let character = client.character;
@@ -187,7 +187,7 @@ export class PlayerManager implements Odyssey.PlayerManager {
       });
   }
 
-  partMap(client: Odyssey.Client) {
+  partMap(client: Server.Client) {
     //TODO need to handle npc exit text
     client.sendMessage(88, Buffer.from([0, 0]));
 
@@ -196,7 +196,7 @@ export class PlayerManager implements Odyssey.PlayerManager {
     this.game.clients.sendMessageMap(9, Buffer.from([client.index]), map, client.index);
   }
 
-  exitMap(client: Odyssey.Client, exit: number) {
+  exitMap(client: Server.Client, exit: number) {
     //TODO check map switch timer
     this.mapData.get(client.character.location.map, (err, map: MapDocument) => {
       let newMap: number;
@@ -241,7 +241,7 @@ export class PlayerManager implements Odyssey.PlayerManager {
     });
   }
 
-  warp(client: Odyssey.Client, location: Odyssey.Location) {
+  warp(client: Server.Client, location: Odyssey.Location) {
     let map = client.character.location.map;
     if (map == location.map) {
       client.character.location = location;
@@ -351,7 +351,7 @@ export class PlayerManager implements Odyssey.PlayerManager {
     }
   }
 
-  protected sendMapPlayers(client: Odyssey.Client) {
+  protected sendMapPlayers(client: Server.Client) {
     let map = client.character.location.map;
     let clients = this.game.clients.getClientsByMap(map);
     let msg = new RawMessage();
@@ -399,11 +399,11 @@ export class PlayerManager implements Odyssey.PlayerManager {
    * Sends client's location to all others on that map
    *
    * @protected
-   * @param {Odyssey.Client} client
+   * @param {Server.Client} client
    *
    * @memberOf PlayerEvents
    */
-  protected updateLocationToMap(client: Odyssey.Client) {
+  protected updateLocationToMap(client: Server.Client) {
     let location = client.character.location;
     let dataToMap: Buffer = Buffer.allocUnsafe(7);
     dataToMap.writeUInt8(client.index, 0);

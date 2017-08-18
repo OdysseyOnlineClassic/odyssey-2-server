@@ -25,7 +25,7 @@ import { ScriptManager } from './script';
  * @export
  * @class GameState
  */
-export class GameState implements Odyssey.GameState {
+export class GameState implements Server.GameState {
   private playingProcessors: Array<MessageProcessor> = new Array<MessageProcessor>(255); //Processors for when a client is playing
   private connectingProcessors: Array<MessageProcessor> = new Array<MessageProcessor>(255); //Processors before a client is playing
   private intervalId: number;
@@ -39,8 +39,8 @@ export class GameState implements Odyssey.GameState {
   private timestamp: [number, number];
   private counter: number = 0;
 
-  readonly clients: Odyssey.ClientManager;
-  readonly data: Odyssey.Data;
+  readonly clients: Server.Managers.ClientManager;
+  readonly data: Server.Data;
   readonly managers: {
     accounts: AccountManager,
     characters: CharacterManager,
@@ -48,7 +48,7 @@ export class GameState implements Odyssey.GameState {
   };
   readonly scripts = new ScriptManager(this);
 
-  public options: Odyssey.GameOptions = {
+  public options: Server.GameOptions = {
     max: {
       attributes: 22,
       classes: 4,

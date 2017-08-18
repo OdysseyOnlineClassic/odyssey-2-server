@@ -1,5 +1,5 @@
 export class Player {
-  constructor(protected gameState: Odyssey.GameState, protected client: Odyssey.Client) {
+  constructor(protected gameState: Server.GameState, protected client: Server.Client) {
   }
 
   get access() {

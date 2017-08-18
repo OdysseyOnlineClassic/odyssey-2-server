@@ -1,13 +1,11 @@
 import { MessageProcessor } from './process';
-import { Message } from '../message';
 import { ProcessFunction } from './process';
-import { PlayerManager } from '../managers/player';
 
 export class MovementProcessor extends MessageProcessor {
   protected processors: { [id: number]: ProcessFunction } = {};
-  protected playerEvents: PlayerManager;
+  protected playerEvents: Server.Managers.PlayerManager;
 
-  constructor(game: Odyssey.GameState) {
+  constructor(game: Server.GameState) {
     super(game);
 
     this.processors[7] = this.move.bind(this);
@@ -16,11 +14,11 @@ export class MovementProcessor extends MessageProcessor {
     this.playerEvents = game.managers.player;
   }
 
-  async process(msg: Message): Promise<any> {
+  async process(msg: Server.Message): Promise<any> {
     this.processors[msg.id](msg);
   }
 
-  move(msg: Message): void {
+  move(msg: Server.Message): void {
     let location: Odyssey.Location = {
       map: msg.client.character.map,
       x: msg.data.readUInt8(0),
@@ -33,7 +31,7 @@ export class MovementProcessor extends MessageProcessor {
     this.playerEvents.move(msg.client, location, walkStep);
   }
 
-  switchMap(msg: Message): void {
+  switchMap(msg: Server.Message): void {
     let exit = msg.data.readUInt8(0);
     this.playerEvents.exitMap(msg.client, exit);
   }

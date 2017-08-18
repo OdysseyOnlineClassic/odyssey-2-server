@@ -9,7 +9,7 @@ export class NpcDataProcessor extends MessageProcessor {
 
   protected npcData: NpcDataManager;
 
-  constructor(game: Odyssey.GameState) {
+  constructor(game: Server.GameState) {
     super(game);
 
     this.npcData = game.data.managers.npcs;
