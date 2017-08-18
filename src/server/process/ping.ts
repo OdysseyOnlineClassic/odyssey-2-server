@@ -1,6 +1,5 @@
 import { MessageProcessor } from './process';
-import { Message } from '../message';
-
+import Message = Server.Message;
 
 export class PingProcessor extends MessageProcessor {
   protected processors: { [id: number]: Server.ProcessFunction } = {};

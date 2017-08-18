@@ -2,9 +2,9 @@ import { MessageProcessor } from './process';
 import { AccountDataManager } from '../data/accounts';
 import { AccountDocument } from '../data/accounts';
 import { CharacterDataManager } from '../data/characters';
-import { CharacterDocument } from '../data/characters';
-import { AccountManager } from '../managers/accounts';
-import { CharacterManager } from '../managers/characters';
+import AccountManager = Server.Managers.AccountManager;
+import CharacterManager = Server.Managers.CharacterManager;
+import Message = Server.Message;
 
 export class AccountsProcessor extends MessageProcessor {
   protected processors: { [id: number]: Server.ProcessFunction } = {};
@@ -26,11 +26,11 @@ export class AccountsProcessor extends MessageProcessor {
     this.characters = game.managers.characters;
   }
 
-  async process(msg: Server.Message): Promise<any> {
+  async process(msg: Message): Promise<any> {
     this.processors[msg.id](msg);
   }
 
-  protected async createAccount(msg: Server.Message) {
+  protected async createAccount(msg: Message) {
     let dataString: string = msg.data.toString('utf-8');
 
     let strings = dataString.split('\0');
@@ -47,7 +47,7 @@ export class AccountsProcessor extends MessageProcessor {
     msg.client.sendMessage(2, Buffer.allocUnsafe(0));
   }
 
-  protected async login(msg: Server.Message) {
+  protected async login(msg: Message) {
     let dataString: string = msg.data.toString('utf-8');
 
     let strings = dataString.split('\0');
@@ -73,7 +73,7 @@ export class AccountsProcessor extends MessageProcessor {
     this.sendCharacter(msg.client, character);
   }
 
-  protected async createCharacter(msg: Server.Message) {
+  protected async createCharacter(msg: Message) {
     let classIndex: number = msg.data.readUInt8(0);
     let female: boolean = msg.data.readUInt8(1) > 0;
     let dataString: string = msg.data.toString('utf-8', 2);
@@ -96,7 +96,7 @@ export class AccountsProcessor extends MessageProcessor {
     this.sendCharacter(msg.client, character);
   }
 
-  protected sendCharacter(client: Server.Client, character: CharacterDocument): void {
+  protected sendCharacter(client: Server.Client, character: Odyssey.Character): void {
     let length = 15 + character.name.length + character.description.length;
     let data = Buffer.allocUnsafe(length);
     data.writeUInt8(character.class, 0);
