@@ -25,7 +25,11 @@ declare namespace Odyssey {
   export interface GameState {
     readonly data: Data;
     readonly clients: ClientManager;
-    readonly managers: any;
+    readonly managers: {
+      accounts: AccountManager,
+      characters: CharacterManager,
+      player: PlayerManager
+    };
     readonly scripts: any;
     processMessage(msg: Message);
     options: GameOptions;
@@ -90,6 +94,18 @@ declare namespace Odyssey {
 
   export interface Message {
 
+  }
+
+  export interface AccountManager {
+
+  }
+
+  export interface CharacterManager {
+
+  }
+
+  export interface PlayerManager {
+    warp(client: Client, location: Location);
   }
 }
 

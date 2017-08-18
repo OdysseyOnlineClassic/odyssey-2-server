@@ -41,7 +41,11 @@ export class GameState implements Odyssey.GameState {
 
   readonly clients: Odyssey.ClientManager;
   readonly data: Odyssey.Data;
-  readonly managers: {};
+  readonly managers: {
+    accounts: AccountManager,
+    characters: CharacterManager,
+    player: PlayerManager
+  };
   readonly scripts = new ScriptManager(this);
 
   public options: Odyssey.GameOptions = {
