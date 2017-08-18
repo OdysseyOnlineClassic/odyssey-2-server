@@ -52,7 +52,7 @@ declare namespace Server {
   namespace Managers {
     export interface AccountManager {
       createAccount(username: string, password: string): void;
-      login(username: string, password: string): Account;
+      login(username: string, password: string): Promise<Account>;
     }
 
     export interface CharacterManager {
@@ -152,8 +152,9 @@ declare namespace Server {
   }
 
   export interface GameState {
-    readonly data: Data;
     readonly clients: Managers.ClientManager;
+    readonly config: Server.Config;
+    readonly data: Data;
     readonly managers: {
       accounts: Managers.AccountManager,
       characters: Managers.CharacterManager,

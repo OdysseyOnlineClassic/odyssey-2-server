@@ -1,4 +1,4 @@
-declare namespace Odyssey {
+declare namespace Server {
   export interface Config {
     server: {
       port: number,
