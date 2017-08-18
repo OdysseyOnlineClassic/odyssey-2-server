@@ -11,7 +11,7 @@ const BlockingAttributes = [Att.Wall, Att.Key, Att.Fish, Att.Ore, Att.Projectile
 const InteractiveAttributes = [Att.Warp, Att.Door, Att.TouchPlate, Att.Damage, Att.Script, Att.DirectionalWall, Att.Light, Att.LightDampening]; //Attribute indexes that need to do something when a player moves into the tile
 const CheckAttributes = [].concat(BlockingAttributes, InteractiveAttributes);
 
-export class PlayerManager {
+export class PlayerManager implements Odyssey.PlayerManager {
   protected mapData: MapDataManager;
   protected characterData: CharacterDataManagerInterface;
 

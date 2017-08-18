@@ -1,6 +1,6 @@
 import { CharacterDocument } from '../data/characters';
 
-export class CharacterManager {
+export class CharacterManager implements Odyssey.CharacterManager {
   private characterData;
 
   constructor(private game: Odyssey.GameState) {

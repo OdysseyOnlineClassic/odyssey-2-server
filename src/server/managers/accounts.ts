@@ -1,6 +1,6 @@
 import * as bcrypt from 'bcryptjs';
 
-export class AccountManager {
+export class AccountManager implements Odyssey.AccountManager {
   private accountData;
   private characterData;
 
