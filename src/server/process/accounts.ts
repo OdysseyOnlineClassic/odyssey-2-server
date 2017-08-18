@@ -1,6 +1,4 @@
 import { MessageProcessor } from './process';
-import { ProcessFunction } from './process';
-import { Message } from '../message';
 import { AccountDataManager } from '../data/accounts';
 import { AccountDocument } from '../data/accounts';
 import { CharacterDataManager } from '../data/characters';
@@ -9,7 +7,7 @@ import { AccountManager } from '../managers/accounts';
 import { CharacterManager } from '../managers/characters';
 
 export class AccountsProcessor extends MessageProcessor {
-  protected processors: { [id: number]: ProcessFunction } = {};
+  protected processors: { [id: number]: Server.ProcessFunction } = {};
   private accountData: AccountDataManager;
   private characterData: CharacterDataManager;
   private accounts: Server.Managers.AccountManager;
@@ -28,11 +26,11 @@ export class AccountsProcessor extends MessageProcessor {
     this.characters = game.managers.characters;
   }
 
-  async process(msg: Message): Promise<any> {
+  async process(msg: Server.Message): Promise<any> {
     this.processors[msg.id](msg);
   }
 
-  protected async createAccount(msg: Message) {
+  protected async createAccount(msg: Server.Message) {
     let dataString: string = msg.data.toString('utf-8');
 
     let strings = dataString.split('\0');
@@ -49,7 +47,7 @@ export class AccountsProcessor extends MessageProcessor {
     msg.client.sendMessage(2, Buffer.allocUnsafe(0));
   }
 
-  protected async login(msg: Message) {
+  protected async login(msg: Server.Message) {
     let dataString: string = msg.data.toString('utf-8');
 
     let strings = dataString.split('\0');
@@ -75,7 +73,7 @@ export class AccountsProcessor extends MessageProcessor {
     this.sendCharacter(msg.client, character);
   }
 
-  protected async createCharacter(msg: Message) {
+  protected async createCharacter(msg: Server.Message) {
     let classIndex: number = msg.data.readUInt8(0);
     let female: boolean = msg.data.readUInt8(1) > 0;
     let dataString: string = msg.data.toString('utf-8', 2);

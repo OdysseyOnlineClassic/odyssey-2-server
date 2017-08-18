@@ -1,9 +1,5 @@
-export interface ProcessFunction {
-  (msg: Server.Message): void;
-}
-
 export abstract class MessageProcessor {
-  protected processors: { [id: number]: ProcessFunction } = {};
+  protected processors: { [id: number]: Server.ProcessFunction } = {};
   constructor(protected game: Server.GameState) {
   }
 

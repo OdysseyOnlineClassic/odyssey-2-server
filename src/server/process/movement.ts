@@ -1,8 +1,8 @@
 import { MessageProcessor } from './process';
-import { ProcessFunction } from './process';
+
 
 export class MovementProcessor extends MessageProcessor {
-  protected processors: { [id: number]: ProcessFunction } = {};
+  protected processors: { [id: number]: Server.ProcessFunction } = {};
   protected playerEvents: Server.Managers.PlayerManager;
 
   constructor(game: Server.GameState) {

@@ -1,10 +1,10 @@
 import { MessageProcessor } from './process';
-import { ProcessFunction } from './process';
+
 import { Message } from '../message';
 import { PlayerManager } from '../managers/player';
 
 export class ClientProcessor extends MessageProcessor {
-  protected processors: { [id: number]: ProcessFunction } = {};
+  protected processors: { [id: number]: Server.ProcessFunction } = {};
   protected playerEvents: Server.Managers.PlayerManager;
 
   constructor(game: Server.GameState) {
