@@ -18,7 +18,7 @@ export class GameDataListProcessor extends MessageProcessor {
   protected prefixData: PrefixDataManager;
   protected suffixData: SuffixDataManager;
 
-  constructor(protected game: Odyssey.GameState) {
+  constructor(protected game: Server.GameState) {
     super(game);
 
     this.hallData = game.data.managers.halls;

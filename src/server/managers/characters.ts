@@ -1,9 +1,9 @@
 import { CharacterDocument } from '../data/characters';
 
-export class CharacterManager implements Odyssey.CharacterManager {
+export class CharacterManager implements Server.Managers.CharacterManager {
   private characterData;
 
-  constructor(private game: Odyssey.GameState) {
+  constructor(private game: Server.GameState) {
     this.characterData = game.data.managers.characters;
   }
 
@@ -61,7 +61,7 @@ export class CharacterManager implements Odyssey.CharacterManager {
     });
   }
 
-  public getCharacter(accountId) {
+  public getCharacter(accountId: string): Promise<Odyssey.Character> {
     return new Promise((resolve, reject) => {
       this.characterData.getCharacter(accountId, (err, character) => {
         if (err) {

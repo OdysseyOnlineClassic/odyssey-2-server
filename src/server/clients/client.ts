@@ -4,7 +4,7 @@ import { Message } from '../message';
 import { AccountDocument } from '../data/accounts';
 import { CharacterDocument } from '../data/characters';
 
-export abstract class Client extends events.EventEmitter implements Odyssey.Client {
+export abstract class Client extends events.EventEmitter implements Server.Client {
   account: AccountDocument;
   character: CharacterDocument;
   index: number;

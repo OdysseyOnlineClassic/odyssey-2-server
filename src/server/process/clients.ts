@@ -5,9 +5,9 @@ import { PlayerManager } from '../managers/player';
 
 export class ClientProcessor extends MessageProcessor {
   protected processors: { [id: number]: ProcessFunction } = {};
-  protected playerEvents: PlayerManager;
+  protected playerEvents: Server.Managers.PlayerManager;
 
-  constructor(game: Odyssey.GameState) {
+  constructor(game: Server.GameState) {
     super(game);
 
     this.processors[23] = this.joinGame.bind(this);

@@ -9,40 +9,9 @@ import { DataDocument } from './game-data';
  * @interface CharacterDocument
  * @extends {DataDocument}
  */
-export interface CharacterDocument extends DataDocument {
+export interface CharacterDocument extends DataDocument, Odyssey.Character {
   accountId: string;
-  name: string;
-  class: any; //Class interface?
-  female: boolean;
-  sprite: number;
-  description?: string;
-  status: number;
-  location: Odyssey.Location; //Position interface
-  stats: {
-    attack: number,
-    defense: number,
-    experience: number
-    level: number,
-    magicDefense: number,
-    maxHp: number,
-    maxEnergy: number,
-    maxMana: number,
-  }; //Stats interface
-  inventory: InventoryItemInterface[]; //Inventory interface
-  ammo: number;
-  equipped: InventoryItemInterface[];
-  bank: any; //Bank interface (extends inventory?)
-  guild: {
-    id: number, //Guild numeric id, old system used byte (255)
-    rank: number,
-    slot: number, //TODO what is this for in old code?
-    invite: number //Current invite to join Guild by number id
-  },
   extended: any; //Extended data to hold whatever scripts want
-  timers?: {
-    walk: number
-  }, //Flood, walk, etc.
-  alive: boolean;
 
   /*'Character Data
   Name As String

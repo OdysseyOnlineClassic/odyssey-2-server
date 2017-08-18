@@ -1,10 +1,10 @@
 import * as bcrypt from 'bcryptjs';
 
-export class AccountManager implements Odyssey.AccountManager {
+export class AccountManager implements Server.Managers.AccountManager {
   private accountData;
   private characterData;
 
-  constructor(private gameState: Odyssey.GameState) {
+  constructor(private gameState: Server.GameState) {
     this.accountData = gameState.data.managers.accounts;
     this.characterData = gameState.data.managers.characters;
   }

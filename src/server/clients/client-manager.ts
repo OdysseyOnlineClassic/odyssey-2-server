@@ -8,7 +8,7 @@ export enum ClientType {
   WebAdmin
 }
 
-export class ClientManager implements Odyssey.ClientManager {
+export class ClientManager implements Server.Managers.ClientManager {
   public readonly clients: Array<Client>;
   private min = 1;
   constructor(private game: GameState) {

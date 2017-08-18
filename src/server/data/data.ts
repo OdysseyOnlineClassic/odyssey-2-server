@@ -12,7 +12,7 @@ import { ObjectDataManager } from './objects';
 import { PrefixDataManager } from './prefixes';
 import { SuffixDataManager } from './suffixes';
 
-export class Data implements Odyssey.Data {
+export class Data implements Server.Data {
   public readonly managers: any;
 
   constructor(public readonly dataFolder: string) {

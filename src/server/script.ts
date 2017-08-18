@@ -46,7 +46,7 @@ export class ScriptManager {
     this.loading = Promise.all(loadPromises);
   }
 
-  public runScript(name: string, client: Odyssey.Client) {
+  public runScript(name: string, client: Server.Client) {
     this.loading.then(() => {
       if (!client.scriptContext) {
         client.scriptContext = vm.createContext({ game: this.gameState, player: client, Buffer: Buffer });
