@@ -1,6 +1,5 @@
-import { MessageProcessor } from './process';
-
 import { Message } from '../message';
+import { MessageProcessor } from './process';
 import { ObjectDataManager } from '../data/objects';
 
 export class RawProcessor extends MessageProcessor {
@@ -12,14 +11,14 @@ export class RawProcessor extends MessageProcessor {
     super(game);
   }
 
-  async process(msg: Message): Promise<any> {
+  async process(msg: Server.Message): Promise<any> {
     const headerOffset: number = 3;
     let offset: number = 0;
     let length: number;
     let msgId: number;
     let data: Buffer;
 
-    let extractedMsg: Message;
+    let extractedMsg: Server.Message;
 
     /**
      * [A, A, B, C ...]
