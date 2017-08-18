@@ -1,11 +1,11 @@
 import { MessageProcessor } from '../process';
-import { ProcessFunction } from '../process';
+
 import { Message } from '../../message';
 import { ObjectDataManager } from '../../data/objects';
 import { ObjectDocument } from '../../data/objects';
 
 export class ObjectDataProcessor extends MessageProcessor {
-  protected processors: { [id: number]: ProcessFunction } = {};
+  protected processors: { [id: number]: Server.ProcessFunction } = {};
 
   protected objectData: ObjectDataManager;
 

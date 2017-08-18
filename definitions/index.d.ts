@@ -174,6 +174,10 @@ declare namespace Server {
     isComplete(): boolean,
     send(),
   }
+
+  export interface ProcessFunction {
+    (msg: Server.Message): void;
+  }
 }
 
 

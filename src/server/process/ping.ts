@@ -1,9 +1,9 @@
 import { MessageProcessor } from './process';
 import { Message } from '../message';
-import { ProcessFunction } from './process';
+
 
 export class PingProcessor extends MessageProcessor {
-  protected processors: { [id: number]: ProcessFunction } = {};
+  protected processors: { [id: number]: Server.ProcessFunction } = {};
 
   constructor(game: Server.GameState) {
     super(game);

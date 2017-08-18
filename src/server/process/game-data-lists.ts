@@ -1,5 +1,5 @@
 import { MessageProcessor } from './process';
-import { ProcessFunction } from './process';
+
 import { Message } from '../message';
 import { HallDataManager } from '../data/halls';
 import { MagicDataManager } from '../data/magic';

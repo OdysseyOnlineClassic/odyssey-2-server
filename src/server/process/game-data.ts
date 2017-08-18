@@ -1,5 +1,5 @@
 import { MessageProcessor } from './process';
-import { ProcessFunction } from './process';
+
 import { Message } from '../message';
 import { HallDataManager } from '../data/halls';
 import { MagicDataManager } from '../data/magic';
@@ -11,7 +11,7 @@ import { PrefixDataManager } from '../data/prefixes';
 import { SuffixDataManager } from '../data/suffixes';
 
 export class GameDataProcessor extends MessageProcessor {
-  protected processors: { [id: number]: ProcessFunction } = {};
+  protected processors: { [id: number]: Server.ProcessFunction } = {};
 
   protected hallData: HallDataManager;
   protected magicData: MagicDataManager;
