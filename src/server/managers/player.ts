@@ -1,12 +1,13 @@
 import { CharacterDocument } from '../data/characters';
 import { MapDataManager } from '../data/maps';
 import { MapDocument } from '../data/maps';
-import { AttributeTypes } from '../data/maps';
-import { Directions } from '../data/maps';
 import { CharacterDataManagerInterface } from '../data/characters';
 import { RawMessage } from '../message';
+import { AttributeType } from '../data/maps';
+import { Direction } from '../data/maps';
 
-let Att = AttributeTypes;
+import Att = AttributeType;
+
 const BlockingAttributes = [Att.Wall, Att.Key, Att.Fish, Att.Ore, Att.ProjectileWall, Att.Tree]; //Attribute indexes that out right stop the player always
 const InteractiveAttributes = [Att.Warp, Att.Door, Att.TouchPlate, Att.Damage, Att.Script, Att.DirectionalWall, Att.Light, Att.LightDampening]; //Attribute indexes that need to do something when a player moves into the tile
 const CheckAttributes = [].concat(BlockingAttributes, InteractiveAttributes);
@@ -336,13 +337,13 @@ export class PlayerManager implements Server.Managers.PlayerManager {
     function processDirectionalWall(data, direction, from: boolean) {
       let passableBit;
       switch (direction) {
-        case Directions.up:
+        case Direction.up:
           passableBit = from ? 1 : 3 //To Above, From Below
-        case Directions.down:
+        case Direction.down:
           passableBit = from ? 2 : 0 //To Below, From Above
-        case Directions.left:
+        case Direction.left:
           passableBit = from ? 4 : 6 //To Left, From Right
-        case Directions.right:
+        case Direction.right:
           passableBit = from ? 7 : 5 //To Right, From Left
       }
 
