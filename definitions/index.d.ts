@@ -181,8 +181,6 @@ declare namespace Server {
   }
 }
 
-
-
 declare namespace Express {
   export interface Request {
     gameState: Server.GameState;
