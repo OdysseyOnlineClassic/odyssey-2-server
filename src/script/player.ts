@@ -1,4 +1,9 @@
-import Location = Odyssey.Location
+/**
+ * Provides an object for scripts to interact with the subject player
+ *
+ * @export
+ * @class Player
+ */
 export class Player {
   constructor(protected gameState: Server.GameState, protected client: Server.Client) {
   }
@@ -11,7 +16,7 @@ export class Player {
     return this.client.character.location;
   }
 
-  warp(map: number, x: number, y: number) {
-    this.gameState.managers.player.warp(this.client, { map, x, y });
+  set location(location: Odyssey.Location) {
+    this.gameState.managers.player.warp(this.client, location);
   }
 }

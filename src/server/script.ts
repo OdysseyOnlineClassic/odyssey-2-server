@@ -51,7 +51,7 @@ export class ScriptManager {
     this.loading.then(() => {
       if (!client.scriptContext) {
         let player = new Player(this.gameState, client);
-        client.scriptContext = vm.createContext({ game: this.gameState, player: new Player(this.gameState, client), Buffer: Buffer });
+        client.scriptContext = vm.createContext({ game: this.gameState, player: player, Buffer: Buffer });
       }
       //TODO might we need to run this in a new context?
       this.scripts[name].runInContext(client.scriptContext);
