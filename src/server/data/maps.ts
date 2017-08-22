@@ -1,6 +1,7 @@
 import { GameDataDocument } from './game-data';
 import { GameDataManager } from './game-data';
 
+//TODO extract to Definitions
 export interface MapDocument extends GameDataDocument {
   name: string,
   exits: {
