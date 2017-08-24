@@ -1,18 +1,25 @@
 declare namespace Odyssey {
+  export interface Account {
+    username: string;
+    password: string;
+    access: number;
+    email?: string;
+  }
+
   export interface Character {
-    name: string,
-    class: any, //Class interface?
-    female: boolean,
-    sprite: number,
-    description?: string,
-    status: number,
-    location: Location,
-    stats: Stats,
-    inventory: any,
     ammo: number,
-    equipped: any,
     bank: any,
+    class: any, //Class interface?
+    description?: string,
+    equipped: any,
+    female: boolean,
     guild: GuildAssociation,
+    inventory: any,
+    location: Location,
+    name: string,
+    sprite: number,
+    status: number,
+    stats: Stats,
     timers?: {
       walk: number
     }, //Flood, walk, etc.
@@ -69,11 +76,12 @@ declare namespace Server {
     }
 
     export interface PlayerManager {
+      exitMap(client: Server.Client, exit: number);
       joinGame(client: Server.Client);
       joinMap(client: Server.Client);
       move(client: Server.Client, location: Odyssey.Location, walkStep: number);
       partMap(client: Server.Client);
-      exitMap(client: Server.Client, exit: number);
+      updateName(client: Server.Client);
       warp(client: Server.Client, location: Odyssey.Location);
     }
   }
