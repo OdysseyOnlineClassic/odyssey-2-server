@@ -417,7 +417,7 @@ export class PlayerManager implements Server.Managers.PlayerManager {
     this.game.clients.sendMessageMap(8, dataToMap, location.map, client.index);
   }
 
-  protected updateName(client: Server.Client) {
+  public updateName(client: Server.Client) {
     this.game.clients.sendMessageAll(64, Buffer.concat([Buffer.from([client.index]), Buffer.from(client.character.name)]));
   }
 }
