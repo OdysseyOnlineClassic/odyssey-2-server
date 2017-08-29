@@ -1,12 +1,13 @@
 {
   "compilerOptions": {
+    "alwaysStrict": true,
+    "experimentalDecorators": true,
     "moduleResolution": "node",
     "module": "none",
-    "target": "es6",
     "noImplicitAny": false,
+    "outDir": "bin",
     "sourceMap": true,
-    "alwaysStrict": true,
-    "outDir": "bin"
+    "target": "es6"
   },
   "include": [
     "node_modules/@types/node/index.d.ts",

@@ -7,6 +7,7 @@ declare namespace Odyssey {
   }
 
   export interface Character {
+    alive: boolean,
     ammo: number,
     bank: any,
     class: any, //Class interface?
@@ -20,10 +21,9 @@ declare namespace Odyssey {
     sprite: number,
     status: number,
     stats: Stats,
-    timers?: {
+    timers?: { //Flood, walk, etc.
       walk: number
-    }, //Flood, walk, etc.
-    alive: boolean
+    }
   }
 
   export interface GuildAssociation {
@@ -58,8 +58,8 @@ declare namespace Odyssey {
 declare namespace Server {
   namespace Managers {
     export interface AccountManager {
-      createAccount(username: string, password: string): void;
-      login(username: string, password: string): Promise<Account>;
+      createAccount(username: string, password: string): Promise<Odyssey.Account>;
+      login(username: string, password: string): Promise<Odyssey.Account>;
     }
 
     export interface CharacterManager {
