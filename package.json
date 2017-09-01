@@ -14,30 +14,30 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@types/bcryptjs": "^2.4.0",
-    "@types/body-parser": "^1.16.4",
+    "@types/bcryptjs": "^2.4.1",
+    "@types/body-parser": "^1.16.5",
     "@types/chai": "^3.5.2",
-    "@types/mocha": "^2.2.41",
+    "@types/mocha": "^2.2.42",
     "@types/nedb": "^1.8.3",
-    "@types/node": "^7.0.41",
+    "@types/node": "^7.0.43",
     "@types/sinon": "^1.16.36",
+    "@types/sinon-chai": "^2.7.29",
     "chai": "^3.5.0",
-    "editorconfig": "^0.13.2",
+    "editorconfig": "^0.13.3",
     "gulp": "^3.9.1",
-    "mocha": "^3.4.2",
-    "sinon": "^2.3.6",
-    "ts-node": "^3.1.0",
+    "mocha": "^3.5.0",
+    "sinon": "^2.4.1",
+    "sinon-chai": "^2.13.0",
+    "ts-node": "^3.3.0",
     "tslint": "^4.5.1",
-    "typescript": "^2.3.4"
+    "typescript": "^2.5.1"
   },
   "dependencies": {
-    "@types/commander": "^2.9.1",
-    "@types/winston": "^2.3.3",
+    "@types/commander": "^2.9.2",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.17.2",
     "commander": "^2.11.0",
-    "express": "^4.15.3",
-    "nedb": "^1.8.0",
-    "winston": "^2.3.1"
+    "express": "^4.15.4",
+    "nedb": "^1.8.0"
   }
 }
