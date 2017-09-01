@@ -42,7 +42,6 @@ export class GameDataManager<T extends GameDataDocument> {
 @data
 export abstract class DataDocument {
   readonly _id: string;
-  _autosave: boolean;
   clearChanges() { };
   saveChanges() { };
 }
@@ -60,8 +59,9 @@ export interface GameDataDocument {
 }
 
 export function data(target: any) {
+  target.prototype._autoSave = false;
   target.prototype._changedKeys = [];
-  target.prototype._autosave = true;
+  target.prototype._trackedKeys = target.prototype._trackedKeys || {};
 
   target.prototype.clearChanges = function clearChanges() {
     this._changedKeys = [];
@@ -78,17 +78,30 @@ export function data(target: any) {
     return set;
   }
 
-  target.prototype.markChanged = function markChanged(key) {
-    this._changedKeys.push(key);
-    if (this._autosave) {
-      this.saveChanges();
+  target.prototype.markChanged = async function markChanged(key) {
+    let save = this._trackedKeys[key];
+    if (save === false) {
+      this._changedKeys.push(key);
+      return Promise.resolve();
+    } else if (save === true) {
+      let set = {}
+      set[key] = this[key];
+      this.data.update({ _id: this._id }, { $set: { set } }, {}, (err, numAffected) => {
+        if (err) {
+          return Promise.reject(err);
+        }
+
+        if (numAffected != 1) {
+          return Promise.reject(`Save Changes number affected != 1 (${numAffected})`);
+        }
+        return Promise.resolve();
+      });
     }
   }
 
   target.prototype.saveChanges = function saveChanges() {
     return new Promise((resolve, reject) => {
       let sets = this.getSets();
-      console.log(sets);
       this.data.update({ _id: this._id }, { $set: sets }, {}, (err, numAffected) => {
         if (err) {
           return reject(err);
@@ -104,27 +117,31 @@ export function data(target: any) {
   }
 }
 
-export function trackProperty(target: any, key: string) {
-  if (!target.markChanged) {
-    data(target.constructor);
-  }
-  let _val = target[key];
+export function trackProperty(autoSave: boolean = true) {
+  return function track(target: any, key: string) {
+    let trackedKeys = target.constructor.prototype._trackedKeys || {};
+    trackedKeys['key'] = {
+      autoSave: autoSave
+    }
 
-  let getter = function () {
-    return _val;
-  };
+    let _val = target[key];
 
-  let setter = function (newValue) {
-    _val = newValue;
-    this.markChanged(key);
-  }
+    let getter = function () {
+      return _val;
+    };
 
-  if (delete target[key]) {
-    Object.defineProperty(target, key, {
-      get: getter,
-      set: setter,
-      enumerable: true,
-      configurable: true
-    });
+    let setter = function (newValue) {
+      _val = newValue;
+      this.markChanged(key);
+    }
+
+    if (delete target[key]) {
+      Object.defineProperty(target, key, {
+        get: getter,
+        set: setter,
+        enumerable: true,
+        configurable: true
+      });
+    }
   }
 }

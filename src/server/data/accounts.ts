@@ -4,24 +4,20 @@ import * as Data from './game-data';
 
 @Data.data
 export class AccountDocument extends DataDocument implements Odyssey.Account {
-  readonly _id: string;
-
-  @Data.trackProperty
+  @Data.trackProperty(true)
   username: string;
 
-  @Data.trackProperty
+  @Data.trackProperty(true)
   password: string;
 
-  @Data.trackProperty
+  @Data.trackProperty(true)
   access: number;
 
-  @Data.trackProperty
+  @Data.trackProperty(true)
   email?: string;
 
-  protected constructor(protected data: NeDB, _id, username, password, access, email?) {
+  protected constructor(protected data: NeDB, readonly _id, username, password, access, email?) {
     super();
-    let autosave = this._autosave;
-    this._autosave = false;
 
     this.username = username;
     this.password = password;
@@ -30,7 +26,6 @@ export class AccountDocument extends DataDocument implements Odyssey.Account {
     this._id = _id;
 
     this.clearChanges();
-    this._autosave = autosave;
   }
 }
 
@@ -60,12 +55,11 @@ export class AccountDataManager implements AccountDataManagerInterface {
   async createAccount(username: string, cryptPassword: string, email?: string): Promise<AccountDocument> {
     return new Promise<AccountDocument>((resolve, reject) => {
       this.data.insert({
-        _id: undefined,
         username: username,
         password: cryptPassword,
         access: 0,
         email: email
-      }, (err, account) => {
+      }, (err, account: any) => {
         if (err) {
           return reject(err);
         }
