@@ -1,7 +1,6 @@
 import * as NeDB from 'nedb';
 import * as path from 'path';
 import { DataDocument } from './game-data';
-import * as Data from './game-data';
 
 /**
  * Represents a Player's Character
@@ -11,64 +10,29 @@ import * as Data from './game-data';
  * @extends {DataDocument}
  * @extends {Odyssey.Character}
  */
-@Data.data
 export class CharacterDocument extends DataDocument implements Odyssey.Character {
-  @Data.trackProperty(false)
+  accountId: string;
   alive: boolean;
-
-  @Data.trackProperty()
   ammo: number;
-
-  @Data.trackProperty()
   bank: any;
-
-  @Data.trackProperty()
   class: any; //Class interface?
-
-  @Data.trackProperty()
   description?: string;
-
-  @Data.trackProperty()
   equipped: any;
-
-  @Data.trackProperty()
   female: boolean;
-
-  @Data.trackProperty()
   guild: Odyssey.GuildAssociation;
-
-  @Data.trackProperty()
   inventory: any;
-
-  @Data.trackProperty(false)
   location: Odyssey.Location;
-
-  @Data.trackProperty()
   name: string;
-
-  @Data.trackProperty()
   sprite: number;
-
-  @Data.trackProperty()
   status: number;
-
-  @Data.trackProperty()
   stats: Odyssey.Stats;
-
-  @Data.trackProperty(false)
   timers?: {
     walk: number
   }; //Flood, walk, etc.
-
-  @Data.trackProperty()
-  accountId: string;
-
-  @Data.trackProperty()
   extended: any; //Extended data to hold whatever scripts want
 
-  protected constructor(protected data, readonly _id, character: Odyssey.Character) {
-    super();
-    this._id = _id;
+  protected constructor(protected data, public readonly _id, character: Odyssey.Character) {
+    super(data, _id);
 
     this.alive = character.alive;
     this.ammo = character.ammo;
@@ -84,8 +48,6 @@ export class CharacterDocument extends DataDocument implements Odyssey.Character
     this.sprite = character.sprite;
     this.status = character.status;
     this.stats = character.stats;
-
-    this.clearChanges();
   }
 }
 
@@ -117,16 +79,17 @@ export class CharacterDataManager implements CharacterDataManagerInterface {
       autoload: true
     });
 
-    // this.data.ensureIndex({
-    //   fieldName: '_name',
-    //   unique: true,
-    //   sparse: false
-    // });
+    //Keep _id intact as it provides better spread of primary keys
+    this.data.ensureIndex({
+      fieldName: '_name',
+      unique: true,
+      sparse: false
+    });
   }
 
   async createCharacter(accountId: string, character: Odyssey.Character): Promise<CharacterDocument> {
     return new Promise<CharacterDocument>((resolve, reject) => {
-      let insertCharacter = Object.assign({ _id: character.name.toLowerCase() }, character);
+      let insertCharacter = Object.assign({ _name: character.name.toLowerCase() }, character);
       this.data.insert(insertCharacter, (err, result: any) => {
         if (err) {
           return reject(err);

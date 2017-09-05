@@ -1,12 +1,12 @@
 declare namespace Odyssey {
-  export interface Account {
+  export interface Account extends Server.DataDocument {
     username: string;
     password: string;
     access: number;
     email?: string;
   }
 
-  export interface Character {
+  export interface Character extends Server.DataDocument {
     alive: boolean,
     ammo: number,
     bank: any,
@@ -99,6 +99,19 @@ declare namespace Server {
   export interface Data {
     readonly managers: any;
     readonly dataFolder: string;
+  }
+
+  export interface DataDocument {
+    readonly _id: string;
+    save(): Promise<void>;
+  }
+
+  /**
+   * Represents game data that's indexed numerically and versioned to reduce load times
+   */
+  export interface GameDataDocument extends DataDocument {
+    index: number;
+    version: number;
   }
 
   /**

@@ -1,31 +1,15 @@
 import * as NeDB from 'nedb';
 import { DataDocument } from './game-data';
-import * as Data from './game-data';
 
-@Data.data
 export class AccountDocument extends DataDocument implements Odyssey.Account {
-  @Data.trackProperty(true)
-  username: string;
-
-  @Data.trackProperty(true)
-  password: string;
-
-  @Data.trackProperty(true)
-  access: number;
-
-  @Data.trackProperty(true)
-  email?: string;
-
-  protected constructor(protected data: NeDB, readonly _id, username, password, access, email?) {
-    super();
-
-    this.username = username;
-    this.password = password;
-    this.access = access;
-    this.email = email;
-    this._id = _id;
-
-    this.clearChanges();
+  protected constructor(
+    protected data: NeDB,
+    public readonly _id: string,
+    public username: string,
+    public password,
+    public access,
+    public email?) {
+    super(data, _id);
   }
 }
 
