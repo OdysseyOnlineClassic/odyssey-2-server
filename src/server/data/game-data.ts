@@ -43,7 +43,7 @@ export class GameDataManager<T extends GameDataDocument> {
 export abstract class DataDocument {
   readonly _id: string;
   clearChanges() { };
-  saveChanges() { };
+  save() { };
 }
 
 /**
@@ -79,8 +79,8 @@ export function data(target: any) {
   }
 
   target.prototype.markChanged = async function markChanged(key) {
-    let save = this._trackedKeys[key];
-    if (save === false) {
+    let save = this._trackedKeys[key].autoSave;
+    if (save == false) {
       this._changedKeys.push(key);
       return Promise.resolve();
     } else if (save === true) {
@@ -99,7 +99,7 @@ export function data(target: any) {
     }
   }
 
-  target.prototype.saveChanges = function saveChanges() {
+  target.prototype.save = function saveChanges() {
     return new Promise((resolve, reject) => {
       let sets = this.getSets();
       this.data.update({ _id: this._id }, { $set: sets }, {}, (err, numAffected) => {
@@ -120,8 +120,8 @@ export function data(target: any) {
 export function trackProperty(autoSave: boolean = true) {
   return function track(target: any, key: string) {
     let trackedKeys = target.constructor.prototype._trackedKeys || {};
-    trackedKeys['key'] = {
-      autoSave: autoSave
+    trackedKeys[key] = {
+      autoSave: (autoSave == true)
     }
 
     let _val = target[key];
@@ -131,6 +131,44 @@ export function trackProperty(autoSave: boolean = true) {
     };
 
     let setter = function (newValue) {
+      if (newValue != null && typeof newValue === 'object') {
+        //Have to handle arrays and objects
+        if (Array.isArray(newValue)) {
+
+        } else {
+          let props = Object.getOwnPropertyNames(newValue);
+          for (let i = 0; i < props.length; i++) {
+            let propValue;
+            let prop = props[i];
+            console.log(prop);
+            let descriptor = Object.getOwnPropertyDescriptor(newValue, prop);
+            let dataObj = this;
+
+            if (descriptor.set) {
+              descriptor.set = function (val) {
+                dataObj.markChanged(key);
+                descriptor.set(val);
+              }
+            } else {
+              descriptor.set = function (val) {
+                dataObj.markChanged(key);
+                propValue = val;
+              }
+            }
+
+            if (!descriptor.get) {
+              descriptor.get = function () {
+                return propValue;
+              }
+            }
+
+            delete (descriptor.writable);
+            delete (descriptor.value);
+
+            Object.defineProperty(newValue, prop, descriptor);
+          }
+        }
+      }
       _val = newValue;
       this.markChanged(key);
     }
@@ -144,4 +182,12 @@ export function trackProperty(autoSave: boolean = true) {
       });
     }
   }
+}
+
+function arraySetter(arr, autoSave: boolean) {
+
+}
+
+function objectSetter(obj, autoSave: boolean) {
+
 }

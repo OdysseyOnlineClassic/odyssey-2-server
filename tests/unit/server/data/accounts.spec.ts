@@ -9,7 +9,7 @@ import { AccountDocument } from '../../../../src/server/data/accounts';
 import { AccountDataManager } from '../../../../src/server/data/accounts';
 
 describe('AccountDataManager', () => {
-  let dataFile = path.resolve(`${__dirname}/accounts.data`);
+  let dataFile = path.resolve(`${__dirname}/data/accounts.data`);
   let data: AccountDataManager;
 
   before(async () => {
