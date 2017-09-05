@@ -1,7 +1,7 @@
 import { CharacterDocument } from '../data/characters';
 import { MapDataManager } from '../data/maps';
 import { MapDocument } from '../data/maps';
-import { CharacterDataManagerInterface } from '../data/characters';
+import { CharacterDataManager } from '../data/characters';
 import { RawMessage } from '../message';
 import { AttributeType } from '../data/maps';
 import { Direction } from '../data/maps';
@@ -14,7 +14,7 @@ const CheckAttributes = [].concat(BlockingAttributes, InteractiveAttributes);
 
 export class PlayerManager implements Server.Managers.PlayerManager {
   protected mapData: MapDataManager;
-  protected characterData: CharacterDataManagerInterface;
+  protected characterData: CharacterDataManager;
 
   constructor(protected game: Server.GameState) {
     this.mapData = game.data.managers.maps;
@@ -178,7 +178,6 @@ export class PlayerManager implements Server.Managers.PlayerManager {
     })
       .then((moved) => {
         if (moved) {
-          this.characterData.update(character, (err, character) => { });
           this.game.clients.sendMessageMap(10, Buffer.from([client.index, character.location.x, character.location.y, character.location.direction, walkStep]), character.location.map, client.index);
         }
       })
@@ -417,7 +416,7 @@ export class PlayerManager implements Server.Managers.PlayerManager {
     this.game.clients.sendMessageMap(8, dataToMap, location.map, client.index);
   }
 
-  protected updateName(client: Server.Client) {
+  public updateName(client: Server.Client) {
     this.game.clients.sendMessageAll(64, Buffer.concat([Buffer.from([client.index]), Buffer.from(client.character.name)]));
   }
 }

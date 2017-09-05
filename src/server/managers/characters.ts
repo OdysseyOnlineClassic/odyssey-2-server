@@ -9,9 +9,7 @@ export class CharacterManager implements Server.Managers.CharacterManager {
 
   public createCharacter(accountId, name, description, classIndex, female) {
     return new Promise((resolve, reject) => {
-      let character: CharacterDocument = {
-        _id: name.toLowerCase(),
-        accountId: accountId,
+      let character: Odyssey.Character = {
         name: name,
         class: classIndex,
         female: female,
@@ -44,14 +42,13 @@ export class CharacterManager implements Server.Managers.CharacterManager {
           slot: 0,
           invite: 0
         },
-        extended: null,
         timers: {
           walk: 0
         }, //TODO
         alive: true
       };
 
-      this.characterData.createCharacter(character, (err, character) => {
+      this.characterData.createCharacter(accountId,character, (err, character) => {
         if (err) {
           throw err;
         }
