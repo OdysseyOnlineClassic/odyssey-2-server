@@ -100,84 +100,87 @@ export class MapProcessor extends MessageProcessor {
       return;
     }
 
-    let map = {
-      index: mapIndex,
-      name: msg.data.toString('utf-8', 0, 29),
-      version: msg.data.readUInt32BE(30),
-      npc: msg.data.readUInt16BE(34),
-      midi: msg.data.readUInt8(36),
-      exits: {
-        up: msg.data.readUInt16BE(37),
-        down: msg.data.readUInt16BE(39),
-        left: msg.data.readUInt16BE(41),
-        right: msg.data.readUInt16BE(43),
-      },
-      bootLocation: {
-        map: msg.data.readUInt16BE(45),
-        x: msg.data.readUInt8(47),
-        y: msg.data.readUInt8(48),
-      },
-      deathLocation: {
-        map: msg.data.readUInt16BE(49),
-        x: msg.data.readUInt8(51),
-        y: msg.data.readUInt8(52)
-      },
-      flags: [
-        msg.data.readUInt8(53),
-        msg.data.readUInt8(54)
-      ],
-      monsterSpawns: [],
-      tiles: []
-    }
+    this.mapData.get(mapIndex, (err, map: MapDocument) => {
+      //TODO: we don't have the _id here, need to get map first?
+      Object.assign(map, {
+        index: mapIndex,
+        name: msg.data.toString('utf-8', 0, 29),
+        version: msg.data.readUInt32BE(30),
+        npc: msg.data.readUInt16BE(34),
+        midi: msg.data.readUInt8(36),
+        exits: {
+          up: msg.data.readUInt16BE(37),
+          down: msg.data.readUInt16BE(39),
+          left: msg.data.readUInt16BE(41),
+          right: msg.data.readUInt16BE(43),
+        },
+        bootLocation: {
+          map: msg.data.readUInt16BE(45),
+          x: msg.data.readUInt8(47),
+          y: msg.data.readUInt8(48),
+        },
+        deathLocation: {
+          map: msg.data.readUInt16BE(49),
+          x: msg.data.readUInt8(51),
+          y: msg.data.readUInt8(52)
+        },
+        flags: [
+          msg.data.readUInt8(53),
+          msg.data.readUInt8(54)
+        ],
+        monsterSpawns: [],
+        tiles: []
+      });
 
-    for (let i = 0; i < this.game.options.max.mapMonsters; i++) {
-      map.monsterSpawns[i] = {
-        monsterId: msg.data.readUInt16BE(55 + 3 * i),
-        rate: msg.data.readUInt8(57 + 3 * i),
-        timer: 0
-      }
-    }
-
-    const offset = 85;
-    const tileLength = 18;
-    let tileOffset;
-    //TODO make range configurable
-    for (let y = 0; y < 12; y++) {
-      map.tiles[y] = [];
-      for (let x = 0; x < 12; x++) {
-        tileOffset = (12 * y + x) * tileLength;
-        tileOffset += offset;
-        map.tiles[y][x] = {
-          ground: {
-            tile: msg.data.readUInt16BE(tileOffset),
-            alternate: msg.data.readUInt16BE(tileOffset + 2)
-          },
-          background: {
-            tile: msg.data.readUInt16BE(tileOffset + 4),
-            alternate: msg.data.readUInt16BE(tileOffset + 6)
-          },
-          foreground: {
-            tile: msg.data.readUInt16BE(tileOffset + 8),
-            alternate: msg.data.readUInt16BE(tileOffset + 10)
-          },
-          attribute: msg.data.readUInt8(tileOffset + 12),
-          attributeData: [
-            msg.data.readUInt8(tileOffset + 13),
-            msg.data.readUInt8(tileOffset + 14),
-            msg.data.readUInt8(tileOffset + 15),
-            msg.data.readUInt8(tileOffset + 16),
-          ],
-          attribute2: msg.data.readUInt8(tileOffset + 17)
+      for (let i = 0; i < this.game.options.max.mapMonsters; i++) {
+        map.monsterSpawns[i] = {
+          monsterId: msg.data.readUInt16BE(55 + 3 * i),
+          rate: msg.data.readUInt8(57 + 3 * i),
+          timer: 0
         }
       }
-    }
 
-    this.mapData.update(map, (err, map) => {
-      let mapClients = this.game.clients.getClientsByMap(mapIndex);
-      for (let i = 0; i < mapClients.length; i++) {
-        this.game.managers.player.partMap(mapClients[i]);
-        this.game.managers.player.joinMap(mapClients[i]);
+      const offset = 85;
+      const tileLength = 18;
+      let tileOffset;
+      //TODO make range configurable
+      for (let y = 0; y < 12; y++) {
+        map.tiles[y] = [];
+        for (let x = 0; x < 12; x++) {
+          tileOffset = (12 * y + x) * tileLength;
+          tileOffset += offset;
+          map.tiles[y][x] = {
+            ground: {
+              tile: msg.data.readUInt16BE(tileOffset),
+              alternate: msg.data.readUInt16BE(tileOffset + 2)
+            },
+            background: {
+              tile: msg.data.readUInt16BE(tileOffset + 4),
+              alternate: msg.data.readUInt16BE(tileOffset + 6)
+            },
+            foreground: {
+              tile: msg.data.readUInt16BE(tileOffset + 8),
+              alternate: msg.data.readUInt16BE(tileOffset + 10)
+            },
+            attribute: msg.data.readUInt8(tileOffset + 12),
+            attributeData: [
+              msg.data.readUInt8(tileOffset + 13),
+              msg.data.readUInt8(tileOffset + 14),
+              msg.data.readUInt8(tileOffset + 15),
+              msg.data.readUInt8(tileOffset + 16),
+            ],
+            attribute2: msg.data.readUInt8(tileOffset + 17)
+          }
+        }
       }
+
+      this.mapData.update(map, (err, map) => {
+        let mapClients = this.game.clients.getClientsByMap(mapIndex);
+        for (let i = 0; i < mapClients.length; i++) {
+          this.game.managers.player.partMap(mapClients[i]);
+          this.game.managers.player.joinMap(mapClients[i]);
+        }
+      });
     });
   }
 }

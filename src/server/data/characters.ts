@@ -104,14 +104,15 @@ export class CharacterDataManager implements CharacterDataManagerInterface {
   }
 
   async getCharacter(accountId: string): Promise<CharacterDocument> {
+    let self = this;
     return new Promise<CharacterDocument>((resolve, reject) => {
-      if (this.characters[accountId]) {
-        return resolve(this.characters[accountId]);
+      if (self.characters[accountId]) {
+        return resolve(self.characters[accountId]);
       }
 
-      this.data.findOne({ accountId: accountId }, (err, character: CharacterDocument) => {
-        let newCharacter = new ConcreteCharacter(this.data, character._id, character);
-        this.characters[accountId] = newCharacter;
+      self.data.findOne({ accountId: accountId }, (err, character: CharacterDocument) => {
+        let newCharacter = new ConcreteCharacter(self.data, character._id, character);
+        self.characters[accountId] = newCharacter;
         resolve(newCharacter);
       });
     });

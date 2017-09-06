@@ -48,7 +48,7 @@ export class CharacterManager implements Server.Managers.CharacterManager {
         alive: true
       };
 
-      this.characterData.createCharacter(accountId,character, (err, character) => {
+      this.characterData.createCharacter(accountId, character, (err, character) => {
         if (err) {
           throw err;
         }
@@ -58,25 +58,7 @@ export class CharacterManager implements Server.Managers.CharacterManager {
     });
   }
 
-  public getCharacter(accountId: string): Promise<Odyssey.Character> {
-    return new Promise((resolve, reject) => {
-      this.characterData.getCharacter(accountId, (err, character) => {
-        if (err) {
-          throw new Error('Unknown error while loading character');
-        }
-
-        if (character && !character.location) {
-          //TODO define start location
-          character.location = {
-            map: 1,
-            x: 0,
-            y: 0,
-            direction: 0
-          }
-        }
-
-        resolve(character);
-      });
-    });
+  public async getCharacter(accountId: string): Promise<Odyssey.Character> {
+    return this.characterData.getCharacter(accountId);
   }
 }

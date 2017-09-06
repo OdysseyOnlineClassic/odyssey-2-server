@@ -1,7 +1,6 @@
-import { GameDataDocument } from './game-data';
 import { GameDataManager } from './game-data';
 
-export interface BanDocument extends GameDataDocument {
+export interface BanDocument extends Server.GameDataDocument {
   name: string,
   reason: string,
   unbanDate: number,

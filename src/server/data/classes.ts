@@ -1,4 +1,3 @@
-import { GameDataDocument } from './game-data';
 import { GameDataManager } from './game-data';
 
 /**
@@ -9,7 +8,7 @@ import { GameDataManager } from './game-data';
  * @interface CharacterClassDocument
  * @extends {DataDocument}
  */
-export interface CharacterClassDocument extends GameDataDocument {
+export interface CharacterClassDocument extends Server.GameDataDocument {
   index: number; //Old code referenced them by index
   maxHP: number;
   maxEnergy: number;

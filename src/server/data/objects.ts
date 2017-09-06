@@ -1,7 +1,7 @@
-import { GameDataDocument } from './game-data';
+import * as NeDB from 'nedb';
 import { GameDataManager } from './game-data';
 
-export interface ObjectDocument extends GameDataDocument {
+export interface ObjectDocument extends Server.GameDataDocument {
   name: string,
   sprite: number,
   type: number,
