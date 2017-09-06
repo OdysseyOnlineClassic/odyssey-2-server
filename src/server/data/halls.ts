@@ -1,8 +1,7 @@
 import * as NeDB from 'nedb';
-import { GameDataDocument } from './game-data';
 import { GameDataManager } from './game-data';
 
-export interface HallDocument extends GameDataDocument {
+export interface HallDocument extends Server.GameDataDocument {
   name: string,
   price: number,
   upkeep: number,

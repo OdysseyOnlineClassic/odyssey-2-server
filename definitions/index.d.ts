@@ -1,12 +1,12 @@
 declare namespace Odyssey {
-  export interface Account extends Server.DataDocument {
+  export interface Account {
     username: string;
     password: string;
     access: number;
     email?: string;
   }
 
-  export interface Character extends Server.DataDocument {
+  export interface Character {
     alive: boolean,
     ammo: number,
     bank: any,

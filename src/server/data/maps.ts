@@ -1,8 +1,7 @@
-import { GameDataDocument } from './game-data';
 import { GameDataManager } from './game-data';
 
 //TODO extract to Definitions
-export interface MapDocument extends GameDataDocument, Odyssey.Maps.Map {
+export interface MapDocument extends Server.GameDataDocument, Odyssey.Maps.Map {
 
 }
 

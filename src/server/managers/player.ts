@@ -101,6 +101,7 @@ export class PlayerManager implements Server.Managers.PlayerManager {
    * @memberOf PlayerEvents
    */
   joinMap(client: Server.Client) {
+    client.character.save();
     this.game.scripts.runScript('JoinMap', client);
     let location = client.character.location;
     this.mapData.get(location.map, (err, map) => {
