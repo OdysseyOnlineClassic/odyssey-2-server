@@ -158,14 +158,16 @@ export class PlayerManager implements Server.Managers.PlayerManager {
       ) {
         this.mapData.get(character.location.map, (err, map: MapDocument) => {
           //TODO Check Map Tiles
-          let tile = map.tiles[location.y][location.x];
-          if (CheckAttributes.indexOf(tile.attribute) >= 0 || CheckAttributes.indexOf(tile.attribute2) >= 0) {
-            if (BlockingAttributes.indexOf(tile.attribute) >= 0 || BlockingAttributes.indexOf(tile.attribute2) >= 0) {
-              return resolve(false);
-            }
+          let tile = MapDataManager.getTile(map, location.x, location.y);
+          if (tile != null) {
+            if (CheckAttributes.indexOf(tile.attribute) >= 0 || CheckAttributes.indexOf(tile.attribute2) >= 0) {
+              if (BlockingAttributes.indexOf(tile.attribute) >= 0 || BlockingAttributes.indexOf(tile.attribute2) >= 0) {
+                return resolve(false);
+              }
 
-            let passable = this.resolveAttributeInteraction(client, location, map);
-            return resolve(passable)
+              let passable = this.resolveAttributeInteraction(client, location, map);
+              return resolve(passable)
+            }
           }
           character.location.x += dx;
           character.location.y += dy;

@@ -6,6 +6,8 @@ export interface MapDocument extends Server.GameDataDocument, Odyssey.Maps.Map {
 }
 
 export class MapDataManager extends GameDataManager<MapDocument> {
+  //TODO need to build a blank map when we request a map that doesn't exist.
+
   /**
    * Provides a normalized (x,y) way to get tiles.
    * Currently due to legacy code, map tiles are organized y,x.
@@ -19,6 +21,9 @@ export class MapDataManager extends GameDataManager<MapDocument> {
    * @memberof MapDataManager
    */
   static getTile(map: Odyssey.Maps.Map, x: number, y: number) {
+    if (!map.tiles[y] || !map.tiles[y][x]) {
+      return null;
+    }
     return map.tiles[y][x];
   }
 }
