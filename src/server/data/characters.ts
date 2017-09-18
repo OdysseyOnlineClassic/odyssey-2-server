@@ -95,7 +95,7 @@ export class CharacterDataManager implements CharacterDataManagerInterface {
           return reject(err);
         }
 
-        let newCharacter = new ConcreteCharacter(this.data, result._id, result);
+        let newCharacter = new Proxy(new ConcreteCharacter(this.data, result._id, result), { set: Data.setter });
         this.characters[result.accountId] = newCharacter;
 
         resolve(newCharacter);
@@ -110,9 +110,10 @@ export class CharacterDataManager implements CharacterDataManagerInterface {
         return resolve(self.characters[accountId]);
       }
 
-      self.data.findOne({ accountId: accountId }, (err, character: CharacterDocument) => {
-        let newCharacter = new ConcreteCharacter(self.data, character._id, character);
-        self.characters[accountId] = newCharacter;
+      this.data.findOne({ accountId: accountId }, (err, character: CharacterDocument) => {
+        let newCharacter = new Proxy(new ConcreteCharacter(this.data, character._id, character), { set: Data.setter });
+        this.characters[accountId] = newCharacter;
+
         resolve(newCharacter);
       });
     });
