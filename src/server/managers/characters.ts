@@ -58,7 +58,20 @@ export class CharacterManager implements Server.Managers.CharacterManager {
     });
   }
 
-  public async getCharacter(accountId: string): Promise<Odyssey.Character> {
-    return this.characterData.getCharacter(accountId);
+  public getCharacter(accountId: string): Promise<Odyssey.Character> {
+    return this.characterData.getCharacter(accountId)
+      .then((character) => {
+        if (character && !character.location) {
+          //TODO define start location
+          character.location = {
+            map: 1,
+            x: 0,
+            y: 0,
+            direction: 0
+          }
+        }
+
+        return character
+      });
   }
 }

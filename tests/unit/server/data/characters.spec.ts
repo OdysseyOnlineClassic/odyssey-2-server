@@ -1,9 +1,12 @@
 import 'mocha';
-import { expect } from 'chai';
+import * as chai from 'chai';
 import * as sinon from 'sinon';
-import 'sinon-chai';
+import * as sinonChai from 'sinon-chai';
 import * as fs from 'fs';
 import * as path from 'path';
+
+chai.use(sinonChai);
+const expect = chai.expect;
 
 import { CharacterDocument } from '../../../../src/server/data/characters';
 import { CharacterDataManager } from '../../../../src/server/data/characters';
