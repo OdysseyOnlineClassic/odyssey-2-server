@@ -2,14 +2,19 @@ import * as NeDB from 'nedb';
 import { DataDocument } from './game-data';
 
 export class AccountDocument extends DataDocument implements Odyssey.Account {
-  protected constructor(
-    protected data: NeDB,
-    public readonly _id: string,
-    public username: string,
-    public password,
-    public access,
-    public email?) {
-    super(data, _id);
+  username: string;
+  password: string;
+  access: number;
+  email?: string;
+
+  protected constructor(protected data: NeDB, readonly _id, username, password, access, email?) {
+    super();
+
+    this.username = username;
+    this.password = password;
+    this.access = access;
+    this.email = email;
+    this._id = _id;
   }
 }
 
@@ -48,7 +53,7 @@ export class AccountDataManager implements AccountDataManagerInterface {
           return reject(err);
         }
 
-        let newAccount = new ConcreteAccount(this.data, account._id, account.username, account.password, account.access, account.email);
+        let newAccount = new Proxy(new ConcreteAccount(this.data, account._id, account.username, account.password, account.access, account.email), { set: Data.setter });
         this.accounts[account.username] = newAccount;
 
         resolve(newAccount);
@@ -63,7 +68,7 @@ export class AccountDataManager implements AccountDataManagerInterface {
       }
 
       this.data.findOne({ username: username }, (err, account: AccountDocument) => {
-        let newAccount = new ConcreteAccount(this.data, account._id, account.username, account.password, account.access, account.email);
+        let newAccount = new Proxy(new ConcreteAccount(this.data, account._id, account.username, account.password, account.access, account.email), { set: Data.setter });
         this.accounts[account.username] = newAccount;
         resolve(newAccount);
       });
@@ -78,7 +83,7 @@ export class AccountDataManager implements AccountDataManagerInterface {
  * @extends {AccountDocument}
  */
 class ConcreteAccount extends AccountDocument {
-  constructor(data: NeDB, _id, username, password, access, email?) {
+  constructor(protected data: NeDB, _id, username, password, access, email?) {
     super(data, _id, username, password, access, email);
   }
 }

@@ -11,7 +11,6 @@ import { DataDocument } from './game-data';
  * @extends {Odyssey.Character}
  */
 export class CharacterDocument extends DataDocument implements Odyssey.Character {
-  accountId: string;
   alive: boolean;
   ammo: number;
   bank: any;
@@ -29,6 +28,7 @@ export class CharacterDocument extends DataDocument implements Odyssey.Character
   timers?: {
     walk: number
   }; //Flood, walk, etc.
+  accountId: string;
   extended: any; //Extended data to hold whatever scripts want
 
   protected constructor(protected data, public readonly _id, character: Odyssey.Character) {
@@ -111,6 +111,10 @@ export class CharacterDataManager implements CharacterDataManagerInterface {
       }
 
       this.data.findOne({ accountId: accountId }, (err, character: CharacterDocument) => {
+        if (!character) {
+          resolve(null);
+        }
+
         let newCharacter = new Proxy(new ConcreteCharacter(this.data, character._id, character), { set: Data.setter });
         this.characters[accountId] = newCharacter;
 
