@@ -1,4 +1,4 @@
-import * as NeDB from 'nedb';
+import * as NeDB from 'nedb-core';
 
 export class GameDataManager<T extends Server.GameDataDocument> {
   protected data: NeDB;
@@ -101,4 +101,16 @@ export function data(target: any) {
       }
     });
   }
+}
+
+export function applyProxy(obj: any, ignore: [string] = ['data']) {
+  Object.keys(obj).forEach((key) => {
+    let ignored = (ignore.findIndex(value => value == key) > -1);
+    if (obj[key] instanceof Object && !ignored) {
+      let p = new Proxy(obj[key], { set: subSetter(obj, key) });
+      obj[key] = p;
+    }
+  });
+
+  return new Proxy(obj, { set: setter });
 }
