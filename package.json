@@ -17,6 +17,7 @@
     "@types/bcryptjs": "^2.4.1",
     "@types/body-parser": "^1.16.5",
     "@types/chai": "^3.5.2",
+    "@types/commander": "^2.9.2",
     "@types/mocha": "^2.2.42",
     "@types/nedb": "^1.8.3",
     "@types/node": "^7.0.43",
@@ -33,11 +34,10 @@
     "typescript": "^2.5.1"
   },
   "dependencies": {
-    "@types/commander": "^2.9.2",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.17.2",
     "commander": "^2.11.0",
     "express": "^4.15.4",
-    "nedb": "^1.8.0"
+    "nedb-core": "^3.0.6"
   }
 }

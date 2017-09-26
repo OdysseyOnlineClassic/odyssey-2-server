@@ -88,12 +88,13 @@ export class AccountsProcessor extends MessageProcessor {
     let character;
     try {
       character = await this.characters.createCharacter(msg.client.account._id, name, description, classIndex, female);
+      msg.client.character = character;
+      this.sendCharacter(msg.client, character);
     } catch (ex) {
-      throw ex;
+      // 13 tells client name is already in use
+      //TODO how do we handle other possible errors?
+      msg.client.sendMessage(13, Buffer.allocUnsafe(0));
     }
-
-    msg.client.character = character;
-    this.sendCharacter(msg.client, character);
   }
 
   protected sendCharacter(client: Server.Client, character: Odyssey.Character): void {

@@ -1,4 +1,4 @@
-import * as NeDB from 'nedb';
+import * as NeDB from 'nedb-core';
 import * as path from 'path';
 import { DataDocument } from './game-data';
 
@@ -54,6 +54,7 @@ export class CharacterDocument extends DataDocument implements Odyssey.Character
 class ConcreteCharacter extends CharacterDocument {
   constructor(data: NeDB, _id, character: Odyssey.Character) {
     super(data, _id, character);
+    //TODO Do we add proxies for object properties here?
   }
 }
 
@@ -79,24 +80,31 @@ export class CharacterDataManager implements CharacterDataManagerInterface {
       autoload: true
     });
 
-    //Keep _id intact as it provides better spread of primary keys
     this.data.ensureIndex({
       fieldName: '_name',
       unique: true,
       sparse: false
     });
+
+    this.data.ensureIndex({
+      fieldName: 'accountId',
+      unique: true,
+      sparse: false
+    });
   }
 
-  async createCharacter(accountId: string, character: Odyssey.Character): Promise<CharacterDocument> {
+  public async createCharacter(accountId: string, character: Odyssey.Character): Promise<CharacterDocument> {
+    let self = this;
     return new Promise<CharacterDocument>((resolve, reject) => {
-      let insertCharacter = Object.assign({ _name: character.name.toLowerCase() }, character);
-      this.data.insert(insertCharacter, (err, result: any) => {
+      let insertCharacter = Object.assign({ _name: character.name.toLowerCase(), accountId: accountId }, character);
+      self.data.insert(insertCharacter, (err, result: any) => {
         if (err) {
           return reject(err);
         }
 
-        let newCharacter = new Proxy(new ConcreteCharacter(this.data, result._id, result), { set: Data.setter });
-        this.characters[result.accountId] = newCharacter;
+        //TODO this does not Proxy object properties
+        let newCharacter = Data.applyProxy(new ConcreteCharacter(this.data, result._id, result));
+        self.characters[result.accountId] = newCharacter;
 
         resolve(newCharacter);
       });
@@ -113,12 +121,13 @@ export class CharacterDataManager implements CharacterDataManagerInterface {
       this.data.findOne({ accountId: accountId }, (err, character: CharacterDocument) => {
         if (!character) {
           resolve(null);
+        } else {
+          //TODO this does not Proxy object properties
+          let newCharacter = Data.applyProxy(new ConcreteCharacter(this.data, character._id, character));
+          this.characters[accountId] = newCharacter;
+
+          resolve(newCharacter);
         }
-
-        let newCharacter = new Proxy(new ConcreteCharacter(this.data, character._id, character), { set: Data.setter });
-        this.characters[accountId] = newCharacter;
-
-        resolve(newCharacter);
       });
     });
   }
