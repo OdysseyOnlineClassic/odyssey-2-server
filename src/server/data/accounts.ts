@@ -1,4 +1,5 @@
 import * as NeDB from 'nedb-core';
+import * as Data from './game-data';
 import { DataDocument } from './game-data';
 
 export class AccountDocument extends DataDocument implements Odyssey.Account {
@@ -62,18 +63,19 @@ export class AccountDataManager implements AccountDataManagerInterface {
   }
 
   async getAccount(username: string): Promise<AccountDocument> {
+    let self = this;
     return new Promise<AccountDocument>((resolve, reject) => {
-      if (this.accounts[username]) {
-        return resolve(this.accounts[username]);
+      if (self.accounts[username]) {
+        return resolve(self.accounts[username]);
       }
 
-      this.data.findOne({ username: username }, (err, account: AccountDocument) => {
+      self.data.findOne({ username: username }, (err, account: AccountDocument) => {
         if (!account) {
           return resolve(null);
         }
 
-        let newAccount = Data.applyProxy(new ConcreteAccount(this.data, account._id, account.username, account.password, account.access, account.email));
-        this.accounts[account.username] = newAccount;
+        let newAccount = Data.applyProxy(new ConcreteAccount(self.data, account._id, account.username, account.password, account.access, account.email));
+        self.accounts[account.username] = newAccount;
         resolve(newAccount);
       });
     })

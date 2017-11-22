@@ -7,7 +7,6 @@ import CharacterManager = Server.Managers.CharacterManager;
 import Message = Server.Message;
 
 export class AccountsProcessor extends MessageProcessor {
-  protected processors: { [id: number]: Server.ProcessFunction } = {};
   private accountData: AccountDataManager;
   private characterData: CharacterDataManager;
   private accounts: Server.Managers.AccountManager;
@@ -24,10 +23,6 @@ export class AccountsProcessor extends MessageProcessor {
 
     this.accounts = game.managers.accounts;
     this.characters = game.managers.characters;
-  }
-
-  async process(msg: Message): Promise<any> {
-    this.processors[msg.id](msg);
   }
 
   protected async createAccount(msg: Message) {
