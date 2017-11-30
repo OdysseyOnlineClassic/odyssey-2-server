@@ -1,5 +1,6 @@
 import * as NeDB from 'nedb-core';
 import * as path from 'path';
+import * as Data from './game-data';
 import { DataDocument } from './game-data';
 
 /**
@@ -32,7 +33,7 @@ export class CharacterDocument extends DataDocument implements Odyssey.Character
   extended: any; //Extended data to hold whatever scripts want
 
   protected constructor(protected data, public readonly _id, character: Odyssey.Character) {
-    super(data, _id);
+    super();
 
     this.alive = character.alive;
     this.ammo = character.ammo;
