@@ -1,8 +1,8 @@
-import * as NeDB from 'nedb';
+import * as NeDB from 'nedb-core';
 import { GameDataDocument } from './game-data';
 import { GameDataManager } from './game-data';
 
-export interface GuildDocument extends GameDataDocument {
+export interface GuildDocument extends Server.GameDataDocument {
   name: string,
   members: Membership[],
   declarations: Declaration[],

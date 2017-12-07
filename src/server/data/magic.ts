@@ -1,8 +1,8 @@
-import * as NeDB from 'nedb';
+import * as NeDB from 'nedb-core';
 import { GameDataDocument } from './game-data';
 import { GameDataManager } from './game-data';
 
-export interface MagicDocument extends GameDataDocument {
+export interface MagicDocument extends Server.GameDataDocument {
   name: string,
   level: number,
   class: number,

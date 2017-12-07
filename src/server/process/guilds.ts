@@ -1,13 +1,13 @@
 import { MessageProcessor } from './process';
 import { Message } from '../message';
-import { ProcessFunction } from './process';
+
 import { GuildDataManager } from '../data/guilds';
 
 export class GuildProcessor extends MessageProcessor {
   protected guildData: GuildDataManager;
-  protected processors: { [id: number]: ProcessFunction } = {};
+  protected processors: { [id: number]: Server.ProcessFunction } = {};
 
-  constructor(game: Odyssey.GameState) {
+  constructor(game: Server.GameState) {
     super(game);
 
     this.guildData = game.data.managers.guilds;

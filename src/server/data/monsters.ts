@@ -1,8 +1,8 @@
-import * as NeDB from 'nedb';
+import * as NeDB from 'nedb-core';
 import { GameDataDocument } from './game-data';
 import { GameDataManager } from './game-data';
 
-export interface MonsterDocument extends GameDataDocument {
+export interface MonsterDocument extends Server.GameDataDocument {
   name: string,
   description: string,
   sprite: number,

@@ -1,4 +1,4 @@
-declare namespace Odyssey {
+declare namespace Server {
   export interface Config {
     server: {
       port: number,
@@ -8,6 +8,9 @@ declare namespace Odyssey {
         file: string
       },
       interval: number
+    },
+    scripts: {
+      directory: string
     }
   }
 }

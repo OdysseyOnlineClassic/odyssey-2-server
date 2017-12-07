@@ -1,24 +1,35 @@
 import { CharacterDocument } from '../data/characters';
-import { Location } from '../data/maps';
 import { MapDataManager } from '../data/maps';
+import { MapDocument } from '../data/maps';
+import { CharacterDataManager } from '../data/characters';
 import { RawMessage } from '../message';
+import { AttributeType } from '../data/maps';
+import { Direction } from '../data/maps';
 
-export class PlayerManager {
+import Att = AttributeType;
+
+const BlockingAttributes = [Att.Wall, Att.Key, Att.Fish, Att.Ore, Att.ProjectileWall, Att.Tree]; //Attribute indexes that out right stop the player always
+const InteractiveAttributes = [Att.Warp, Att.Door, Att.TouchPlate, Att.Damage, Att.Script, Att.DirectionalWall, Att.Light, Att.LightDampening]; //Attribute indexes that need to do something when a player moves into the tile
+const CheckAttributes = [].concat(BlockingAttributes, InteractiveAttributes);
+
+export class PlayerManager implements Server.Managers.PlayerManager {
   protected mapData: MapDataManager;
+  protected characterData: CharacterDataManager;
 
-  constructor(protected game: Odyssey.GameState) {
+  constructor(protected game: Server.GameState) {
     this.mapData = game.data.managers.maps;
+    this.characterData = game.data.managers.characters;
   }
 
   /**
    * When a client joins the game.
    *
-   * @param {Odyssey.Client} client
+   * @param {Server.Client} client
    * @throws {Error} Expects client to have a character
    *
    * @memberOf PlayerEvents
    */
-  joinGame(client: Odyssey.Client) {
+  joinGame(client: Server.Client) {
     return new Promise((resolve, reject) => {
       if (!client.character) {
         throw new Error('Client does not have a character');
@@ -85,11 +96,13 @@ export class PlayerManager {
    * Sends Map Data to Client
    * Sends Client Location Update to other Clients on map
    *
-   * @param {Odyssey.Client} client
+   * @param {Server.Client} client
    *
    * @memberOf PlayerEvents
    */
-  joinMap(client: Odyssey.Client) {
+  joinMap(client: Server.Client) {
+    client.character.save();
+    this.game.scripts.runScript('JoinMap', client);
     let location = client.character.location;
     this.mapData.get(location.map, (err, map) => {
       if (!map) {
@@ -121,7 +134,63 @@ export class PlayerManager {
     });
   }
 
-  partMap(client: Odyssey.Client) {
+  move(client: Server.Client, location: Odyssey.Location, walkStep: number) {
+    //TODO if WalkStep is run (4), check energy
+
+    let character = client.character;
+
+    let dx = location.x - character.location.x;
+    let dy = location.y - character.location.y;
+
+    character.location.direction = location.direction;
+
+    //Only moving in one direction
+    if (Math.abs(dx) + Math.abs(dy) > 1) {
+      this.warp(client, character.location);
+      return;
+    }
+    new Promise((resolve, reject) => {
+      if (//Check if player is already facing that direction
+        (dy == -1 && location.direction == 0) ||
+        (dy == 1 && location.direction == 1) ||
+        (dx == -1 && location.direction == 2) ||
+        (dx == 1 && location.direction == 3)
+      ) {
+        this.mapData.get(character.location.map, (err, map: MapDocument) => {
+          //TODO Check Map Tiles
+          let tile = MapDataManager.getTile(map, location.x, location.y);
+          if (tile != null) {
+            if (CheckAttributes.indexOf(tile.attribute) >= 0 || CheckAttributes.indexOf(tile.attribute2) >= 0) {
+              if (BlockingAttributes.indexOf(tile.attribute) >= 0 || BlockingAttributes.indexOf(tile.attribute2) >= 0) {
+                return resolve(false);
+              }
+
+              let passable = this.resolveAttributeInteraction(client, location, map);
+              return resolve(passable)
+            }
+          }
+          character.location.x += dx;
+          character.location.y += dy;
+          return resolve(true);
+        });
+
+      } else {
+        character.direction = location.direction;
+        resolve(true);
+      }
+    })
+      .then((moved) => {
+        if (moved) {
+          this.game.clients.sendMessageMap(10, Buffer.from([client.index, character.location.x, character.location.y, character.location.direction, walkStep]), character.location.map, client.index);
+        }
+      })
+      .catch((err) => {
+        //TODO Error Handling
+        console.error(err);
+      });
+  }
+
+  partMap(client: Server.Client) {
     //TODO need to handle npc exit text
     client.sendMessage(88, Buffer.from([0, 0]));
 
@@ -130,7 +199,52 @@ export class PlayerManager {
     this.game.clients.sendMessageMap(9, Buffer.from([client.index]), map, client.index);
   }
 
-  warp(client: Odyssey.Client, location: Location) {
+  exitMap(client: Server.Client, exit: number) {
+    //TODO check map switch timer
+    this.mapData.get(client.character.location.map, (err, map: MapDocument) => {
+      let newMap: number;
+      let warp: boolean = false;
+      let location = client.character.location;
+      let newX = location.x;
+      let newY = location.y;
+      switch (exit) {
+        case 0:
+          warp = location.y == 0;
+          newY = 11;
+          newMap = map.exits.up;
+          break;
+        case 1:
+          warp = location.y == 11;
+          newY = 0;
+          newMap = map.exits.down;
+          break;
+        case 2:
+          warp = location.x == 0;
+          newX = 11;
+          newMap = map.exits.left;
+          break;
+        case 3:
+          newMap = map.exits.right
+          newX = 0;
+          warp = location.x == 11;
+          break;
+      }
+      if (newMap > 0 && newMap <= this.game.options.max.maps) {
+        if (warp) {
+          this.warp(client, { map: newMap, x: newX, y: newY })
+        } else {
+          this.partMap(client);
+          client.character.location = { map: newMap, x: location.x, y: location.y };
+          this.joinMap(client);
+        }
+      } else {
+        this.partMap(client);
+        this.joinMap(client);
+      }
+    });
+  }
+
+  warp(client: Server.Client, location: Odyssey.Location) {
     let map = client.character.location.map;
     if (map == location.map) {
       client.character.location = location;
@@ -143,7 +257,104 @@ export class PlayerManager {
     }
   }
 
-  protected sendMapPlayers(client: Odyssey.Client) {
+  /**
+   * Resolves any interaction with complex Attributes
+   * Returns boolean determining if the player can move into the tile
+   * @param client
+   * @param attribute
+   * @param data
+   */
+  protected resolveAttributeInteraction(client, location, map: MapDocument): boolean {
+    let currentTile = MapDataManager.getTile(map, client.character.location.x, client.character.location.y);
+    let newTile = MapDataManager.getTile(map, location.x, location.y);
+    let passable = true;
+
+    //Check for Directional Walls
+    if (currentTile.attribute == Att.DirectionalWall) {
+      if (!processDirectionalWall(currentTile.attributeData, location.direction, true)) {
+        passable = false;
+      }
+    }
+
+    if (currentTile.attribute2 == Att.DirectionalWall) {
+      if (!processDirectionalWall(currentTile.attributeData2, location.direction, true)) {
+        passable = false;
+      }
+    }
+
+    if (newTile.attribute == Att.DirectionalWall) {
+      if (!processDirectionalWall(newTile.attributeData, location.direction, false)) {
+        passable = false;
+      }
+    }
+
+    if (newTile.attribute2 == Att.DirectionalWall) {
+      if (!processDirectionalWall(newTile.attributeData2, location.direction, false)) {
+        passable = false;
+      }
+    }
+
+    let attribute = newTile.attribute;
+    let data = newTile.attributeData;
+    let attribute2 = newTile.attribute2;
+    let data2 = newTile.attributeData2;
+
+    passable = attributeSwitch(attribute, data) && passable;
+    return attributeSwitch(attribute2, data2) && passable;
+
+    function attributeSwitch(attribute, data) {
+      //TODO: Implement all attributes
+      switch (attribute) {
+        case Att.Warp:
+          passable = false;
+          this.warp(client, { map: data[1], x: data[2], y: data[3], direction: client.character.location.direction })
+          break;
+        case Att.Door:
+          break;
+        case Att.TouchPlate:
+          break;
+        case Att.Damage:
+          break;
+        case Att.Script:
+          break;
+        case Att.Light:
+          passable = data[2] > 0;
+          break;
+        case Att.LightDampening:
+          passable = data[3] > 0;
+          break;
+        default: //Likekly empty Attribute2
+          passable = true;
+      }
+      return passable;
+    }
+
+
+    /**
+     *
+     * @param data Attribute Data
+     * @param direction
+     * @param from True if the player is on this tile. False if the player is moving to this tile.
+     */
+    function processDirectionalWall(data, direction, from: boolean) {
+      let passableBit;
+      switch (direction) {
+        case Direction.up:
+          passableBit = from ? 1 : 3 //To Above, From Below
+        case Direction.down:
+          passableBit = from ? 2 : 0 //To Below, From Above
+        case Direction.left:
+          passableBit = from ? 4 : 6 //To Left, From Right
+        case Direction.right:
+          passableBit = from ? 7 : 5 //To Right, From Left
+      }
+
+      //Checks if the bit at passableBit location is set
+      return (data[0] & (Math.pow(2, passableBit))) == 0;
+    }
+  }
+
+  protected sendMapPlayers(client: Server.Client) {
     let map = client.character.location.map;
     let clients = this.game.clients.getClientsByMap(map);
     let msg = new RawMessage();
@@ -191,11 +402,11 @@ export class PlayerManager {
    * Sends client's location to all others on that map
    *
    * @protected
-   * @param {Odyssey.Client} client
+   * @param {Server.Client} client
    *
    * @memberOf PlayerEvents
    */
-  protected updateLocationToMap(client: Odyssey.Client) {
+  protected updateLocationToMap(client: Server.Client) {
     let location = client.character.location;
     let dataToMap: Buffer = Buffer.allocUnsafe(7);
     dataToMap.writeUInt8(client.index, 0);
@@ -206,5 +417,9 @@ export class PlayerManager {
     dataToMap.writeUInt8(client.character.status, 6);
 
     this.game.clients.sendMessageMap(8, dataToMap, location.map, client.index);
+  }
+
+  public updateName(client: Server.Client) {
+    this.game.clients.sendMessageAll(64, Buffer.concat([Buffer.from([client.index]), Buffer.from(client.character.name)]));
   }
 }

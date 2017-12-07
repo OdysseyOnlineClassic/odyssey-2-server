@@ -1,25 +1,24 @@
-import { MessageProcessor } from './process';
-import { ProcessFunction } from './process';
 import { Message } from '../message';
+import { MessageProcessor } from './process';
 import { ObjectDataManager } from '../data/objects';
 
 export class RawProcessor extends MessageProcessor {
-  protected processors: { [id: number]: ProcessFunction } = {};
+  protected processors: { [id: number]: Server.ProcessFunction } = {};
 
   protected objectData: ObjectDataManager;
 
-  constructor(protected game: Odyssey.GameState) {
+  constructor(protected game: Server.GameState) {
     super(game);
   }
 
-  async process(msg: Message): Promise<any> {
+  async process(msg: Server.Message): Promise<any> {
     const headerOffset: number = 3;
     let offset: number = 0;
     let length: number;
     let msgId: number;
     let data: Buffer;
 
-    let extractedMsg: Message;
+    let extractedMsg: Server.Message;
 
     /**
      * [A, A, B, C ...]

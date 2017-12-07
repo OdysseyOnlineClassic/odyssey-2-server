@@ -1,21 +1,18 @@
 import { MessageProcessor } from './process';
-import { ProcessFunction } from './process';
-import { Message } from '../message';
 import { AccountDataManager } from '../data/accounts';
 import { AccountDocument } from '../data/accounts';
 import { CharacterDataManager } from '../data/characters';
-import { CharacterDocument } from '../data/characters';
-import { AccountManager } from '../managers/accounts';
-import { CharacterManager } from '../managers/characters';
+import AccountManager = Server.Managers.AccountManager;
+import CharacterManager = Server.Managers.CharacterManager;
+import Message = Server.Message;
 
 export class AccountsProcessor extends MessageProcessor {
-  protected processors: { [id: number]: ProcessFunction } = {};
   private accountData: AccountDataManager;
   private characterData: CharacterDataManager;
-  private accounts: AccountManager;
-  private characters: CharacterManager;
+  private accounts: Server.Managers.AccountManager;
+  private characters: Server.Managers.CharacterManager;
 
-  constructor(protected game: Odyssey.GameState) {
+  constructor(protected game: Server.GameState) {
     super(game);
     this.processors[0] = this.createAccount.bind(this);
     this.processors[1] = this.login.bind(this);
@@ -26,10 +23,6 @@ export class AccountsProcessor extends MessageProcessor {
 
     this.accounts = game.managers.accounts;
     this.characters = game.managers.characters;
-  }
-
-  async process(msg: Message): Promise<any> {
-    this.processors[msg.id](msg);
   }
 
   protected async createAccount(msg: Message) {
@@ -90,15 +83,16 @@ export class AccountsProcessor extends MessageProcessor {
     let character;
     try {
       character = await this.characters.createCharacter(msg.client.account._id, name, description, classIndex, female);
+      msg.client.character = character;
+      this.sendCharacter(msg.client, character);
     } catch (ex) {
-      throw ex;
+      // 13 tells client name is already in use
+      //TODO how do we handle other possible errors?
+      msg.client.sendMessage(13, Buffer.allocUnsafe(0));
     }
-
-    msg.client.character = character;
-    this.sendCharacter(msg.client, character);
   }
 
-  protected sendCharacter(client: Odyssey.Client, character: CharacterDocument): void {
+  protected sendCharacter(client: Server.Client, character: Odyssey.Character): void {
     let length = 15 + character.name.length + character.description.length;
     let data = Buffer.allocUnsafe(length);
     data.writeUInt8(character.class, 0);

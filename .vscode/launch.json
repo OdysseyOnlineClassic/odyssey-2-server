@@ -16,7 +16,8 @@
       "outFiles": [
         "${workspaceRoot}/bin/**/*.js"
       ],
-      "sourceMaps": true
+      "sourceMaps": true,
+      "protocol": "inspector"
     },
     {
       "type": "node",

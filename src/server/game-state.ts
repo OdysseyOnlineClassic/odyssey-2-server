@@ -17,6 +17,7 @@ import { RawProcessor } from './process/raw';
 import { AccountManager } from './managers/accounts';
 import { CharacterManager } from './managers/characters';
 import { PlayerManager } from './managers/player';
+import { ScriptManager } from './script';
 
 /**
  * IOC Container for different aspects of the Odyssey Server
@@ -24,7 +25,7 @@ import { PlayerManager } from './managers/player';
  * @export
  * @class GameState
  */
-export class GameState implements Odyssey.GameState {
+export class GameState implements Server.GameState {
   private playingProcessors: Array<MessageProcessor> = new Array<MessageProcessor>(255); //Processors for when a client is playing
   private connectingProcessors: Array<MessageProcessor> = new Array<MessageProcessor>(255); //Processors before a client is playing
   private intervalId: number;
@@ -38,11 +39,16 @@ export class GameState implements Odyssey.GameState {
   private timestamp: [number, number];
   private counter: number = 0;
 
-  readonly clients: ClientManager;
-  readonly data: Odyssey.Data;
-  readonly managers: {};
+  readonly clients: Server.Managers.ClientManager;
+  readonly data: Server.Data;
+  readonly managers: {
+    accounts: Server.Managers.AccountManager,
+    characters: Server.Managers.CharacterManager,
+    player: Server.Managers.PlayerManager
+  };
+  readonly scripts = new ScriptManager(this);
 
-  public options: Odyssey.GameOptions = {
+  public options: Server.GameOptions = {
     max: {
       attributes: 22,
       classes: 4,
@@ -88,7 +94,7 @@ export class GameState implements Odyssey.GameState {
     }
   }
 
-  constructor(readonly config: Odyssey.Config) {
+  constructor(readonly config: Server.Config) {
     this.data = new Data('data/');
     this.clients = new ClientManager(this);
 

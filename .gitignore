@@ -2,3 +2,4 @@ node_modules
 bin/
 /data/
 npm-debug.log
+*.data
