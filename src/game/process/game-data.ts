@@ -1,6 +1,6 @@
 import { MessageProcessor } from './process';
 
-import { Message } from '../message';
+import { Message } from '../../server/message';
 import { HallDataManager } from '../data/halls';
 import { MagicDataManager } from '../data/magic';
 import { MonsterDataManager } from '../data/monsters';

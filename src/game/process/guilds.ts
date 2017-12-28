@@ -1,5 +1,5 @@
 import { MessageProcessor } from './process';
-import { Message } from '../message';
+import { Message } from '../../server/message';
 
 import { GuildDataManager } from '../data/guilds';
 

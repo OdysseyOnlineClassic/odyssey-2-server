@@ -1,5 +1,5 @@
 import { MessageProcessor } from './process';
-import { Message } from '../message';
+import { Message } from '../../server/message';
 
 
 export class DebugProcessor extends MessageProcessor {
@@ -16,6 +16,6 @@ export class DebugProcessor extends MessageProcessor {
     }
 
     debug(msg: Message): void {
-        console.debug(`${msg.client.character.name}[${msg.client.getAddress()}] - ${msg.data.toString()}`)
+        console.debug(`${msg.client.character.name}[${msg.client.address}] - ${msg.data.toString()}`)
     }
 }

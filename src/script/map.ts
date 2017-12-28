@@ -1,4 +1,4 @@
-import { MapDocument } from '../server/data/maps';
+import { MapDocument } from '../game/data/maps';
 
 /**
  * Provides an object for scripts to interact with Maps

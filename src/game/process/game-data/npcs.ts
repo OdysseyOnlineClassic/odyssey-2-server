@@ -1,6 +1,6 @@
 import { MessageProcessor } from '../process';
 
-import { Message } from '../../message';
+import { Message } from '../../../server/message';
 import { NpcDataManager } from '../../data/npcs';
 import { NpcDocument } from '../../data/npcs';
 
