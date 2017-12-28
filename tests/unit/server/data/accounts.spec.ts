@@ -8,8 +8,8 @@ import * as path from 'path';
 chai.use(sinonChai);
 const expect = chai.expect;
 
-import { AccountDocument } from '../../../../src/server/data/accounts';
-import { AccountDataManager } from '../../../../src/server/data/accounts';
+import { AccountDocument } from '../../../../src/game/data/accounts';
+import { AccountDataManager } from '../../../../src/game/data/accounts';
 
 describe('AccountDataManager', () => {
   let dataFile = path.resolve(`${__dirname}/data/accounts.data`);
