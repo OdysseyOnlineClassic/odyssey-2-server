@@ -1,7 +1,6 @@
 import * as net from 'net';
 import { Client } from './client';
-import { ClassicClient } from './classic/classic-client';
-import { GameState } from '../game-state';
+import { GameState } from '../game/game-state';
 
 export enum ClientType {
   Classic,
@@ -15,14 +14,67 @@ export class ClientManager implements Server.Managers.ClientManager {
     this.clients = new Array<Client>(game.options.max.players + 1);
   }
 
-  createClient(socket: net.Socket) {
-    let index = this.getAvailablePlayerIndex();
+  /**
+   * Handles client disconnection
+   * 
+   * @param client 
+   */
+  disconnect(client) {
+    if (this.clients[client.index] !== client) {
+      // TODO Error State! Client should not have different index
+      let flag = false;
+      this.clients.forEach((value, index) => {
+        if (value === client) {
+          this.clients[index] = null;
+          flag = true;
+        }
+      });
 
-    if (index == null) {
-      //TODO Server Full
+      if (!flag) {
+        // TODO Error State! Client was not in list of clients
+      }
+    } else {
+      this.clients[client.index] = null;
+    }
+  }
+
+  /**
+   * Gets a list of all clients on the map.
+   * Index in result is not their global index
+   *
+   * @param {number} mapIndex
+   * @returns {Client[]}
+   *
+   * @memberOf ClientManager
+   */
+  getClientsByMap(mapIndex: number): Client[] {
+    let mapClients: Client[] = [];
+    for (let i = this.min; i < this.clients.length; i++) {
+      if (this.clients[i] && this.clients[i].character && this.clients[i].character.location.map == mapIndex) {
+        mapClients.push(this.clients[i]);
+      }
     }
 
-    return this.createClassicClient(index, socket);
+    return mapClients;
+  }
+
+  /**
+   * Registers the client with the game
+   * 
+   * @param client 
+   */
+  registerClient(client: Client) {
+    let index = this.getAvailablePlayerIndex();
+    if (index === null) {
+      // TODO Server Full
+    }
+
+    client.on('message', (message) => { this.game.processMessage(message); });
+    client.on('disconnect', (client) => { this.disconnect(client); })
+    client.index = index;
+    this.clients[index] = client;
+
+    return index;
   }
 
   /**
@@ -61,26 +113,6 @@ export class ClientManager implements Server.Managers.ClientManager {
     }
   }
 
-  /**
-   * Gets a list of all clients on the map.
-   * Index in result is not their global index
-   *
-   * @param {number} mapIndex
-   * @returns {Client[]}
-   *
-   * @memberOf ClientManager
-   */
-  getClientsByMap(mapIndex: number): Client[] {
-    let mapClients: Client[] = [];
-    for (let i = this.min; i < this.clients.length; i++) {
-      if (this.clients[i] && this.clients[i].character && this.clients[i].character.location.map == mapIndex) {
-        mapClients.push(this.clients[i]);
-      }
-    }
-
-    return mapClients;
-  }
-
   protected clientDisconnect(client: Client) {
     this.clients[client.index] = null;
   }
@@ -92,15 +124,5 @@ export class ClientManager implements Server.Managers.ClientManager {
       }
     }
     return null;
-  }
-
-  protected createClassicClient(index, socket) {
-    let client = new ClassicClient(index, socket);
-    client.on('message', (message) => { this.game.processMessage(message) })
-    this.clients[index] = client;
-
-    client.on('disconnect', this.clientDisconnect.bind(this));
-
-    return client;
   }
 }

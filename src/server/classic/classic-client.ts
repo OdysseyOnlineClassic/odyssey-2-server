@@ -1,9 +1,9 @@
 import * as net from 'net';
 import * as events from 'events';
 import { Client } from '../client';
-import { Message } from '../../message';
-import { AccountDocument } from '../../data/accounts';
-import { CharacterDocument } from '../../data/characters';
+import { Message } from '../message';
+import { AccountDocument } from '../../game/data/accounts';
+import { CharacterDocument } from '../../game/data/characters';
 
 /**
  * A client designed to work with the classic odyssey (vb6) client
@@ -18,7 +18,7 @@ export class ClassicClient extends Client {
   private _account: AccountDocument;
   character: CharacterDocument;
 
-  constructor(readonly index: number, readonly socket: net.Socket) {
+  constructor(readonly socket: net.Socket) {
     super();
     socket.on('data', (chunk: Buffer) => { this.onData(chunk); });
     socket.on('end', () => { this.onEnd(); });
@@ -34,6 +34,10 @@ export class ClassicClient extends Client {
     }
 
     this._account = account
+  }
+
+  get address() {
+    return this.socket.address().address;
   }
 
   protected onData(chunk: Buffer) {
@@ -67,10 +71,6 @@ export class ClassicClient extends Client {
     if (remainingData.length > 0) {
       this.readMessage(remainingData);
     }
-  }
-
-  getAddress() {
-    return this.socket.address().address;
   }
 
   sendMessage(id: number, data: Buffer) {

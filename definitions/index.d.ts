@@ -69,10 +69,10 @@ declare namespace Server {
 
     export interface ClientManager {
       readonly clients: Array<Client>;
-      createClient(socket);
+      getClientsByMap(mapIndex: number);
+      registerClient(client: Client);
       sendMessageAll(id: number, data: Buffer, ignoreIndex?: number);
       sendMessageMap(id: number, data: Buffer, mapIndex: number, ignoreIndex?: number);
-      getClientsByMap(mapIndex: number);
     }
 
     export interface PlayerManager {
@@ -88,12 +88,12 @@ declare namespace Server {
 
   export interface Client {
     account: any,
+    readonly address: string;
     character: any,
     index: number,
     playing: boolean,
     scriptContext?: any, //TODO can we define this as a context object
     sendMessage(id: number, data: Buffer);
-    getAddress();
   }
 
   export interface Data {

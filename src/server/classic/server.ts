@@ -1,9 +1,8 @@
 import * as net from 'net';
-import { Client } from './clients/client';
-import { Data } from './data/data';
-import { GameState } from './game-state';
+import { ClassicClient } from './classic-client';
+import { GameState } from '../../game/game-state';
 
-export class OdysseyServer {
+export class ClassicServer {
   private server: net.Server;
 
   constructor(private gameState: GameState) {
@@ -19,6 +18,7 @@ export class OdysseyServer {
   protected onConnection(socket: net.Socket) {
     console.log(socket.remoteAddress);
     console.log(socket.remotePort);
-    let client = this.gameState.clients.createClient(socket);
+    let client = new ClassicClient(socket);
+    this.gameState.clients.registerClient(client);
   }
 }

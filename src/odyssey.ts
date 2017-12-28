@@ -3,9 +3,9 @@
 import * as fs from "fs";
 import * as Commander from "commander";
 import * as path from 'path';
-import { OdysseyServer } from "./server/server";
+import { ClassicServer } from "./server/classic/server";
 import { AdminServer } from './server/admin/admin-server';
-import { GameState } from './server/game-state';
+import { GameState } from './game/game-state';
 
 Commander
   .option('-c, --config [config]', 'Configuration File')
@@ -26,5 +26,5 @@ try {
 config.scripts.directory = path.join(__dirname, '..', config.scripts.directory);
 
 let gameState = new GameState(config);
-let server = new OdysseyServer(gameState);
+let server = new ClassicServer(gameState);
 let adminServer = new AdminServer(gameState);
