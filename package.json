@@ -1,5 +1,5 @@
 {
-  "name": "ts-ody",
+  "name": "odyssey-online-server",
   "version": "0.0.1",
   "description": "",
   "main": "bin/odyssey.js",
