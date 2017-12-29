@@ -1,7 +1,7 @@
 const zlib = require('zlib');
 import { MessageProcessor } from '../process';
 
-import { Message } from '../../message';
+import { Message } from '../../../server/message';
 import { MapDataManager } from '../../data/maps';
 import { MapDocument } from '../../data/maps';
 

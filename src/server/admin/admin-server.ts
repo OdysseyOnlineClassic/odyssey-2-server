@@ -1,6 +1,6 @@
 import * as express from 'express';
 import * as bodyParser from 'body-parser'
-import { GameState } from '../game-state';
+import { GameState } from '../../game/game-state';
 import players from './controllers/players';
 
 export class AdminServer {

@@ -1,6 +1,6 @@
 import { AdminServer } from '../../src/server/admin/admin-server';
-import { GameState } from '../../src/server/game-state';
-import { OdysseyServer } from '../../src/server/server';
+import { GameState } from '../../src/game/game-state';
+import { ClassicServer } from '../../src/server/classic/server';
 
 const config = {
   server: {
@@ -18,5 +18,5 @@ const config = {
 }
 
 let gameState = new GameState(config);
-let server = new OdysseyServer(gameState);
+let server = new ClassicServer(gameState);
 let adminServer = new AdminServer(gameState);

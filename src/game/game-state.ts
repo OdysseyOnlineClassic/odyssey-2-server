@@ -1,6 +1,6 @@
-import { ClientManager } from './clients/client-manager';
+import { ClientManager } from '../server/client-manager';
 import { Data } from './data/data';
-import { Message } from './message';
+import { Message } from '../server/message';
 import { AccountsProcessor } from './process/accounts';
 import { ClientProcessor } from './process/clients';
 import { DebugProcessor } from './process/debug';
@@ -17,7 +17,7 @@ import { RawProcessor } from './process/raw';
 import { AccountManager } from './managers/accounts';
 import { CharacterManager } from './managers/characters';
 import { PlayerManager } from './managers/player';
-import { ScriptManager } from './script';
+import { ScriptManager } from '../script/script';
 
 /**
  * IOC Container for different aspects of the Odyssey Server
@@ -121,7 +121,7 @@ export class GameState implements Server.GameState {
   }
 
   processMessage(msg: Message) {
-    console.log(`Message ${msg.id} [${msg.data.length}] - ` + (msg.client.account ? msg.client.account.username : msg.client.getAddress().address));
+    console.log(`Message ${msg.id} [${msg.data.length}] - ` + (msg.client.account ? msg.client.account.username : msg.client.address));
     console.log(`Playing: ${msg.client.playing}`);
 
     let processors: Array<MessageProcessor>;
@@ -134,7 +134,7 @@ export class GameState implements Server.GameState {
     if (processors[msg.id]) {
       processors[msg.id].process(msg);
     } else {
-      console.error(`Unhandled Message ${msg.id} [${msg.data.length}] - ` + (msg.client.account ? msg.client.account.username : msg.client.getAddress().address))
+      console.error(`Unhandled Message ${msg.id} [${msg.data.length}] - ` + (msg.client.account ? msg.client.account.username : msg.client.address))
     }
   }
 

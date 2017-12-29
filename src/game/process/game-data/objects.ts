@@ -1,6 +1,6 @@
 import { MessageProcessor } from '../process';
 
-import { Message } from '../../message';
+import { Message } from '../../../server/message';
 import { ObjectDataManager } from '../../data/objects';
 import { ObjectDocument } from '../../data/objects';
 

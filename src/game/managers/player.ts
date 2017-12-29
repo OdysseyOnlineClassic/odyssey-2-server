@@ -2,7 +2,7 @@ import { CharacterDocument } from '../data/characters';
 import { MapDataManager } from '../data/maps';
 import { MapDocument } from '../data/maps';
 import { CharacterDataManager } from '../data/characters';
-import { RawMessage } from '../message';
+import { RawMessage } from '../../server/message';
 import { AttributeType } from '../data/maps';
 import { Direction } from '../data/maps';
 

@@ -1,6 +1,6 @@
 import { MessageProcessor } from './process';
 
-import { Message } from '../message';
+import { Message } from '../../server/message';
 import { PlayerManager } from '../managers/player';
 
 export class ClientProcessor extends MessageProcessor {

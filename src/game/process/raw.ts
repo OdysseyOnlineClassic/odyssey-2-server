@@ -1,4 +1,4 @@
-import { Message } from '../message';
+import { Message } from '../../server/message';
 import { MessageProcessor } from './process';
 import { ObjectDataManager } from '../data/objects';
 
