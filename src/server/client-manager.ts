@@ -1,13 +1,14 @@
 import * as net from 'net';
 import { Client } from './client';
 import { GameState } from '../game/game-state';
+import { Message } from '@odyssey/shared';
 
 export enum ClientType {
   Classic,
   WebAdmin
 }
 
-export class ClientManager implements Server.Managers.ClientManager {
+export class ClientManager {
   public readonly clients: Array<Client>;
   private min = 1;
   constructor(private game: GameState) {
@@ -16,8 +17,8 @@ export class ClientManager implements Server.Managers.ClientManager {
 
   /**
    * Handles client disconnection
-   * 
-   * @param client 
+   *
+   * @param client
    */
   disconnect(client) {
     if (this.clients[client.index] !== client) {
@@ -60,8 +61,8 @@ export class ClientManager implements Server.Managers.ClientManager {
 
   /**
    * Registers the client with the game
-   * 
-   * @param client 
+   *
+   * @param client
    */
   registerClient(client: Client) {
     let index = this.getAvailablePlayerIndex();
@@ -69,7 +70,7 @@ export class ClientManager implements Server.Managers.ClientManager {
       // TODO Server Full
     }
 
-    client.on('message', (message) => { this.game.processMessage(message); });
+    client.on('message', (message) => { this.game.processMessage(message, client); });
     client.on('disconnect', (client) => { this.disconnect(client); })
     client.index = index;
     this.clients[index] = client;
@@ -86,10 +87,10 @@ export class ClientManager implements Server.Managers.ClientManager {
    *
    * @memberOf ClientManager
    */
-  sendMessageAll(id: number, data: Buffer, ignoreIndex?: number) {
+  sendMessageAll(msg: Message, ignoreIndex?: number) {
     for (let i = this.min; i < this.clients.length; i++) {
       if (i != ignoreIndex && this.clients[i] && this.clients[i].playing) {
-        this.clients[i].sendMessage(id, data);
+        this.clients[i].sendMessage(msg);
       }
     }
   }
@@ -104,11 +105,11 @@ export class ClientManager implements Server.Managers.ClientManager {
    *
    * @memberOf ClientManager
    */
-  sendMessageMap(id: number, data: Buffer, mapIndex: number, ignoreIndex?: number) {
+  sendMessageMap(msg: Message, mapIndex: number, ignoreIndex?: number) {
     let clients = this.getClientsByMap(mapIndex);
     for (let i = 0; i < clients.length; i++) {
       if (clients[i].index != ignoreIndex) {
-        clients[i].sendMessage(id, data);
+        clients[i].sendMessage(msg);
       }
     }
   }

@@ -1,9 +1,8 @@
-
-import GameState = Server.GameState;
 import { Player } from '../script/player';
 import * as vm from 'vm';
 import * as fs from 'fs';
 import * as path from 'path';
+import { GameState } from '../game/game-state';
 
 export enum Scripts {
   JoinMap = 'JoinMap'
