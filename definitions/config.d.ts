@@ -1,13 +1,19 @@
 declare namespace Server {
   export interface Config {
+    game: {
+      accounts: {
+        file: string,
+      }
+    },
     server: {
-      port: number,
       adminPort: number,
+      dataFolder: string,
+      interval: number,
       log: {
         level: string,
         file: string
       },
-      interval: number
+      port: number
     },
     scripts: {
       directory: string
