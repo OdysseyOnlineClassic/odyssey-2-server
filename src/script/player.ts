@@ -7,9 +7,9 @@
 export class Player {
   protected account;
   protected character: Odyssey.Character;
-  protected players: Server.Managers.PlayerManager;
+  protected players;
 
-  constructor(protected gameState: Server.GameState, protected client: Server.Client) {
+  constructor(protected gameState, protected client: Server.Client) {
     this.account = client.account;
     this.character = client.character;
 

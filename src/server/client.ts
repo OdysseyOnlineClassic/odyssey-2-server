@@ -28,8 +28,9 @@ export class SocketClient extends Client {
 
   constructor(protected socket: net.Socket) {
     super();
-    socket.on('data', (chunk: Buffer) => { this.onData(chunk); });
-    socket.on('end', () => { this.onEnd(); });
+    socket.on('data', this.onData.bind(this));
+    socket.on('end', this.onEnd.bind(this));
+    socket.on('error', this.onError.bind(this));
   }
 
   get address() {
@@ -54,6 +55,7 @@ export class SocketClient extends Client {
 
   protected onData(data: Buffer) {
     let remainingData: Buffer;
+    console.log('data');
 
     if (!this.msg) {
       if (data.length < 4) {
@@ -66,7 +68,7 @@ export class SocketClient extends Client {
       let system: Enums.Systems = data.readUInt8(2);
       let msgId = data.readUInt8(3);
       this.msg = new Message(system, msgId, length);
-      remainingData = this.msg.append(data.slice(5));
+      remainingData = this.msg.append(data.slice(4));
     }
     else {
       remainingData = this.msg.append(data);
@@ -85,5 +87,9 @@ export class SocketClient extends Client {
   protected onEnd() {
     console.log('end');
     this.emit('disconnect', this);
+  }
+
+  protected onError(err, address, family, host) {
+    console.log(err);
   }
 }

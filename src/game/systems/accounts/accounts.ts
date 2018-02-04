@@ -36,6 +36,7 @@ export class Accounts extends System {
 
   protected async login(msg: Message, client: Client) {
     const [username, password] = this.splitLogin(msg.data);
+    console.log(username);
     const account = await this.data.getAccount(username);
     if (!(account && bcrypt.compare(password, account.password))) {
 

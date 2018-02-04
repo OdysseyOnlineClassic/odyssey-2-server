@@ -7,7 +7,7 @@ import { MapDocument } from '../game/data/maps';
  * @class Map
  */
 export class Map {
-  constructor(protected gameState: Server.GameState, protected map: MapDocument) {
+  constructor(protected gameState, protected map: MapDocument) {
   }
 
   get name(): string {

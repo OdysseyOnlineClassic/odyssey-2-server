@@ -149,20 +149,6 @@ declare namespace Server {
     }
   }
 
-  export interface GameState {
-    readonly clients: Managers.ClientManager;
-    readonly config: Server.GameOptions;
-    readonly data: Data;
-    readonly managers: {
-      accounts: Managers.AccountManager,
-      characters: Managers.CharacterManager,
-      player: Managers.PlayerManager
-    };
-    readonly scripts: any;
-    processMessage(msg: any); //TODO improve this or move it into Odyssey Shared?
-    options: GameOptions;
-  }
-
   export interface ProcessFunction {
     (msg: any): void; //TODO improve this or move it into Odyssey Shared?
   }
@@ -170,6 +156,6 @@ declare namespace Server {
 
 declare namespace Express {
   export interface Request {
-    gameState: Server.GameState;
+    gameState: any;
   }
 }

@@ -7,7 +7,7 @@ import { Player } from './player';
  * @class Game
  */
 export class Game {
-  constructor(protected gameState: Server.GameState) {
+  constructor(protected gameState) {
   }
 
   findPlayer(name: string): Player {
