@@ -1,106 +1,72 @@
 import * as net from 'net';
 import * as events from 'events';
-import { Client } from '../client';
-import { Message } from '../message';
+import { Message } from '@odyssey/shared';
 import { AccountDocument } from '../../game/data/accounts';
 import { CharacterDocument } from '../../game/data/characters';
+import { Client, SocketClient } from '../client';
 
 /**
  * A client designed to work with the classic odyssey (vb6) client
  *
  * @class ClassicClient
- * @extends {Client}
+ * @extends {ClientInterface}
  */
-export class ClassicClient extends Client {
-  playing: boolean = false;
-  private msg: Message = null;
+export class ClassicClient extends SocketClient {
   private packetOrder: number = 0;
-  private _account: AccountDocument;
-  character: CharacterDocument;
 
-  constructor(readonly socket: net.Socket) {
-    super();
-    socket.on('data', (chunk: Buffer) => { this.onData(chunk); });
-    socket.on('end', () => { this.onEnd(); });
-  }
+  // protected onData(data: Buffer) {
+  // TODO need to handle classic data
+  //   let remainingData: Buffer;
 
-  get account() {
-    return this._account;
-  }
+  //   if (!this.msg) {
+  //     if (data.length < 5) {
+  //       console.log('Need to cache not enough data');
+  //       //Need to cache this data
+  //       return;
+  //     }
 
-  set account(account: AccountDocument) {
-    if (this._account) {
-      throw new Error('Client has already been assigned an account.');
-    }
+  //     let length = data.readUInt16BE(0) - 1; //We're not including the Packet ID
+  //     let msgId = data.readUInt8(4);
+  //     this.msg = new Message(msgId, length, this);
+  //     remainingData = this.msg.append(data.slice(5));
+  //   }
+  //   else {
+  //     remainingData = this.msg.append(data);
+  //   }
 
-    this._account = account
-  }
+  //   if (this.msg.isComplete()) {
+  //     this.emit('message', this.msg);
+  //     this.msg = null;
+  //   }
 
-  get address() {
-    return this.socket.address().address;
-  }
+  //   if (remainingData.length > 0) {
+  //     this.onData(remainingData);
+  //   }
+  // }
 
-  protected onData(chunk: Buffer) {
-    this.readMessage(chunk);
-  }
+  // sendMessage(id: number, data: Buffer) {
+  //   let length: number = data.length + 1;
+  //   let buffer: Buffer = Buffer.allocUnsafe(length + 4);
+  //   let checksum: number = id;
+  //   let len = data.length;
 
-  protected readMessage(data: Buffer) {
-    let remainingData: Buffer;
+  //   for (let i = 0; i < len; i++) {
+  //     checksum += data.readUInt8(i);
+  //   }
 
-    if (!this.msg) {
-      if (data.length < 5) {
-        console.log('Need to cache not enough data');
-        //Need to cache this data
-        return;
-      }
+  //   checksum = checksum * 20 % 194;
 
-      let length = data.readUInt16BE(0) - 1; //We're not including the Packet ID
-      let msgId = data.readUInt8(4);
-      this.msg = new Message(msgId, length, this);
-      remainingData = this.msg.append(data.slice(5));
-    }
-    else {
-      remainingData = this.msg.append(data);
-    }
+  //   buffer.writeUInt16BE(length, 0);
+  //   buffer.writeUInt8(checksum, 2);
+  //   buffer.writeUInt8(this.packetOrder, 3);
+  //   buffer.writeUInt8(id, 4);
+  //   data.copy(buffer, 5, 0);
 
-    if (this.msg.isComplete()) {
-      this.emit('message', this.msg);
-      this.msg = null;
-    }
+  //   this.packetOrder++;
+  //   if (this.packetOrder > 200) {
+  //     this.packetOrder = 0;
+  //   }
 
-    if (remainingData.length > 0) {
-      this.readMessage(remainingData);
-    }
-  }
-
-  sendMessage(id: number, data: Buffer) {
-    let length: number = data.length + 1;
-    let buffer: Buffer = Buffer.allocUnsafe(length + 4);
-    let checksum: number = id;
-    let len = data.length;
-
-    for (let i = 0; i < len; i++) {
-      checksum += data.readUInt8(i);
-    }
-
-    checksum = checksum * 20 % 194;
-
-    buffer.writeUInt16BE(length, 0);
-    buffer.writeUInt8(checksum, 2);
-    buffer.writeUInt8(this.packetOrder, 3);
-    buffer.writeUInt8(id, 4);
-    data.copy(buffer, 5, 0);
-
-    this.packetOrder++;
-    if (this.packetOrder > 200) {
-      this.packetOrder = 0;
-    }
-
-    this.socket.write(buffer);
-  }
-
-  protected onEnd() {
-    console.log('end');
-    this.emit('disconnect', this);
-  }
+  //   this.socket.write(buffer);
+  // }
 }

@@ -1,3 +1,5 @@
+/// <reference types="node" />
+
 declare namespace Odyssey {
   export interface Account {
     username: string;
@@ -57,16 +59,6 @@ declare namespace Odyssey {
  */
 declare namespace Server {
   namespace Managers {
-    export interface AccountManager {
-      createAccount(username: string, password: string): Promise<Odyssey.Account>;
-      login(username: string, password: string): Promise<Odyssey.Account>;
-    }
-
-    export interface CharacterManager {
-      createCharacter(accountId: string, name: string, descript: string, classIndex: number, female: boolean);
-      getCharacter(accountId: string): Promise<Odyssey.Character>;
-    }
-
     export interface ClientManager {
       readonly clients: Array<Client>;
       getClientsByMap(mapIndex: number);
@@ -74,31 +66,16 @@ declare namespace Server {
       sendMessageAll(id: number, data: Buffer, ignoreIndex?: number);
       sendMessageMap(id: number, data: Buffer, mapIndex: number, ignoreIndex?: number);
     }
-
-    export interface PlayerManager {
-      exitMap(client: Server.Client, exit: number);
-      joinGame(client: Server.Client);
-      joinMap(client: Server.Client);
-      move(client: Server.Client, location: Odyssey.Location, walkStep: number);
-      partMap(client: Server.Client);
-      updateName(client: Server.Client);
-      warp(client: Server.Client, location: Odyssey.Location);
-    }
   }
 
-  export interface Client {
+  export interface Client extends NodeJS.EventEmitter {
     account: any,
     readonly address: string;
     character: any,
     index: number,
     playing: boolean,
     scriptContext?: any, //TODO can we define this as a context object
-    sendMessage(id: number, data: Buffer);
-  }
-
-  export interface Data {
-    readonly managers: any;
-    readonly dataFolder: string;
+    sendMessage(message: any); //TODO improve this or move it into Odyssey Shared?
   }
 
   export interface DataDocument {
@@ -172,38 +149,13 @@ declare namespace Server {
     }
   }
 
-  export interface GameState {
-    readonly clients: Managers.ClientManager;
-    readonly config: Server.Config;
-    readonly data: Data;
-    readonly managers: {
-      accounts: Managers.AccountManager,
-      characters: Managers.CharacterManager,
-      player: Managers.PlayerManager
-    };
-    readonly scripts: any;
-    processMessage(msg: Message);
-    options: GameOptions;
-  }
-
-  export interface Message {
-    id: number,
-    client: Client,
-    data: Buffer,
-    length: number,
-    timestamp: number,
-    append(appendData: Buffer),
-    isComplete(): boolean,
-    send(),
-  }
-
   export interface ProcessFunction {
-    (msg: Server.Message): void;
+    (msg: any): void; //TODO improve this or move it into Odyssey Shared?
   }
 }
 
 declare namespace Express {
   export interface Request {
-    gameState: Server.GameState;
+    gameState: any;
   }
 }
