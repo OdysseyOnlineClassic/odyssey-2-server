@@ -37,7 +37,7 @@ export class AccountData {
           return;
         }
 
-        resolve(Data.applyProxy(new ConcreteAccount(this.data, account._id, account.username, account.password, account.access, account.email));
+        resolve(Data.applyProxy(new ConcreteAccount(this.data, account._id, account.username, account.password, account.access, account.email)));
       });
     });
   }
