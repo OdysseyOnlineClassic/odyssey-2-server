@@ -1,7 +1,6 @@
 import * as net from 'net';
 import * as events from 'events';
 import { Message } from '@odyssey/shared';
-import { AccountDocument } from '../../game/data/accounts';
 import { CharacterDocument } from '../../game/data/characters';
 import { Client, SocketClient } from '../client';
 

@@ -13,6 +13,7 @@ export class AccountData {
     }
     this.data = new NeDB(options);
 
+    // username is required and cannot be null
     this.data.ensureIndex({
       fieldName: 'username',
       unique: true,
@@ -36,13 +37,22 @@ export class AccountData {
           return;
         }
 
-
+        resolve(Data.applyProxy(new ConcreteAccount(this.data, account._id, account.username, account.password, account.access, account.email));
       });
     });
   }
 
-  public getAccount(username: string): Promise<Account> {
-    return;
+  public async getAccount(username: string): Promise<Account> {
+    return new Promise<Account>((resolve, reject) => {
+      this.data.findOne({ username: username }, (err, account) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        resolve(Data.applyProxy(account));
+      });
+    });
   }
 }
 

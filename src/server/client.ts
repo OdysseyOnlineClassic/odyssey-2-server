@@ -2,7 +2,7 @@ import * as net from 'net';
 import * as events from 'events';
 import { Enums } from '@odyssey/shared';
 import { Message } from '@odyssey/shared';
-import { AccountDocument } from '../game/data/accounts';
+import { Account } from '../game/systems/accounts/account-data';
 import { CharacterDocument } from '../game/data/characters';
 import { EventEmitter } from 'events';
 
@@ -10,7 +10,7 @@ import { EventEmitter } from 'events';
  * Base client class
  */
 export abstract class Client extends EventEmitter {
-  public account: AccountDocument;
+  public account: Account;
   public character: CharacterDocument;
   public index: number;
   public playing: boolean = false;

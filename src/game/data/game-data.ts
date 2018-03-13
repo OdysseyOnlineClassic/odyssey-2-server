@@ -104,6 +104,10 @@ export function data(target: any) {
 }
 
 export function applyProxy(obj: any, ignore: [string] = ['data']) {
+  if (!obj) {
+    return null;
+  }
+
   Object.keys(obj).forEach((key) => {
     let ignored = (ignore.findIndex(value => value == key) > -1);
     if (obj[key] instanceof Object && !ignored) {
