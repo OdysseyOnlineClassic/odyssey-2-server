@@ -6,6 +6,7 @@ import * as path from 'path';
 import { ClassicServer } from "./server/classic/server";
 import { AdminServer } from './server/admin/admin-server';
 import { GameState } from './game/game-state';
+import { WSServer } from "./server/web-socket/server";
 
 Commander
   .option('-c, --config [config]', 'Configuration File')
@@ -27,4 +28,5 @@ config.scripts.directory = path.join(__dirname, '..', config.scripts.directory);
 
 let gameState = new GameState(config);
 let server = new ClassicServer(gameState);
+let wsServer = new WSServer(gameState, 5001);
 let adminServer = new AdminServer(gameState);

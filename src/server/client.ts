@@ -16,8 +16,11 @@ export abstract class Client extends EventEmitter {
   public playing: boolean = false;
   public readonly address: string;
 
-  public abstract sendMessage(msg: Message);
   public abstract send(system: Enums.Systems, id: number, data: Buffer);
+
+  public sendMessage(msg: Message) {
+    return this.send(msg.system, msg.id, msg.data);
+  }
 }
 
 /**
@@ -35,10 +38,6 @@ export class SocketClient extends Client {
 
   get address() {
     return this.socket.address().address;
-  }
-
-  public sendMessage(msg: Message) {
-    return this.send(msg.system, msg.id, msg.data);
   }
 
   public send(system, id, data) {
